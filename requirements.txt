@@ -1,0 +1,14 @@
+langchain
+langchain-core
+langchain-community
+langchain-classic
+langchain-huggingface
+langchain-groq
+langgraph
+python-dotenv
+langchain_anthropic
+langchain_openai
+uvicorn[standard]
+aiosqlite
+deepagents
+portkey_ai 
