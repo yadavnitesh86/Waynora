@@ -20,16 +20,18 @@ register_harness_profile(
         )
     ),
 )
-agent = create_deep_agent(
-        model=get_llm("heavy"),
-        system_prompt=SYSTEM_PROMPT,
-        middleware=middleware,
-        checkpointer=InMemorySaver()
-    )
+async def build_agent(checkpointer):
+    return create_deep_agent(
+            model=get_llm("heavy"),
+            system_prompt=SYSTEM_PROMPT,
+            middleware=middleware,
+            checkpointer=checkpointer
+        )
 
 async def ask(question:str):
   
     config = {"configurable": {"thread_id":"yadavnitesh86"}}
+    agent = await build_agent()
 
     # Run the agent
     result = await agent.ainvoke(

@@ -37,7 +37,7 @@ def get_llm(model_type: str) -> ChatOpenAI:
     return ChatOpenAI(
         # Portkey Config determines the actual model.
         # This value is not your real provider model.
-        model="step-3.7-flash",
+        model="default",
 
         # Authentication is handled by Portkey.
         api_key="dummy",
