@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import asyncio
 from langchain.agents import create_agent
 from app.portkey.llm import get_llm
+from langchain.agents.middleware import ToolCallLimitMiddleware
 
 load_dotenv()
 from app.agents.sub_agent.Destination_subagent.schema import DestinationResearchResult
@@ -11,27 +12,32 @@ from app.agents.sub_agent.Destination_subagent.schema import DestinationResearch
 tavilyapi = os.getenv("TAVILY_API")
 
 
-SYSTEM_PROMPT = """You are Waynora's Destination Research Specialist. Research the requested destination and return a `DestinationResearchResult` for the main Travel Agent.
+SYSTEM_PROMPT = """
+You are Waynora's Destination Research Specialist. Research the requested destination and finish by calling `DestinationResearchResult` for the main Travel Agent.
 
 ## Tools
-- OpenStreetMap is for all place/geographic data: `openstreetmap_search_places` for named places, `openstreetmap_query_nearby` for nearby POIs.
-- Tavily is for web info: `tavily_search` for general research, `tavily_extract` only when a specific URL needs detailed reading. Tavily never replaces OpenStreetMap place data; use both when appropriate.
-- Use the minimum number of tool calls needed. Never repeat a search for information already obtained. Cross-check important facts when practical.
+- OpenStreetMap is for place data. `openstreetmap_search_places` for named places (returns coordinates). `openstreetmap_query_nearby` for nearby POIs: use lat/lon from search_places, `tag_key` "tourism" or "historic", radius up to 3000, limit up to 10.
+- Tavily is for web info. `tavily_search` (max_results 3) for general research; `tavily_extract` for at most one specific official URL. Tavily never replaces OpenStreetMap place data; use both.
+- Prefer official tourism, government, and attraction sources.
+
+## Tool budget (max 6 calls: 2 OpenStreetMap, 3 tavily_search, 1 tavily_extract)
+- Call independent tools in parallel in one step.
+- One search per topic. Never repeat a search. If a price or duration is not found, leave it null; do not search again for it.
+- If a call is blocked or the budget is used, stop and call `DestinationResearchResult` with what you have.
 
 ## Rules
-- Facts, prices, and durations must come from tool results. Never invent them.
-- Prefer official tourism, government, and attraction sources.
-- Tailor everything to the user's preferences. Skip redundant or low-value info.
-- Do not create the itinerary, book anything, or handle hotels, flights, or final budget.
+- Facts, prices, and durations come only from tool results. Never invent them. Not found means null.
+- `basis` is "sourced" if a tool result states the value, "estimated" only if inferred from one.
+- Copy latitude/longitude only from OpenStreetMap results, otherwise null. No extra calls for coordinates.
+- Each item's `area` must be one of the returned area names.
+- List only sources that tools returned.
+- Tailor to the user's preferences. Skip redundant or low-value info. Keep it concise.
+- Do not create itineraries, bookings, hotels, flights, or budgets; ignore those parts of the request.
 
-## Output
-Return only `DestinationResearchResult`: destination, summary, areas, attractions and activities (each with category, description, duration, cost, suitability), practical notes, sources. Use the `Cost`, `Duration`, and `Source` models consistently. Keep it concise and useful to the Travel Agent.
-
-## Research Limits (maximum)
-Areas: 5 | Attractions: 8 | Activities: 5 | Practical notes: 3 | Sources: 5
-Prioritize the most relevant information based on the user's preferences.
-Avoid redundant or low-value information.
+## Limits (max)
+Areas 5 | Attractions 5 | Activities 5 | Practical notes 3 | Sources 5
 """
+
 
 
 async def get_mcp_tools():
@@ -68,40 +74,28 @@ async def get_mcp_tools():
             "openstreetmap_query_nearby",
         ]
     ]
-    for tool in selected_tools:
-        print(tool.name)
-        print(tool.description)
-        print()
-    return tools
+    # for tool in selected_tools:
+    #     print(tool.name)
+    #     print(tool.description)
+    #     print()
+    return selected_tools
 
 
 async def destination_initiation():
-    llm = get_llm("heavy")
+    llm = get_llm("lite")
     mcp_tools = await get_mcp_tools()
     return create_agent(
         model=llm,
         tools=mcp_tools,
         system_prompt=SYSTEM_PROMPT,
         response_format=DestinationResearchResult,
+        middleware=[
+            ToolCallLimitMiddleware(run_limit=8, exit_behavior="continue")
+        ]
     )
 
 
 async def destination_subagent(Instruction: str):
-    """Use this agent when destination-specific research is needed.
-
-    Provide:
-    - destination
-    - travel dates/season if known
-    - trip duration if relevant
-    - traveler type
-    - interests/preferences
-    - the specific information you need researched
-
-    Ask it to research relevant areas, attractions, activities, and destination-specific
-    constraints that may affect itinerary planning.
-
-    Do not delegate full trip planning, itinerary creation, flights, hotels,
-    transportation planning, or final budget calculations to this agent."""
 
     agent = await destination_initiation()
     result = await agent.ainvoke(
@@ -112,5 +106,5 @@ async def destination_subagent(Instruction: str):
 
 if __name__ == "__main__":
     asyncio.run(
-        destination_subagent("Research Jaipur for a 3-day family trip with kids.   ")
+        destination_subagent("Research Jaipur for a family trip with young kids. We like history and food, no nightlife. Cover Hawa Mahal and what is around it, plus everything else worth seeing, with exact ticket prices and visit durations. Also suggest hotels and a day-by-day plan with a total budget. ")
     )
