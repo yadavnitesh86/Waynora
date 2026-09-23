@@ -7,6 +7,7 @@ import asyncio
 from langchain.agents import create_agent
 from app.portkey.llm import get_llm
 from langchain.agents.middleware import ToolCallLimitMiddleware
+from deepagents import CompiledSubAgent
 
 SYSTEM_PROMPT = """
 You are Waynora's Transport Research Specialist. Research transport options
@@ -84,12 +85,10 @@ async def get_mcp_tools():
         print(tool.name)
         print(tool.description)
 
-
-
     return selected_tools
 
 
-async def Transport_initiation():
+async def create_transport_agent():
     llm = get_llm("lite")
     mcp_tools = await get_mcp_tools()
     return create_agent(
@@ -100,18 +99,35 @@ async def Transport_initiation():
     )
 
 
-async def destination_subagent(Instruction: str):
-    agent = await Transport_initiation()
-    result = await agent.ainvoke(
-        {"messages": [{"role": "user", "content": Instruction}]}
+async def create_transport_subagent():
+    transport_agent = await create_transport_agent()
+
+    return CompiledSubAgent(
+        name="transport_research",
+        description=(
+            "Research current transportation options for a route: flights, Indian trains, "
+            "and driving/walking. Use for prices, schedules, availability, routes, duration, "
+            "and transport constraints. Returns up to 5 factual options; does not build "
+            "itineraries or make final transport decisions."
+        ),
+        runnable=transport_agent,
     )
-    print(result["messages"][-1].content)
 
 
-if __name__ == "__main__":
-    asyncio.run(
-        destination_subagent(
-            "Find me cheapest way to tavel from ahmedabad to Jaipur . Give all travel options result for date 8 nov 2026 "
-        )
-    )
-    
+
+# Bellow code is for Testing while developing the sub agent 
+
+# async def transport_subagent(Instruction: str):
+#     agent = await create_transport_agent()
+#     result = await agent.ainvoke(
+#         {"messages": [{"role": "user", "content": Instruction}]}
+#     )
+#     print(result["messages"][-1].content)
+
+
+# if __name__ == "__main__":
+#     asyncio.run(
+#         transport_subagent(
+#             "Find me cheapest way to tavel from ahmedabad to Jaipur . Give all travel options result for date 8 nov 2026 "
+#         )
+#     )

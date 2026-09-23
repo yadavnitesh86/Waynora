@@ -8,6 +8,7 @@ from langchain.agents.middleware import ToolCallLimitMiddleware
 
 load_dotenv()
 from app.agents.sub_agent.Destination_subagent.schema import DestinationResearchResult
+from deepagents import CompiledSubAgent
 
 tavilyapi = os.getenv("TAVILY_API")
 
@@ -119,19 +120,37 @@ async def destination_initiation():
         ],
     )
 
+async def create_Destination_subagent():
+    destination_agent = await destination_initiation()
 
-async def destination_subagent(Instruction: str):
-
-    agent = await destination_initiation()
-    result = await agent.ainvoke(
-        {"messages": [{"role": "user", "content": Instruction}]}
+    return CompiledSubAgent(
+        name="destination_research",
+        description=(
+            """Researches destinations and provides concise, factual information about
+            attractions, activities, neighborhoods, local experiences, and destination
+            highlights. Delegate when destination discovery, sightseeing, or activity
+            research is needed. Tailors results to the user's interests, dates, and
+            constraints without inventing facts."""
+        ),
+        runnable=destination_agent,
     )
-    print(result["messages"][-1].content)
 
 
-if __name__ == "__main__":
-    asyncio.run(
-        destination_subagent(
-            "give me areas and attractions to  visit and activities do in Dwarka  India   "
-        )
-    )
+
+# Bellow code is for Testing while developing the sub agent 
+
+# async def destination_subagent(Instruction: str):
+
+#     agent = await destination_initiation()
+#     result = await agent.ainvoke(
+#         {"messages": [{"role": "user", "content": Instruction}]}
+#     )
+#     print(result["messages"][-1].content)
+
+
+# if __name__ == "__main__":
+#     asyncio.run(
+#         destination_subagent(
+#             "give me areas and attractions to  visit and activities do in Dwarka  India   "
+#         )
+#     )
