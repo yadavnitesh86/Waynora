@@ -1,5 +1,6 @@
 from app.agents.sub_agent.Transport_subagent.schema import TransportResearchResult
 from langchain_mcp_adapters.client import MultiServerMCPClient
+import sys
 import os
 from dotenv import load_dotenv
 import asyncio
@@ -7,38 +8,36 @@ from langchain.agents import create_agent
 from app.portkey.llm import get_llm
 from langchain.agents.middleware import ToolCallLimitMiddleware
 
-
 SYSTEM_PROMPT = """
 You are Waynora's Transport Research Specialist. Research transport options
-(origin, destination, dates, passengers, constraints) then call
-`TransportResearchResult` for the main Travel Agent.
+(origin, destination, dates, passengers, constraints) - You MUST end every response by calling `TransportResearchResult`. 
+  Never respond with plain text/markdown as your final answer.
 
-SCOPE: Flights (domestic/intl). Ground: driving/walking via Google Maps.
+SCOPE: Flights (domestic/intl), Trains (India), Ground (driving/walking via Google Maps).
 
 TOOLS
 - search_flights: specific route+dates
 - search_calendar: flexible dates, cheaper/better options
-- get_reference_data: ONLY to resolve ambiguous airport/city/airline/country info
-- discover_flights: flexible inspiration, alt airports, deals, discovery — NOT exact-route searches
-- compute_routes: driving/walking distance+duration (needs both origin & destination, most specific location available)
+- discover_flights: flexible inspiration, alt airports, deals — NOT exact-route searches
+- get_reference_data: resolve ambiguous airport/city/airline/country/station info only
+- compute_routes: driving/walking distance+duration, needs specific origin+destination
+- search_trains_between_stations: needs from_station/to_station as CODES (e.g. NDLS, ADI) — resolve via get_reference_data if given as city/station name. Optional date (YYYY-MM-DD) filters to trains running that weekday.
+- search_flights: always pass top_n=5 (or equivalent) to limit results at the source.
 
 RULES
-- Explicit mode requested → return only that mode. Else mix flights+ground as useful.
-- Max 5 options.
-- Minimum necessary tool calls; one targeted call > repeated/exploratory calls. Never skip a stated requirement to save calls.
-- Respect all constraints: dates, budget, passengers, locations, cabin, stops, timing, etc.
-- Never invent prices, schedules, availability, durations, airlines, routes, providers.
-- Non-essential unavailable value → null. Genuinely ambiguous required info → ask, don't guess.
-- get_reference_data/search_calendar/discover_flights: use only when they add real value, not routinely.
-- No tools outside your domain. No itinerary-building or final decisions.
-- Final result: concise, directly useful to main Travel Agent.
+- Explicit mode requested → only that mode; else mix flights+trains+ground as useful. Max 5 options.
+- Minimum necessary tool calls; one targeted call > exploratory ones. Never skip a stated requirement to save calls.
+- Respect all constraints (dates, budget, passengers, locations, cabin, stops, timing).
+- Never invent prices, schedules, availability, durations, airlines, routes, providers, train numbers.
+- Non-essential unavailable value → null. Ambiguous required info → ask, don't guess.
+- get_reference_data/search_calendar/discover_flights → use only when they add real value.
+- No tools outside domain. No itinerary-building or final decisions. Keep result concise.
 
-FLIGHT TOOLS USE RULES
-- Dates: use `dd/mm/yyyy`; prefer user-provided dates, otherwise use current/latest date when appropriate.
-- Round trip: `returnDate` must be strictly after `departureDate`; omit it for one-way unless required.
-- Validate dates before `search_flights`; correct invalid parameters before retrying and never repeat the same failed call.
+DATES
+- Flights: dd/mm/yyyy. Trains: YYYY-MM-DD. Prefer user dates, else current date.
+- Round trip: returnDate strictly after departureDate; omit for one-way unless required.
+- Validate before calling; fix and retry once, never repeat a failed call unchanged.
 """
-
 
 load_dotenv()
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
@@ -48,6 +47,7 @@ TRANSPORT_TOOLS = [
     "get_reference_data",
     "discover_flights",
     "compute_routes",
+    "search_trains_between_stations",
 ]
 
 
@@ -58,6 +58,14 @@ async def get_mcp_tools():
                 "transport": "stdio",
                 "command": "npx",
                 "args": ["-y", "mcp-remote", "https://flights.fctolabs.com/mcp"],
+            },
+            "RailRadar-Train-Search": {
+                "transport": "stdio",
+                "command": sys.executable,
+                "args": [
+                    "-m",
+                    "app.agents.sub_agent.Transport_subagent.server",
+                ],
             },
             "google_maps": {
                 "transport": "streamable_http",
@@ -71,9 +79,13 @@ async def get_mcp_tools():
         }
     )
     tools = await client.get_tools()
-    # selected_tools = [tool for tool in tools if tool.name in TRANSPORT_TOOLS]
     selected_tools = [tool for tool in tools if tool.name in TRANSPORT_TOOLS]
-    
+    for tool in selected_tools:
+        print(tool.name)
+        print(tool.description)
+
+
+
     return selected_tools
 
 
@@ -99,6 +111,7 @@ async def destination_subagent(Instruction: str):
 if __name__ == "__main__":
     asyncio.run(
         destination_subagent(
-            "Find me cheapest way to go Delhi to Mumbai which option is best flight or car on date 2026-10-1"
+            "Find me cheapest way to tavel from ahmedabad to Jaipur . Give all travel options result for date 8 nov 2026 "
         )
     )
+    
