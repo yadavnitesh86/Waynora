@@ -21,6 +21,7 @@ dependencies = [
     "portkey-ai>=2.3.4",
     "python-dotenv>=1.2.3",
     "rail",
+    "stays>=0.1.1",
     "uvicorn[standard]>=0.53.0",
 ]
 

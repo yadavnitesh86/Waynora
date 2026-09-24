@@ -2759,15 +2759,15 @@ wheels = [
 
 [[package]]
 name = "rich"
-version = "15.0.0"
+version = "14.3.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "markdown-it-py" },
     { name = "pygments" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/c0/8f/0722ca900cc807c13a6a0c696dacf35430f72e0ec571c4275d2371fca3e9/rich-15.0.0.tar.gz", hash = "sha256:edd07a4824c6b40189fb7ac9bc4c52536e9780fbbfbddf6f1e2502c31b068c36", size = 230680, upload-time = "2026-04-12T08:24:00.75Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/e9/67/cae617f1351490c25a4b8ac3b8b63a4dda609295d8222bad12242dfdc629/rich-14.3.4.tar.gz", hash = "sha256:817e02727f2b25b40ef56f5aa2217f400c8489f79ca8f46ea2b70dd5e14558a9", size = 230524, upload-time = "2026-04-11T02:57:45.419Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/82/3b/64d4899d73f91ba49a8c18a8ff3f0ea8f1c1d75481760df8c68ef5235bf5/rich-15.0.0-py3-none-any.whl", hash = "sha256:33bd4ef74232fb73fe9279a257718407f169c09b78a87ad3d296f548e27de0bb", size = 310654, upload-time = "2026-04-12T08:24:02.83Z" },
+    { url = "https://files.pythonhosted.org/packages/b3/76/6d163cfac87b632216f71879e6b2cf17163f773ff59c00b5ff4900a80fa3/rich-14.3.4-py3-none-any.whl", hash = "sha256:07e7adb4690f68864777b1450859253bed81a99a31ac321ac1817b2313558952", size = 310480, upload-time = "2026-04-11T02:57:47.484Z" },
 ]
 
 [[package]]
@@ -2975,6 +2975,27 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/b5/b4/205b0d5241d934e8add0c38aa924c4f9fb7330834ff11e5444db964ec3f9/starlette-1.6.0.tar.gz", hash = "sha256:d4e3ac5e546444960c710297a3c9fc3f7ebae1b7e963f3d36173b49da535be9b", size = 2716969, upload-time = "2026-08-08T18:27:57.512Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c8/cb/6a6a47d5b464bd08695d254f3da6e7986cc70c9fa5d778eda57538edfe56/starlette-1.6.0-py3-none-any.whl", hash = "sha256:a86dd39d14bb45f85a3d18525215a9ef0cfd1f192ac793220e72598c90335f0c", size = 75969, upload-time = "2026-08-08T18:27:56.196Z" },
+]
+
+[[package]]
+name = "stays"
+version = "0.1.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "curl-cffi" },
+    { name = "fastapi" },
+    { name = "fastmcp" },
+    { name = "pydantic" },
+    { name = "pydantic-settings" },
+    { name = "ratelimit" },
+    { name = "rich" },
+    { name = "tenacity" },
+    { name = "typer" },
+    { name = "uvicorn" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a1/75/f23d6453c0bd3d28e6a0f90c260119d1ef9dd833e1bb838f9f185b64668e/stays-0.1.1.tar.gz", hash = "sha256:21b963a9a3b4d295388a91f9adcdebe32c499dd63e0851cc839cf75c9b9d5e27", size = 69405, upload-time = "2026-04-24T02:02:30.279Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/f6/8c/b2a24672828cd02985e3bd728c44e7d7dd87a1db584e7f48d44596ffa5aa/stays-0.1.1-py3-none-any.whl", hash = "sha256:2888096b96400107556810266a0cec7e2d0e8fba17587db693d8c3065d3fa0b3", size = 83540, upload-time = "2026-04-24T02:02:29.035Z" },
 ]
 
 [[package]]
@@ -3382,6 +3403,7 @@ dependencies = [
     { name = "portkey-ai" },
     { name = "python-dotenv" },
     { name = "rail" },
+    { name = "stays" },
     { name = "uvicorn", extra = ["standard"] },
 ]
 
@@ -3403,6 +3425,7 @@ requires-dist = [
     { name = "portkey-ai", specifier = ">=2.3.4" },
     { name = "python-dotenv", specifier = ">=1.2.3" },
     { name = "rail", git = "https://github.com/SharmaVrishab/rail.git" },
+    { name = "stays", specifier = ">=0.1.1" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.53.0" },
 ]
 
