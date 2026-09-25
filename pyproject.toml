@@ -17,6 +17,7 @@ dependencies = [
     "langchain-huggingface>=1.2.2",
     "langchain-mcp-adapters>=0.3.2",
     "langchain-openai>=1.6.2",
+    "langchain-typesafe>=0.0.1a3",
     "langgraph>=1.2.11",
     "portkey-ai>=2.3.4",
     "python-dotenv>=1.2.3",

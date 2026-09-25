@@ -65,7 +65,7 @@ AW_tools = [
 
 
 async def get_mcp_tools():
-    print("3")
+    
 
     client = MultiServerMCPClient(
         {
@@ -85,11 +85,7 @@ async def get_mcp_tools():
     )
     tools = await client.get_tools()
     selected_tools = [tool for tool in tools if tool.name in AW_tools]
-    for tool in selected_tools:
-        print(tool.name)
-        print(tool.description)
-        print()
-    print("4")
+    
     return selected_tools
 
 
@@ -132,7 +128,7 @@ async def create_AW_subagent():
 
 
 # if __name__ == "__main__":
-#     print("5")
+#    
 #     asyncio.run(
 #         AW_subagent(
 #             "Search best place to live in jaipur and weather for date 28-09-2026"
