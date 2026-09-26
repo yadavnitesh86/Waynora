@@ -1,12 +1,17 @@
+from langchain_mcp_adapters import client
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from dotenv import load_dotenv
+import logfire
+import os
 import asyncio
 from langchain.agents import create_agent
 from app.portkey.llm import get_llm
-from app.agents.sub_agent.AccommodationWeather_subagent.schema import (
-    AccommodationWeatherResult,
-)
+from app.agents.sub_agent.AccommodationWeather_subagent.schema import AccommodationWeatherResult
 from deepagents import CompiledSubAgent
+load_dotenv()
+
+logfire.configure(token=os.getenv("LOGFIRE_TOKEN"))
+
 
 SYSTEM_PROMPT = """
 You are Waynora's Accommodation & Weather Specialist. Research accommodation
@@ -63,35 +68,55 @@ AW_tools = [
     "get_forecast",
 ]
 
-
 async def get_mcp_tools():
-    
 
-    client = MultiServerMCPClient(
-        {
-            "google_hotels": {
-                "transport": "stdio",
-                # Invokes the python executable registered on your venv PATH
-                "command": "stays",
-                # Signals the library to open its stdio MCP protocol engine
-                "args": ["mcp"],
-            },
-            "weather": {
-                "transport": "stdio",
-                "command": "npx",
-                "args": ["-y", "@dangahagan/weather-mcp@latest", "--preset", "basic"],
-            },
-        }
-    )
-    tools = await client.get_tools()
-    selected_tools = [tool for tool in tools if tool.name in AW_tools]
-    
-    return selected_tools
+    with logfire.span("Getting MCP tools for AccommodationWeather subagent"):
+
+        client = MultiServerMCPClient(
+            {
+                "google_hotels": {
+                    "transport": "stdio",
+                    "command": "stays",
+                    "args": ["mcp"],
+                },
+                "weather": {
+                    "transport": "stdio",
+                    "command": "npx",
+                    "args": [
+                        "-y",
+                        "@dangahagan/weather-mcp@latest",
+                        "--preset",
+                        "basic",
+                    ],
+                },
+            }
+        )
+
+        try:
+            tools = await client.get_tools()
+
+            selected_tools = [
+                tool for tool in tools
+                if tool.name in AW_tools
+            ]
+
+            logfire.info(
+                f"Selected {len(selected_tools)} tools: "
+                f"{[t.name for t in selected_tools]}"
+            )
+
+            return selected_tools
+
+        except Exception as e:
+            logfire.error(f"Error getting MCP tools: {e}")
+            return []
 
 
 async def create_AW_agent():
+
     llm = get_llm("lite")
     mcp_tools = await get_mcp_tools()
+
     return create_agent(
         model=llm,
         tools=mcp_tools,
@@ -100,22 +125,22 @@ async def create_AW_agent():
     )
 
 
-async def create_AW_subagent():
-    AW_agent = await create_AW_agent()
+# async def create_AW_subagent():
+#     AW_agent = await create_AW_agent()
 
-    return CompiledSubAgent(
-        name="Accommodation_Weather_research",
-        description=(
-            """
-            Specialist for accommodation and weather research. Use this agent when
-            the trip requires hotel/accommodation options, accommodation pricing or
-            details, or weather information for the destination and travel dates.
-            It returns structured, tool-verified accommodation and weather data for
-            the main Travel Agent and does not create the final itinerary.
-    """
-        ),
-        runnable=AW_agent,
-    )
+#     return CompiledSubAgent(
+#         name="Accommodation_Weather_research",
+#         description=(
+#             """
+#             Specialist for accommodation and weather research. Use this agent when
+#             the trip requires hotel/accommodation options, accommodation pricing or
+#             details, or weather information for the destination and travel dates.
+#             It returns structured, tool-verified accommodation and weather data for
+#             the main Travel Agent and does not create the final itinerary.
+#     """
+#         ),
+#         runnable=AW_agent,
+#     )
 # Bellow code is for Testing while developing the sub agent 
 
 # async def AW_subagent(Instruction: str):
@@ -127,10 +152,8 @@ async def create_AW_subagent():
 #     print(result["messages"][-1].content)
 
 
-# if __name__ == "__main__":
-#    
-#     asyncio.run(
-#         AW_subagent(
-#             "Search best place to live in jaipur and weather for date 28-09-2026"
-#         )
-#     )
+if __name__ == "__main__":
+   
+    asyncio.run(
+       create_AW_agent()
+    )

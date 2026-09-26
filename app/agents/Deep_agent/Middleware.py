@@ -19,7 +19,7 @@ class PromptInjectionMiddleware(AgentMiddleware):
     def before_agent(self, state: AgentState, runtime: Runtime) -> dict[str, Any] | None:
         response = self.classifier.invoke(
             {
-                "state": state["messages"],
+                "state": state["messages"][-1].content,
                 "questions": {
                     "security": Choice(
                         instructions=(
