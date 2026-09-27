@@ -5,12 +5,13 @@ import asyncio
 from langchain.agents import create_agent
 from app.portkey.llm import get_llm
 from langchain.agents.middleware import ToolCallLimitMiddleware
-
+import logfire
 load_dotenv()
 from app.agents.sub_agent.Destination_subagent.schema import DestinationResearchResult
 from deepagents import CompiledSubAgent
 
 tavilyapi = os.getenv("TAVILY_API")
+logfire.configure(token=os.getenv("LOGFIRE_TOKEN"))
 
 
 SYSTEM_PROMPT = """
@@ -52,44 +53,49 @@ Areas 5 | Attractions 5 | Activities 5 | Practical notes 3 | Sources 5
 
 
 async def get_mcp_tools():
-    client = MultiServerMCPClient(
-        {
-            "tavily-remote-mcp": {
-                "transport": "stdio",
-                "command": "npx",
-                "args": [
-                    "-y",
-                    "mcp-remote",
-                    f"https://mcp.tavily.com/mcp/?tavilyApiKey={tavilyapi}",
-                ],
-            },
-            "openstreetmap-mcp-server": {
-                "transport": "stdio",
-                "command": "npx",
-                "args": [
-                    "-y",
-                    "@cyanheads/openstreetmap-mcp-server@latest",
-                ],
-            },
-        }
-    )
-    tools = await client.get_tools()
-    selected_tools = [
-        tool
-        for tool in tools
-        if tool.name
-        in [
-            "tavily_search",
-            "tavily_extract",
-            "openstreetmap_search_places",
-            "openstreetmap_query_nearby",
-        ]
-    ]
-    # for tool in selected_tools:
-    #     print(tool.name)
-    #     print(tool.description)
-    #     print()
-    return selected_tools
+    with logfire.span("Getting MCP tools for Destination subagent"):
+        client = MultiServerMCPClient(
+            {
+                "tavily-remote-mcp": {
+                    "transport": "stdio",
+                    "command": "npx",
+                    "args": [
+                        "-y",
+                        "mcp-remote",
+                        f"https://mcp.tavily.com/mcp/?tavilyApiKey={tavilyapi}",
+                    ],
+                },
+                "openstreetmap-mcp-server": {
+                    "transport": "stdio",
+                    "command": "npx",
+                    "args": [
+                        "-y",
+                        "@cyanheads/openstreetmap-mcp-server@latest",
+                    ],
+                },
+            }
+        )
+        try:
+            tools = await client.get_tools()
+            selected_tools = [
+                tool
+                for tool in tools
+                if tool.name
+                in [
+                    "tavily_search",
+                    "tavily_extract",
+                    "openstreetmap_search_places",
+                    "openstreetmap_query_nearby",
+                ]
+            ]
+            logfire.info(
+                f"Selected {len(selected_tools)} tools: "
+                f"{ [t.name for t in selected_tools]}"
+            )
+            return selected_tools
+        except Exception as e:
+            logfire.error(f"Error getting Destination's MCP tools: {e}")
+            return []
 
 
 async def destination_initiation():
@@ -120,20 +126,20 @@ async def destination_initiation():
         ],
     )
 
-async def create_Destination_subagent():
-    destination_agent = await destination_initiation()
+# async def create_Destination_subagent():
+#     destination_agent = await destination_initiation()
 
-    return CompiledSubAgent(
-        name="destination_research",
-        description=(
-            """Researches destinations and provides concise, factual information about
-            attractions, activities, neighborhoods, local experiences, and destination
-            highlights. Delegate when destination discovery, sightseeing, or activity
-            research is needed. Tailors results to the user's interests, dates, and
-            constraints without inventing facts."""
-        ),
-        runnable=destination_agent,
-    )
+#     return CompiledSubAgent(
+#         name="destination_research",
+#         description=(
+#             """Researches destinations and provides concise, factual information about
+#             attractions, activities, neighborhoods, local experiences, and destination
+#             highlights. Delegate when destination discovery, sightseeing, or activity
+#             research is needed. Tailors results to the user's interests, dates, and
+#             constraints without inventing facts."""
+#         ),
+#         runnable=destination_agent,
+#     )
 
 
 
@@ -148,9 +154,7 @@ async def create_Destination_subagent():
 #     print(result["messages"][-1].content)
 
 
-# if __name__ == "__main__":
-#     asyncio.run(
-#         destination_subagent(
-#             "give me areas and attractions to  visit and activities do in Dwarka  India   "
-#         )
-#     )
+if __name__ == "__main__":
+    asyncio.run(
+        destination_initiation()
+    )

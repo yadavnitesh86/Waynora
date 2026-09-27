@@ -4,24 +4,37 @@ from dotenv import load_dotenv
 from app.agents.Deep_agent.Middleware import middleware ,PromptInjectionDetected
 import asyncio
 from langgraph.checkpoint.memory import InMemorySaver
+from app.agents.sub_agent.AccommodationWeather_subagent.AccommodationWeather import create_AW_subagent
+from app.agents.sub_agent.Destination_subagent.Destination import create_Destination_subagent
+from app.agents.sub_agent.Transport_subagent.Transport import create_transport_subagent
 
 load_dotenv()
 SYSTEM_PROMPT="""You are a Travel agent name waynora
 """
 register_harness_profile(
-    "openai",  # e.g., "anthropic:claude-sonnet-4-6" or your specific provider key
+    "openai",  
     HarnessProfile(
         excluded_tools=frozenset(
             {"ls", "read_file", "write_file", "edit_file", "delete", "glob", "grep"}
         )
     ),
 )
+
+async def get_subagents():
+    return [
+        await create_AW_subagent(),
+        await create_Destination_subagent(),
+        await create_transport_subagent()
+    ]
+
 async def build_agent(checkpointer):
     return create_deep_agent(
             model=get_llm("heavy"),
             system_prompt=SYSTEM_PROMPT,
             middleware=middleware,
-            checkpointer=checkpointer
+            checkpointer=checkpointer,
+            subagents=await get_subagents(),
+
         )
 
 async def ask(question:str):
@@ -37,10 +50,10 @@ async def ask(question:str):
         )
         print(result['messages'][-1].content)
     except PromptInjectionDetected:
-          print("Sorry, I can't help with that request. Prompt injection detected ")
+          print("Sorry, I can't help with that request. I am happy to help with travel related request ")
     except Exception as e:
-        print(f"Agent error: {e}")   # log the real error for yourself
-        reply = "Something went wrong. Please try again."
+        print(f"Agent error: {e}")   
+            
 
 if __name__  == "__main__":
     asyncio.run(ask("""Plan a 5-day trip to Goa under 20000 rupees."""))

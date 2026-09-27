@@ -108,7 +108,7 @@ async def get_mcp_tools():
             return selected_tools
 
         except Exception as e:
-            logfire.error(f"Error getting MCP tools: {e}")
+            logfire.error(f"Error getting AccommodationWeather's MCP tools: {e}")
             return []
 
 
@@ -125,22 +125,22 @@ async def create_AW_agent():
     )
 
 
-# async def create_AW_subagent():
-#     AW_agent = await create_AW_agent()
+async def create_AW_subagent():
+    AW_agent = await create_AW_agent()
 
-#     return CompiledSubAgent(
-#         name="Accommodation_Weather_research",
-#         description=(
-#             """
-#             Specialist for accommodation and weather research. Use this agent when
-#             the trip requires hotel/accommodation options, accommodation pricing or
-#             details, or weather information for the destination and travel dates.
-#             It returns structured, tool-verified accommodation and weather data for
-#             the main Travel Agent and does not create the final itinerary.
-#     """
-#         ),
-#         runnable=AW_agent,
-#     )
+    return CompiledSubAgent(
+        name="Accommodation_Weather_research",
+        description=(
+            """
+            Specialist for accommodation and weather research. Use this agent when
+            the trip requires hotel/accommodation options, accommodation pricing or
+            details, or weather information for the destination and travel dates.
+            It returns structured, tool-verified accommodation and weather data for
+            the main Travel Agent and does not create the final itinerary.
+    """
+        ),
+        runnable=AW_agent,
+    )
 # Bellow code is for Testing while developing the sub agent 
 
 # async def AW_subagent(Instruction: str):
@@ -152,8 +152,8 @@ async def create_AW_agent():
 #     print(result["messages"][-1].content)
 
 
-if __name__ == "__main__":
+# if __name__ == "__main__":
    
-    asyncio.run(
-       create_AW_agent()
-    )
+#     asyncio.run(
+#        create_AW_agent()
+#     )
