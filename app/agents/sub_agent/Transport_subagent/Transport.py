@@ -2,12 +2,14 @@ from app.agents.sub_agent.Transport_subagent.schema import TransportResearchResu
 from langchain_mcp_adapters.client import MultiServerMCPClient
 import sys
 import os
+import logfire
 from dotenv import load_dotenv
 import asyncio
 from langchain.agents import create_agent
 from app.portkey.llm import get_llm
 from langchain.agents.middleware import ToolCallLimitMiddleware
 from deepagents import CompiledSubAgent
+logfire.configure(token=os.getenv("LOGFIRE_TOKEN"))
 
 SYSTEM_PROMPT = """
 You are Waynora's Transport Research Specialist. Research transport options
@@ -53,39 +55,45 @@ TRANSPORT_TOOLS = [
 
 
 async def get_mcp_tools():
-    client = MultiServerMCPClient(
-        {
-            "flight_search": {
-                "transport": "stdio",
-                "command": "npx",
-                "args": ["-y", "mcp-remote", "https://flights.fctolabs.com/mcp"],
-            },
-            "RailRadar-Train-Search": {
-                "transport": "stdio",
-                "command": sys.executable,
-                "args": [
-                    "-m",
-                    "app.agents.sub_agent.Transport_subagent.server",
-                ],
-            },
-            "google_maps": {
-                "transport": "streamable_http",
-                "url": "https://mapstools.googleapis.com/mcp",
-                "headers": {
-                    "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY,
-                    "Content-Type": "application/json",
-                    "Accept": "application/json, text/event-stream",
+    with logfire.span("Getting MCP tools for AccommodationWeather subagent"):
+        client = MultiServerMCPClient(
+            {
+                "flight_search": {
+                    "transport": "stdio",
+                    "command": "npx",
+                    "args": ["-y", "mcp-remote", "https://flights.fctolabs.com/mcp"],
                 },
-            },
-        }
-    )
-    tools = await client.get_tools()
-    selected_tools = [tool for tool in tools if tool.name in TRANSPORT_TOOLS]
-    for tool in selected_tools:
-        print(tool.name)
-        print(tool.description)
+                "RailRadar-Train-Search": {
+                    "transport": "stdio",
+                    "command": sys.executable,
+                    "args": [
+                        "-m",
+                        "app.agents.sub_agent.Transport_subagent.server",
+                    ],
+                },
+                "google_maps": {
+                    "transport": "streamable_http",
+                    "url": "https://mapstools.googleapis.com/mcp",
+                    "headers": {
+                        "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY,
+                        "Content-Type": "application/json",
+                        "Accept": "application/json, text/event-stream",
+                    },
+                },
+            }
+        )
+        try:
+            tools = await client.get_tools()
+            selected_tools = [tool for tool in tools if tool.name in TRANSPORT_TOOLS]
+            logfire.info(
+                f"Selected {len(selected_tools)} tools: "
+                f"{[t.name for t in selected_tools]}"
+            )
+        except Exception as e:
+            logfire.error(f"Error getting Transport's MCP tools: {e}")
+            return []
 
-    return selected_tools
+        return selected_tools
 
 
 async def create_transport_agent():
@@ -127,7 +135,5 @@ async def create_transport_subagent():
 
 # if __name__ == "__main__":
 #     asyncio.run(
-#         transport_subagent(
-#             "Find me cheapest way to tavel from ahmedabad to Jaipur . Give all travel options result for date 8 nov 2026 "
-#         )
+#         get_mcp_tools()
 #     )
