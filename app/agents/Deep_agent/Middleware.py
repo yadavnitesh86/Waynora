@@ -2,19 +2,26 @@ from langchain.agents.middleware import SummarizationMiddleware
 from langchain.agents.middleware import PIIMiddleware
 from app.portkey.llm import get_llm
 from typing import Any
-
+from collections.abc import Callable, Awaitable
+from langchain.agents.middleware import wrap_tool_call
+from langchain.messages import ToolMessage
+from langchain.tools.tool_node import ToolCallRequest
 from langchain.agents.middleware import AgentMiddleware, AgentState, Runtime
 from langchain_typesafe import Choice, TypeSafeClassifier
 from dotenv import load_dotenv
 load_dotenv()
-
+import os
 class PromptInjectionDetected(Exception):
     pass
 class PromptInjectionMiddleware(AgentMiddleware):
     """Blocks prompt-injection attempts before the agent runs."""
 
     def __init__(self) -> None:
-        self.classifier = TypeSafeClassifier()
+        self.classifier = TypeSafeClassifier(
+            model="typesafe-ai/jev",
+            base_url=os.environ.get("TYPESAFE_BASE_URL"),
+            api_key=os.environ.get("TYPESAFE_API_KEY")
+        )
 
     def before_agent(self, state: AgentState, runtime: Runtime) -> dict[str, Any] | None:
         response = self.classifier.invoke(
@@ -58,12 +65,29 @@ class PromptInjectionMiddleware(AgentMiddleware):
 
 PASSWORD_SHARE_PATTERN = (r"(?i)\b(?:my\s+)?(?:password|passwrod|passwd|pwd)\s*(?:is|=|:)\s*\S+")
 PASSWORD_IN_RESPONSE_PATTERN = (r'(?i)(?:password|passwrod|passwd|pwd)\s*["\']?[\w!@#$%^&*.-]{3,}["\']?')
+@wrap_tool_call
+async def isolate_subagent_errors(
+    request: ToolCallRequest,
+    handler: Callable[[ToolCallRequest], Awaitable[ToolMessage]],
+) -> ToolMessage:
+    try:
+        return await handler(request)
 
+    except Exception as e:
+        return ToolMessage(
+            content=(
+                f"Subagent execution failed: "
+                f"{type(e).__name__}: {e}. "
+                f"Continue with the remaining available subagents."
+            ),
+            tool_call_id=request.tool_call["id"],
+        )
 
 
 
 middleware =[
-    PromptInjectionMiddleware(),
+    # PromptInjectionMiddleware(),
+    isolate_subagent_errors,
     SummarizationMiddleware(model=get_llm("lite"),trigger=("tokens", 6000),keep=("messages", 10)),
     PIIMiddleware("password_share",detector=PASSWORD_SHARE_PATTERN,strategy="redact",apply_to_input=True,apply_to_output=True,),
     PIIMiddleware("password_output",detector=PASSWORD_IN_RESPONSE_PATTERN,strategy="redact",apply_to_output=True,apply_to_tool_results=True,),

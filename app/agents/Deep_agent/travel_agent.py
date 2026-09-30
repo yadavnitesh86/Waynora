@@ -33,6 +33,8 @@ Use web search only when all three hold:
 - That information is necessary for a reliable answer.
 - Web search can reasonably obtain it.
 
+Exception: if a subagent fails (see Failures), always use web search to get the data it was supposed to provide.
+
 Keep searches targeted to the specific gap. Never repeat or expand research already delegated. Prefer subagent results over web search when both give the same information.
 
 # Budget
@@ -63,11 +65,13 @@ Before responding, check:
 Simplify the itinerary if it is too dense.
 
 # Failures
-If a subagent fails or is unavailable:
+A subagent has failed if its tool result starts with `Subagent execution failed:`. When this happens:
 - Do not retry it and do not fabricate its output.
-- Continue with available information if a useful plan is still possible.
-- Tell the user the corresponding Waynora function is currently unavailable, e.g. "I'm currently unable to use my accommodation research function. It will be available again soon."
-- Never expose internal errors, stack traces, or orchestration details.
+- Continue with the remaining subagents.
+- Use web search to get the data the failed subagent was supposed to provide.
+- Tell the user that the corresponding subagent failed, that the data came from web search, and that they should verify it, e.g. "My accommodation research function failed, so I got these details from web search. Please verify them."
+- If web search also cannot provide the data, tell the user and give the output based on the other subagents' results.
+- Never expose the raw error text, error types, stack traces, or orchestration details.
 
 If required information cannot be reliably obtained via subagents or web search, state the limitation. Do not fabricate it.
 
@@ -115,6 +119,8 @@ async def build_agent(checkpointer):
 
         )
 
+
+
 async def ask(question:str):
   
     config = {"configurable": {"thread_id":"yadavnitesh86"}}
@@ -131,8 +137,9 @@ async def ask(question:str):
           print("Sorry, I can't help with that request. I am happy to help with travel related request ")
     except Exception as e:
         print(f"Agent error: {e}")   
+
             
 
 if __name__  == "__main__":
-    asyncio.run(ask("""Plan a 5-day trip to Goa under 20000 rupees."""))
+    asyncio.run(ask("""Plan a 5-day trip from Ahmedabad to Jaipur for 2 people from 15 October 2026 to 19 October 2026. My total budget is $800 excluding flights. I prefer trains over flights if the journey is reasonable. Find suitable accommodation, check the weather, suggest places and activities, calculate the budget, and create a practical day-by-day itinerary."""))
 

@@ -126,20 +126,20 @@ async def destination_initiation():
         ],
     )
 
-# async def create_Destination_subagent():
-#     destination_agent = await destination_initiation()
+async def create_Destination_subagent():
+    destination_agent = await destination_initiation()
 
-#     return CompiledSubAgent(
-#         name="destination_research",
-#         description=(
-#             """Researches destinations and provides concise, factual information about
-#             attractions, activities, neighborhoods, local experiences, and destination
-#             highlights. Delegate when destination discovery, sightseeing, or activity
-#             research is needed. Tailors results to the user's interests, dates, and
-#             constraints without inventing facts."""
-#         ),
-#         runnable=destination_agent,
-#     )
+    return CompiledSubAgent(
+        name="destination_research",
+        description=(
+            """Researches destinations and provides concise, factual information about
+            attractions, activities, neighborhoods, local experiences, and destination
+            highlights. Delegate when destination discovery, sightseeing, or activity
+            research is needed. Tailors results to the user's interests, dates, and
+            constraints without inventing facts."""
+        ),
+        runnable=destination_agent,
+    )
 
 
 
