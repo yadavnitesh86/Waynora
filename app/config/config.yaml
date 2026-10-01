@@ -1,3 +1,0 @@
-llm: 
- provider: ChatGroq
- model: qwen/qwen3.6-27b

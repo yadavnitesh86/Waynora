@@ -18,7 +18,7 @@ class PromptInjectionMiddleware(AgentMiddleware):
 
     def __init__(self) -> None:
         self.classifier = TypeSafeClassifier(
-            model="typesafe-ai/jev",
+            model=os.environ.get("MODEL_NAME"),
             base_url=os.environ.get("TYPESAFE_BASE_URL"),
             api_key=os.environ.get("TYPESAFE_API_KEY")
         )
@@ -65,6 +65,7 @@ class PromptInjectionMiddleware(AgentMiddleware):
 
 PASSWORD_SHARE_PATTERN = (r"(?i)\b(?:my\s+)?(?:password|passwrod|passwd|pwd)\s*(?:is|=|:)\s*\S+")
 PASSWORD_IN_RESPONSE_PATTERN = (r'(?i)(?:password|passwrod|passwd|pwd)\s*["\']?[\w!@#$%^&*.-]{3,}["\']?')
+
 @wrap_tool_call
 async def isolate_subagent_errors(
     request: ToolCallRequest,
@@ -86,7 +87,7 @@ async def isolate_subagent_errors(
 
 
 middleware =[
-    # PromptInjectionMiddleware(),
+    PromptInjectionMiddleware(),
     isolate_subagent_errors,
     SummarizationMiddleware(model=get_llm("lite"),trigger=("tokens", 6000),keep=("messages", 10)),
     PIIMiddleware("password_share",detector=PASSWORD_SHARE_PATTERN,strategy="redact",apply_to_input=True,apply_to_output=True,),

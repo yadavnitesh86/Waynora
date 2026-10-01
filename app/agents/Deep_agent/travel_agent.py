@@ -123,7 +123,7 @@ async def build_agent(checkpointer):
 
 async def ask(question:str):
   
-    config = {"configurable": {"thread_id":"yadavnitesh86"}}
+    config = {"configurable": {"thread_id":"yadfdavnitesh86"}}
     agent = await build_agent(InMemorySaver())
 
     # Run the agent
@@ -141,5 +141,6 @@ async def ask(question:str):
             
 
 if __name__  == "__main__":
-    asyncio.run(ask("""Plan a 5-day trip from Ahmedabad to Jaipur for 2 people from 15 October 2026 to 19 October 2026. My total budget is $800 excluding flights. I prefer trains over flights if the journey is reasonable. Find suitable accommodation, check the weather, suggest places and activities, calculate the budget, and create a practical day-by-day itinerary."""))
+    question = str(input("Ask question : "))
+    asyncio.run(ask(question))
 
