@@ -1,3 +1,5 @@
+from asyncio import timeout
+from time import time
 import os
 
 from dotenv import load_dotenv
@@ -7,13 +9,15 @@ from portkey_ai import PORTKEY_GATEWAY_URL, createHeaders
 load_dotenv()
 
 
-def get_llm(model_type: str) -> ChatOpenAI:
+async def get_llm(model_type: str) -> ChatOpenAI:
     """
     Return a LangChain chat model configured through Portkey.
 
     model_type:
         - "heavy"
         - "lite"
+        "lite-A"
+        "lite-T"    
     """
 
     configs = {
@@ -24,7 +28,7 @@ def get_llm(model_type: str) -> ChatOpenAI:
     if model_type not in configs:
         raise ValueError(
             f"Invalid model_type: {model_type}. "
-            "Expected 'heavy' or 'lite'."
+            
         )
 
     config = configs[model_type]
@@ -33,22 +37,33 @@ def get_llm(model_type: str) -> ChatOpenAI:
         raise ValueError(
             f"Portkey config for '{model_type}' is not configured."
         )
+    if model_type == "heavy":
+        streamingH = True
+    else:
+        streamingH = False
 
     return ChatOpenAI(
-        # Portkey Config determines the actual model.
-        # This value is not your real provider model.
         model="default",
-
-        # Authentication is handled by Portkey.
         api_key="dummy",
-        streaming=True,
-
-        # Send the request through Portkey.
+        model_kwargs={
+            "parallel_tool_calls": True,
+        },
         base_url=PORTKEY_GATEWAY_URL,
+        streaming=streamingH,
+        
 
-        # Tell Portkey which Config to use.
         default_headers=createHeaders(
             api_key=os.getenv("PORTKEY_API_KEY"),
             config=config,
+            request_timeout=900000
         ),
     )
+
+
+
+def get_llm_for_summarization():
+    return ChatOpenAI(
+            model_name="sensenova-6.8-flash-lite",
+            api_key=os.getenv("OPENAI_API_KEY1"),
+            base_url="https://api.hcnsec.cn/v1"
+        )

@@ -14,3 +14,4 @@ deepagents
 portkey_ai 
 langchain_mcp_adapters
 langchain_typesafe
+langgraph-checkpoint-sqlite

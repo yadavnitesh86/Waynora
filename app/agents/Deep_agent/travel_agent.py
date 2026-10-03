@@ -1,3 +1,4 @@
+from ddgs.base import logger
 from deepagents import create_deep_agent ,HarnessProfile ,register_harness_profile
 from app.portkey.llm import get_llm
 from dotenv import load_dotenv
@@ -9,8 +10,9 @@ from app.agents.sub_agent.Destination_subagent.Destination import create_Destina
 from app.agents.sub_agent.Transport_subagent.Transport import create_transport_subagent
 from langchain_community.tools import DuckDuckGoSearchRun
 load_dotenv()
+
+
 SYSTEM_PROMPT="""
-# Role
 You are Waynora's main Travel Planning Agent and central orchestrator.
 
 # Workflow
@@ -110,7 +112,7 @@ async def get_subagents():
 
 async def build_agent(checkpointer):
     return create_deep_agent(
-            model=get_llm("heavy"),
+            model=await get_llm("heavy"),
             system_prompt=SYSTEM_PROMPT,
             middleware=middleware,
             checkpointer=checkpointer,
@@ -119,24 +121,19 @@ async def build_agent(checkpointer):
 
         )
 
+REFUSAL = "Sorry, I can't help with that request. I'm happy to help with travel-related questions."
 
 
-async def ask(question:str):
-  
-    config = {"configurable": {"thread_id":"yadfdavnitesh86"}}
-    agent = await build_agent(InMemorySaver())
-
-    # Run the agent
+async def ask(agent, question: str, thread_id: str) -> str:
+    config = {"configurable": {"thread_id": thread_id}}
     try:
         result = await agent.ainvoke(
             {"messages": [{"role": "user", "content": question}]},
-            config=config
+            config=config,
         )
-        print(result['messages'][-1].content)
+        return result["messages"][-1].content
     except PromptInjectionDetected:
-          print("Sorry, I can't help with that request. I am happy to help with travel related request ")
-    except Exception as e:
-        print(f"Agent error: {e}")   
+        return REFUSAL
 
             
 

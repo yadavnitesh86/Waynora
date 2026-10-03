@@ -10,7 +10,6 @@ from app.agents.sub_agent.AccommodationWeather_subagent.schema import Accommodat
 from deepagents import CompiledSubAgent
 load_dotenv()
 
-logfire.configure(token=os.getenv("LOGFIRE_TOKEN"))
 
 
 SYSTEM_PROMPT = """
@@ -114,7 +113,7 @@ async def get_mcp_tools():
 
 async def create_AW_agent():
 
-    llm = get_llm("lite")
+    llm = await get_llm("lite")
     mcp_tools = await get_mcp_tools()
 
     return create_agent(
@@ -143,17 +142,17 @@ async def create_AW_subagent():
     )
 # Bellow code is for Testing while developing the sub agent 
 
-# async def AW_subagent(Instruction: str):
-#     
-# agent = await create_AW_agent()
-#     result = await agent.ainvoke(
-#         {"messages": [{"role": "user", "content": Instruction}]}
-#     )
-#     print(result["messages"][-1].content)
+async def AW_subagent(Instruction: str):
+    
+    agent = await create_AW_agent()
+    result = await agent.ainvoke(
+        {"messages": [{"role": "user", "content": Instruction}]}
+    )
+    print(result["messages"][-1].content)
 
 
-# if __name__ == "__main__":
+if __name__ == "__main__":
    
-#     asyncio.run(
-#        create_AW_agent()
-#     )
+    asyncio.run(
+       AW_subagent("I want to go to manali from 15/11/2026 to 20/11/2026 for 2 adults and 1 child")
+    )

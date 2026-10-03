@@ -9,7 +9,6 @@ from langchain.agents import create_agent
 from app.portkey.llm import get_llm
 from langchain.agents.middleware import ToolCallLimitMiddleware
 from deepagents import CompiledSubAgent
-logfire.configure(token=os.getenv("LOGFIRE_TOKEN"))
 
 SYSTEM_PROMPT = """
 You are Waynora's Transport Research Specialist. Research transport options
@@ -106,7 +105,7 @@ async def get_mcp_tools():
 
 
 async def create_transport_agent():
-    llm = get_llm("lite")
+    llm = await get_llm("lite")
     mcp_tools = await get_mcp_tools()
     return create_agent(
         model=llm,

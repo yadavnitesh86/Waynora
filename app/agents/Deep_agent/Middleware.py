@@ -1,6 +1,6 @@
 from langchain.agents.middleware import SummarizationMiddleware
 from langchain.agents.middleware import PIIMiddleware
-from app.portkey.llm import get_llm
+from app.portkey.llm import get_llm_for_summarization
 from typing import Any
 from collections.abc import Callable, Awaitable
 from langchain.agents.middleware import wrap_tool_call
@@ -89,7 +89,7 @@ async def isolate_subagent_errors(
 middleware =[
     PromptInjectionMiddleware(),
     isolate_subagent_errors,
-    SummarizationMiddleware(model=get_llm("lite"),trigger=("tokens", 6000),keep=("messages", 10)),
+    SummarizationMiddleware(model=get_llm_for_summarization(),trigger=("tokens", 80000),keep=("messages", 20),),
     PIIMiddleware("password_share",detector=PASSWORD_SHARE_PATTERN,strategy="redact",apply_to_input=True,apply_to_output=True,),
     PIIMiddleware("password_output",detector=PASSWORD_IN_RESPONSE_PATTERN,strategy="redact",apply_to_output=True,apply_to_tool_results=True,),
     PIIMiddleware("credit_card", strategy="mask", apply_to_input=True),
