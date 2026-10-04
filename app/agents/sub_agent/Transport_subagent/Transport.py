@@ -1,14 +1,15 @@
-from app.agents.sub_agent.Transport_subagent.schema import TransportResearchResult
-from langchain_mcp_adapters.client import MultiServerMCPClient
-import sys
 import os
+import sys
+
 import logfire
-from dotenv import load_dotenv
-import asyncio
-from langchain.agents import create_agent
-from app.portkey.llm import get_llm
-from langchain.agents.middleware import ToolCallLimitMiddleware
 from deepagents import CompiledSubAgent
+from dotenv import load_dotenv
+from langchain.agents import create_agent
+from langchain.agents.middleware import ToolCallLimitMiddleware
+from langchain_mcp_adapters.client import MultiServerMCPClient
+
+from app.agents.sub_agent.Transport_subagent.schema import TransportResearchResult
+from app.portkey.llm import get_llm
 
 SYSTEM_PROMPT = """
 You are Waynora's Transport Research Specialist. Research transport options
@@ -31,7 +32,7 @@ RULES
 
 * Explicit mode requested → only that mode; else mix flights+trains+ground as useful. Max 5 options.
 * Use the minimum necessary tool calls. One targeted call > exploratory calls.
-* HARD LIMIT: maximum 5 total tool calls per request.
+* HARD LIMIT: maximum 6 total tool calls per request.
 * get_reference_data: maximum 2 calls and only when an identifier must be resolved. Reuse its result; never call it again for the same information.
 * Never call a tool when the required information is already available from a previous tool result.
 * Never repeat the same successful tool call unless new information or user requirements require it.
@@ -113,16 +114,16 @@ async def create_transport_agent():
         system_prompt=SYSTEM_PROMPT,
         response_format=TransportResearchResult,
         middleware=[
-        ToolCallLimitMiddleware(
-            tool_name="get_reference_data",
-            run_limit=2,
-            exit_behavior="continue",
-        ),
-        ToolCallLimitMiddleware(
-            run_limit=6,
-            exit_behavior="continue",
-        ),
-]
+            ToolCallLimitMiddleware(
+                tool_name="get_reference_data",
+                run_limit=2,
+                exit_behavior="continue",
+            ),
+            ToolCallLimitMiddleware(
+                run_limit=8,
+                exit_behavior="continue",
+            ),
+        ],
     )
 
 
@@ -141,8 +142,7 @@ async def create_transport_subagent():
     )
 
 
-
-# Bellow code is for Testing while developing the sub agent 
+# Bellow code is for Testing while developing the sub agent
 
 # async def transport_subagent(Instruction: str):
 #     agent = await create_transport_agent()

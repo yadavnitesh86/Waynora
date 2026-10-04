@@ -1,5 +1,3 @@
-from asyncio import timeout
-from time import time
 import os
 
 from dotenv import load_dotenv
@@ -17,7 +15,7 @@ async def get_llm(model_type: str) -> ChatOpenAI:
         - "heavy"
         - "lite"
         "lite-A"
-        "lite-T"    
+        "lite-T"
     """
 
     configs = {
@@ -26,17 +24,12 @@ async def get_llm(model_type: str) -> ChatOpenAI:
     }
 
     if model_type not in configs:
-        raise ValueError(
-            f"Invalid model_type: {model_type}. "
-            
-        )
+        raise ValueError(f"Invalid model_type: {model_type}. ")
 
     config = configs[model_type]
 
     if not config:
-        raise ValueError(
-            f"Portkey config for '{model_type}' is not configured."
-        )
+        raise ValueError(f"Portkey config for '{model_type}' is not configured.")
     if model_type == "heavy":
         streamingH = True
     else:
@@ -50,20 +43,15 @@ async def get_llm(model_type: str) -> ChatOpenAI:
         },
         base_url=PORTKEY_GATEWAY_URL,
         streaming=streamingH,
-        
-
         default_headers=createHeaders(
-            api_key=os.getenv("PORTKEY_API_KEY"),
-            config=config,
-            request_timeout=900000
+            api_key=os.getenv("PORTKEY_API_KEY"), config=config, request_timeout=900000
         ),
     )
 
 
-
 def get_llm_for_summarization():
     return ChatOpenAI(
-            model_name="sensenova-6.8-flash-lite",
-            api_key=os.getenv("OPENAI_API_KEY1"),
-            base_url="https://api.hcnsec.cn/v1"
-        )
+        model_name="sensenova-6.8-flash-lite",
+        api_key=os.getenv("OPENAI_API_KEY1"),
+        base_url="https://api.hcnsec.cn/v1",
+    )

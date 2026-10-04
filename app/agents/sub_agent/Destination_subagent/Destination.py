@@ -1,14 +1,18 @@
-from langchain_mcp_adapters.client import MultiServerMCPClient
-import os
-from dotenv import load_dotenv
 import asyncio
-from langchain.agents import create_agent
-from app.portkey.llm import get_llm
-from langchain.agents.middleware import ToolCallLimitMiddleware
+import os
+
 import logfire
+from dotenv import load_dotenv
+from langchain.agents import create_agent
+from langchain.agents.middleware import ToolCallLimitMiddleware
+from langchain_mcp_adapters.client import MultiServerMCPClient
+
+from app.portkey.llm import get_llm
+
 load_dotenv()
-from app.agents.sub_agent.Destination_subagent.schema import DestinationResearchResult
 from deepagents import CompiledSubAgent
+
+from app.agents.sub_agent.Destination_subagent.schema import DestinationResearchResult
 
 tavilyapi = os.getenv("TAVILY_API")
 
@@ -89,7 +93,7 @@ async def get_mcp_tools():
             ]
             logfire.info(
                 f"Selected {len(selected_tools)} tools: "
-                f"{ [t.name for t in selected_tools]}"
+                f"{[t.name for t in selected_tools]}"
             )
             return selected_tools
         except Exception as e:
@@ -125,6 +129,7 @@ async def destination_initiation():
         ],
     )
 
+
 async def create_Destination_subagent():
     destination_agent = await destination_initiation()
 
@@ -141,8 +146,7 @@ async def create_Destination_subagent():
     )
 
 
-
-# Bellow code is for Testing while developing the sub agent 
+# Bellow code is for Testing while developing the sub agent
 
 # async def destination_subagent(Instruction: str):
 
@@ -154,6 +158,4 @@ async def create_Destination_subagent():
 
 
 if __name__ == "__main__":
-    asyncio.run(
-        destination_initiation()
-    )
+    asyncio.run(destination_initiation())

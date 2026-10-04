@@ -1,4 +1,5 @@
 from datetime import datetime
+
 from pydantic import BaseModel, Field
 
 
@@ -45,6 +46,7 @@ class TransportOption(BaseModel):
 
 class TransportResearchResult(BaseModel):
     """Final transport research result. Call this once, when research is finished"""
+
     origin: str
     destination: str
 

@@ -1,15 +1,17 @@
-from langchain_mcp_adapters import client
-from langchain_mcp_adapters.client import MultiServerMCPClient
-from dotenv import load_dotenv
-import logfire
-import os
 import asyncio
-from langchain.agents import create_agent
-from app.portkey.llm import get_llm
-from app.agents.sub_agent.AccommodationWeather_subagent.schema import AccommodationWeatherResult
-from deepagents import CompiledSubAgent
-load_dotenv()
 
+import logfire
+from deepagents import CompiledSubAgent
+from dotenv import load_dotenv
+from langchain.agents import create_agent
+from langchain_mcp_adapters.client import MultiServerMCPClient
+
+from app.agents.sub_agent.AccommodationWeather_subagent.schema import (
+    AccommodationWeatherResult,
+)
+from app.portkey.llm import get_llm
+
+load_dotenv()
 
 
 SYSTEM_PROMPT = """
@@ -21,6 +23,7 @@ CRITICAL: When processing tool results, use only text/structured data. Do not
 parse, render, or pass binary images, map blocks, thumbnails, or other media.
 
 MUST end with `AccommodationWeatherResult` only — never plain text/markdown.
+MUST use tools for research do not make assumptions using own knowledge 
 
 ACCOMMODATION
 - Use destination, dates, guests, rooms, budget, and preferences from the request.
@@ -67,10 +70,10 @@ AW_tools = [
     "get_forecast",
 ]
 
+
 async def get_mcp_tools():
 
     with logfire.span("Getting MCP tools for AccommodationWeather subagent"):
-
         client = MultiServerMCPClient(
             {
                 "google_hotels": {
@@ -94,10 +97,7 @@ async def get_mcp_tools():
         try:
             tools = await client.get_tools()
 
-            selected_tools = [
-                tool for tool in tools
-                if tool.name in AW_tools
-            ]
+            selected_tools = [tool for tool in tools if tool.name in AW_tools]
 
             logfire.info(
                 f"Selected {len(selected_tools)} tools: "
@@ -140,10 +140,13 @@ async def create_AW_subagent():
         ),
         runnable=AW_agent,
     )
-# Bellow code is for Testing while developing the sub agent 
+
+
+# Bellow code is for Testing while developing the sub agent
+
 
 async def AW_subagent(Instruction: str):
-    
+
     agent = await create_AW_agent()
     result = await agent.ainvoke(
         {"messages": [{"role": "user", "content": Instruction}]}
@@ -152,7 +155,8 @@ async def AW_subagent(Instruction: str):
 
 
 if __name__ == "__main__":
-   
     asyncio.run(
-       AW_subagent("I want to go to manali from 15/11/2026 to 20/11/2026 for 2 adults and 1 child")
+        AW_subagent(
+            "I want to go to manali from 15/11/2026 to 20/11/2026 for 2 adults and 1 child"
+        )
     )

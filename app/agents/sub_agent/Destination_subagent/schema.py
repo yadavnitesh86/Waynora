@@ -1,4 +1,5 @@
 from typing import Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -12,7 +13,6 @@ class Cost(BaseModel):
 class Duration(BaseModel):
     minutes: int
     basis: Literal["sourced", "estimated"] = "estimated"
-
 
 
 class Area(BaseModel):
@@ -47,6 +47,7 @@ class Activity(BaseModel):
 
 class DestinationResearchResult(BaseModel):
     """Final research result. Call this once, when research is finished."""
+
     destination: str
     summary: str = Field(description="2-3 sentences")
     areas: list[Area] = Field(max_length=5)

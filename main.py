@@ -1,18 +1,21 @@
 import os
-import logfire
 import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
+
+import logfire
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
-from app.agents.Deep_agent.travel_agent import ask 
-from app.agents.Deep_agent.travel_agent import build_agent
-from app.api.model import AskRequest ,AskResponse
-from dotenv import load_dotenv
+
+from app.agents.Deep_agent.travel_agent import ask, build_agent
+from app.api.model import AskRequest, AskResponse
+
 load_dotenv()
 from fastapi.middleware.cors import CORSMiddleware
-from app.portkey.llm import get_llm
+
 logfire.configure(token=os.getenv("LOGFIRE_TOKEN"))
+
 
 def get_checkpointer_db_path() -> str:
     db_path = "app/db/checkpoints.db"
@@ -23,16 +26,16 @@ def get_checkpointer_db_path() -> str:
     )
 
     return db_path
-# llm = get_llm("lite")
-# print("request_timeout:", llm.request_timeout)
-# print("stream_chunk_timeout:", llm.stream_chunk_timeout)
-# print("openai async client timeout:", llm.root_async_client.timeout)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    async with AsyncSqliteSaver.from_conn_string(get_checkpointer_db_path()) as checkpointer:
+    async with AsyncSqliteSaver.from_conn_string(
+        get_checkpointer_db_path()
+    ) as checkpointer:
         app.state.agent = await build_agent(checkpointer)
         yield
+
 
 app = FastAPI(lifespan=lifespan)
 
@@ -52,5 +55,7 @@ async def ask_endpoint(body: AskRequest, request: Request):
         answer = await ask(request.app.state.agent, body.question, thread_id)
     except Exception as e:
         logfire.error(f"Agent error (thread_id={thread_id}) as {e}")
-        raise HTTPException(status_code=500, detail="Something went wrong. Please try again.")
+        raise HTTPException(
+            status_code=500, detail="Something went wrong. Please try again."
+        )
     return AskResponse(answer=answer, thread_id=thread_id)

@@ -1,18 +1,23 @@
-from ddgs.base import logger
-from deepagents import create_deep_agent ,HarnessProfile ,register_harness_profile
-from app.portkey.llm import get_llm
-from dotenv import load_dotenv
-from app.agents.Deep_agent.Middleware import middleware ,PromptInjectionDetected
 import asyncio
-from langgraph.checkpoint.memory import InMemorySaver
-from app.agents.sub_agent.AccommodationWeather_subagent.AccommodationWeather import create_AW_subagent
-from app.agents.sub_agent.Destination_subagent.Destination import create_Destination_subagent
-from app.agents.sub_agent.Transport_subagent.Transport import create_transport_subagent
+
+from deepagents import HarnessProfile, create_deep_agent, register_harness_profile
+from dotenv import load_dotenv
 from langchain_community.tools import DuckDuckGoSearchRun
+
+from app.agents.Deep_agent.Middleware import PromptInjectionDetected, middleware
+from app.agents.sub_agent.AccommodationWeather_subagent.AccommodationWeather import (
+    create_AW_subagent,
+)
+from app.agents.sub_agent.Destination_subagent.Destination import (
+    create_Destination_subagent,
+)
+from app.agents.sub_agent.Transport_subagent.Transport import create_transport_subagent
+from app.portkey.llm import get_llm
+
 load_dotenv()
 
 
-SYSTEM_PROMPT="""
+SYSTEM_PROMPT = """
 You are Waynora's main Travel Planning Agent and central orchestrator.
 
 # Workflow
@@ -93,7 +98,7 @@ A realistic, slightly less complete itinerary beats an overloaded or fabricated 
 
 """
 register_harness_profile(
-    "openai",  
+    "openai",
     HarnessProfile(
         excluded_tools=frozenset(
             {"ls", "read_file", "write_file", "edit_file", "delete", "glob", "grep"}
@@ -107,19 +112,20 @@ async def get_subagents():
     return [
         await create_AW_subagent(),
         await create_Destination_subagent(),
-        await create_transport_subagent()
+        await create_transport_subagent(),
     ]
+
 
 async def build_agent(checkpointer):
     return create_deep_agent(
-            model=await get_llm("heavy"),
-            system_prompt=SYSTEM_PROMPT,
-            middleware=middleware,
-            checkpointer=checkpointer,
-            subagents=await get_subagents(),
-            tools=[ddg_search_tool]
+        model=await get_llm("heavy"),
+        system_prompt=SYSTEM_PROMPT,
+        middleware=middleware,
+        checkpointer=checkpointer,
+        subagents=await get_subagents(),
+        tools=[ddg_search_tool],
+    )
 
-        )
 
 REFUSAL = "Sorry, I can't help with that request. I'm happy to help with travel-related questions."
 
@@ -135,9 +141,7 @@ async def ask(agent, question: str, thread_id: str) -> str:
     except PromptInjectionDetected:
         return REFUSAL
 
-            
 
-if __name__  == "__main__":
+if __name__ == "__main__":
     question = str(input("Ask question : "))
     asyncio.run(ask(question))
-

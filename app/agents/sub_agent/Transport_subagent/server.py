@@ -1,10 +1,11 @@
-from dotenv import load_dotenv
-import os
 import json
-import httpx
-from typing import Optional
+import os
 from datetime import datetime
+
+import httpx
+from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
+
 load_dotenv()
 
 mcp = FastMCP("RailRadar-Train-Search")
@@ -18,9 +19,7 @@ WEEKDAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]
 
 @mcp.tool()
 async def search_trains_between_stations(
-    from_station: str,
-    to_station: str,
-    date: Optional[str] = None
+    from_station: str, to_station: str, date: str | None = None
 ) -> str:
     """
     Find trains between two railway stations, optionally filtered to a specific date.
@@ -58,14 +57,17 @@ async def search_trains_between_stations(
         weekday = WEEKDAYS[datetime.strptime(date, "%Y-%m-%d").weekday()]
         trains = [t for t in trains if weekday in t["train"]["runDays"]]
 
-    return json.dumps({
-        "from": from_station,
-        "to": to_station,
-        "date": date,
-        "day_checked": weekday if date else None,
-        "count": len(trains),
-        "trains": trains
-    }, indent=2)
+    return json.dumps(
+        {
+            "from": from_station,
+            "to": to_station,
+            "date": date,
+            "day_checked": weekday if date else None,
+            "count": len(trains),
+            "trains": trains,
+        },
+        indent=2,
+    )
 
 
 if __name__ == "__main__":

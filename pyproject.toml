@@ -32,3 +32,8 @@ dependencies = [
 
 [tool.uv.sources]
 rail = { git = "https://github.com/SharmaVrishab/rail.git" }
+
+[dependency-groups]
+dev = [
+    "ruff>=0.16.10",
+]
