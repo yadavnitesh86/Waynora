@@ -1,0 +1,23 @@
+{
+  "name": "waynora",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "convex dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yadavnitesh86/Waynora.git"
+  },
+  "keywords": [],
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/yadavnitesh86/Waynora/issues"
+  },
+  "homepage": "https://github.com/yadavnitesh86/Waynora#readme",
+  "dependencies": {
+    "convex": "^1.46.0"
+  }
+}

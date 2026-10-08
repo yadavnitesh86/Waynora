@@ -15,3 +15,8 @@ graphify-out
 .env
 .env.local
 app/db/*
+frontend/.env.local
+frontend/.claude
+frontend/.agents
+frontend/node_modules
+frontend/convex/*
