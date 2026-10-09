@@ -149,13 +149,68 @@ Updated during roadmap creation. Each v1 requirement maps to exactly one phase.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| *(pending roadmap creation)* | — | Pending |
+| FOUND-01 | Phase 1 | Pending |
+| FOUND-02 | Phase 1 | Pending |
+| FOUND-03 | Phase 1 | Pending |
+| FOUND-04 | Phase 5 | Pending |
+| FOUND-05 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Pending |
+| AUTH-05 | Phase 1 | Pending |
+| AUTH-06 | Phase 1 | Pending |
+| LAND-01 | Phase 5 | Pending |
+| LAND-02 | Phase 5 | Pending |
+| LAND-03 | Phase 5 | Pending |
+| LAND-04 | Phase 5 | Pending |
+| LAND-05 | Phase 5 | Pending |
+| LAND-06 | Phase 5 | Pending |
+| CHAT-01 | Phase 3 | Pending |
+| CHAT-02 | Phase 3 | Pending |
+| CHAT-03 | Phase 3 | Pending |
+| CHAT-04 | Phase 1 | Pending |
+| CHAT-05 | Phase 3 | Pending |
+| CHAT-06 | Phase 3 | Pending |
+| CHAT-07 | Phase 3 | Pending |
+| CHAT-08 | Phase 3 | Pending |
+| CHAT-09 | Phase 3 | Pending |
+| WAIT-01 | Phase 3 | Pending |
+| WAIT-02 | Phase 3 | Pending |
+| WAIT-03 | Phase 3 | Pending |
+| WAIT-04 | Phase 3 | Pending |
+| WAIT-05 | Phase 3 | Pending |
+| WAIT-06 | Phase 3 | Pending |
+| PERSIST-01 | Phase 2 | Pending |
+| PERSIST-02 | Phase 2 | Pending |
+| PERSIST-03 | Phase 2 | Pending |
+| PERSIST-04 | Phase 2 | Pending |
+| PERSIST-05 | Phase 2 | Pending |
+| PERSIST-06 | Phase 4 | Pending |
+| PERSIST-07 | Phase 4 | Pending |
+| PERSIST-08 | Phase 4 | Pending |
+| PERSIST-09 | Phase 2 | Pending |
+| PERSIST-10 | Phase 2 | Pending |
+| GAME-01 | Phase 4 | Pending |
+| GAME-02 | Phase 4 | Pending |
+| GAME-03 | Phase 4 | Pending |
+| GAME-04 | Phase 4 | Pending |
+| GAME-05 | Phase 4 | Pending |
+| GAME-06 | Phase 4 | Pending |
+| GAME-07 | Phase 4 | Pending |
+| QUAL-01 | Phase 5 | Pending |
+| QUAL-02 | Phase 5 | Pending |
+| QUAL-03 | Phase 5 | Pending |
+| QUAL-04 | Phase 4 | Pending |
+| QUAL-05 | Phase 5 | Pending |
+| QUAL-06 | Phase 5 | Pending |
+| QUAL-07 | Phase 5 | Pending |
 
 **Coverage:**
 - v1 requirements: 56 total
-- Mapped to phases: 0
-- Unmapped: 56 ⚠️
+- Mapped to phases: 56
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-10-09*  
-*Last updated: 2026-10-09 after initial definition*
+*Last updated: 2026-10-09 after roadmap creation*
