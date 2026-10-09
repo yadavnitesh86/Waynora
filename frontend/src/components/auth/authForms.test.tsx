@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import SignInForm from "./SignInForm";
 import SignUpForm from "./SignUpForm";
+import { isValidNextPath } from "../../routes/ProtectedRoute";
 import {
   AUTH_GENERIC_FAILURE,
   AUTH_SIGNUP_GENERIC_FAILURE,
@@ -166,5 +167,16 @@ describe("password field toggle (FOUND-05)", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Hide password" }));
     expect(input.type).toBe("password");
+  });
+});
+
+describe("next allowlist (TM-03 open-redirect protection)", () => {
+  it("accepts single-leading-slash paths and rejects external targets", () => {
+    expect(isValidNextPath("/chat")).toBe(true);
+    expect(isValidNextPath("/chat?tab=1")).toBe(true);
+    // Both plan-verification cases: fall back to /chat instead of redirecting.
+    expect(isValidNextPath("//evil.com")).toBe(false);
+    expect(isValidNextPath("https://evil.com")).toBe(false);
+    expect(isValidNextPath("javascript:alert(1)")).toBe(false);
   });
 });
