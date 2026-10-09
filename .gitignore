@@ -19,4 +19,6 @@ frontend/.env.local
 frontend/.claude
 frontend/.agents
 frontend/node_modules
-frontend/convex/*
+# Convex backend source IS version-controlled (schema, auth, http, tsconfig);
+# only machine-generated output is ignored.
+frontend/convex/_generated/
