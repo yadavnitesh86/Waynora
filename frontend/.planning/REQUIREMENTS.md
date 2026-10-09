@@ -17,12 +17,12 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 
 ### Authentication
 
-- [ ] **AUTH-01**: A visitor can create an account using the configured Convex email/password authentication flow.
-- [ ] **AUTH-02**: A registered user can log in with validation, loading state, and friendly invalid-credential feedback.
-- [ ] **AUTH-03**: A logged-in user can log out and the UI returns to an unauthenticated state.
-- [ ] **AUTH-04**: An authenticated session persists across browser refresh using the supported Convex session mechanism.
-- [ ] **AUTH-05**: Unauthenticated visitors cannot access the chat route and receive a clear path to sign up or log in.
-- [ ] **AUTH-06**: Authentication configuration does not expose passwords, deployment credentials, API secrets, or private environment values to browser code.
+- [x] **AUTH-01**: A visitor can create an account using the configured Convex email/password authentication flow.
+- [x] **AUTH-02**: A registered user can log in with validation, loading state, and friendly invalid-credential feedback.
+- [x] **AUTH-03**: A logged-in user can log out and the UI returns to an unauthenticated state.
+- [x] **AUTH-04**: An authenticated session persists across browser refresh using the supported Convex session mechanism.
+- [x] **AUTH-05**: Unauthenticated visitors cannot access the chat route and receive a clear path to sign up or log in.
+- [x] **AUTH-06**: Authentication configuration does not expose passwords, deployment credentials, API secrets, or private environment values to browser code.
 
 ### Landing Experience
 
@@ -154,12 +154,12 @@ Updated during roadmap creation. Each v1 requirement maps to exactly one phase.
 | FOUND-03 | Phase 1 | Pending |
 | FOUND-04 | Phase 5 | Pending |
 | FOUND-05 | Phase 1 | Pending |
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
-| AUTH-04 | Phase 1 | Pending |
-| AUTH-05 | Phase 1 | Pending |
-| AUTH-06 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
+| AUTH-04 | Phase 1 | Complete |
+| AUTH-05 | Phase 1 | Complete |
+| AUTH-06 | Phase 1 | Complete |
 | LAND-01 | Phase 5 | Pending |
 | LAND-02 | Phase 5 | Pending |
 | LAND-03 | Phase 5 | Pending |
