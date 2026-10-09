@@ -28,16 +28,16 @@ Waynora will be built as a five-phase vertical MVP: establish the React/Convex/A
   4. No private Convex credentials, passwords, API keys, or server-only values are exposed in browser code.
 
 **UI hint:** yes
-**Plans:** 3 plans
+**Plans:** 2/3 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 01-01: Scaffold Vite React TypeScript app, Tailwind tokens, routing, environment validation, API schemas, and safe Markdown boundary.
+- [x] 01-01: Scaffold Vite React TypeScript app, Tailwind tokens, routing, environment validation, API schemas, and safe Markdown boundary.
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-02: Configure Convex Password authentication, session provider, signup/login/logout forms, and protected-route behavior.
+- [x] 01-02: Configure Convex Password authentication, session provider, signup/login/logout forms, and protected-route behavior.
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -137,7 +137,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation, Contracts, and Auth | 0/3 | Not started | - |
+| 1. Foundation, Contracts, and Auth | 2/3 | In Progress|  |
 | 2. Cookie Persistence and Chat Domain | 0/2 | Not started | - |
 | 3. Real Chat and Long-Request Lifecycle | 0/3 | Not started | - |
 | 4. Chat Management, 2048, and Responsive Experience | 0/3 | Not started | - |
