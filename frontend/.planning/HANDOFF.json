@@ -1,0 +1,108 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-10-09T14:25:04.740Z",
+  "phase": "01",
+  "phase_name": "foundation-contracts-and-auth",
+  "phase_dir": ".planning/phases/01-foundation-contracts-and-auth",
+  "plan": 3,
+  "task": 0,
+  "total_tasks": 4,
+  "status": "paused",
+  "wave_state": {
+    "total_waves": 3,
+    "completed_waves": [1, 2],
+    "next_wave": 3,
+    "plans_done": ["01-01", "01-02"],
+    "plans_remaining": ["01-03"]
+  },
+  "completed_tasks": [
+    {
+      "id": 1,
+      "name": "Plan 01-01 — Foundation scaffold, design tokens, env validation, typed /ask boundary, safe Markdown, routes (4/4 tasks)",
+      "status": "done",
+      "commit": "7029ee3"
+    },
+    {
+      "id": 2,
+      "name": "Plan 01-02 — Convex Auth Password provider, session wiring, auth forms, protected route (4/4 tasks)",
+      "status": "done",
+      "commit": "0e9a171"
+    }
+  ],
+  "remaining_tasks": [
+    {
+      "id": 3,
+      "name": "01-03 Task 1: Build the shared accessible UI primitive barrel",
+      "status": "not_started"
+    },
+    {
+      "id": 4,
+      "name": "01-03 Task 2: Focus, keyboard, and document-metadata foundations",
+      "status": "not_started"
+    },
+    {
+      "id": 5,
+      "name": "01-03 Task 3: Lock the contract boundaries with regression tests",
+      "status": "not_started"
+    },
+    {
+      "id": 6,
+      "name": "01-03 Task 4: Human verification of foundation and auth flows (checkpoint:human-verify, gate=blocking)",
+      "status": "not_started"
+    }
+  ],
+  "blockers": [
+    {
+      "description": "A rate limit killed the Wave 2 executor mid-work, leaving installed dependencies and written convex/ files in the tree with zero commits.",
+      "type": "external",
+      "workaround": "Reconciled manually and re-spawned with an explicit resume_from_partial_work inventory. Always run `git status --porcelain` before spawning an executor."
+    },
+    {
+      "description": ".gitignore line 22 ignored frontend/convex/* entirely, so Convex backend source was never version-controlled.",
+      "type": "technical",
+      "workaround": "Fixed in commit feea71f — now only frontend/convex/_generated/ is ignored. Do not re-add the blanket ignore."
+    }
+  ],
+  "human_actions_pending": [
+    {
+      "action": "Run plan 01-03 Task 4 human-verify checkpoint — browser verification of the foundation and auth flows",
+      "context": "Gate is blocking; phase 1 cannot be marked complete until a human confirms the flows in a browser.",
+      "blocking": true
+    },
+    {
+      "action": "Commit frontend/prompt.md (the authoritative product brief referenced by 01-CONTEXT.md)",
+      "context": "Currently untracked (?? frontend/prompt.md) despite being named the source of truth.",
+      "blocking": false
+    },
+    {
+      "action": "When hosting the FastAPI API, set VITE_API_BASE_URL to the public URL and rebuild the frontend",
+      "context": "Vite inlines the value at build time; changing .env.local only affects the dev server.",
+      "blocking": false
+    },
+    {
+      "action": "Phase 5: npx convex env set SITE_URL https://your-domain",
+      "context": "Not needed for the Password-only provider used in Phase 1; required once OAuth or magic links are added.",
+      "blocking": false
+    }
+  ],
+  "decisions": [
+    {
+      "decision": "Track frontend/convex/ in git, ignore only frontend/convex/_generated/",
+      "rationale": "The blanket ignore meant schema, auth, http and auth.config would never be committed — half of plan 01-02's deliverable had no version history or rollback. User-selected option.",
+      "phase": "01"
+    },
+    {
+      "decision": "Convex Auth JWT keypair generated with the official jose script, not openssl",
+      "rationale": "Plan 01-02 originally prescribed openssl; Convex Auth expects the jose exportPKCS8 format and a mismatch fails silently at session issuance.",
+      "phase": "01"
+    },
+    {
+      "decision": "Teal accent #0F5C56 on canvas #F7F4EE, locked in 01-UI-SPEC.md",
+      "rationale": "Supersedes the looser wording in plan 01-01 Task 2; every visual decision defers to the UI-SPEC.",
+      "phase": "01"
+    }
+  ],
+  "uncommitted_files": ["frontend/prompt.md"],
+  "next_action": "/gsd-resume-work, then /gsd-execute-phase 1 --wave 3 to execute plan 01-03",
+  "context_notes": "Waves 1 and 2 are done and verified green: typecheck exit 0, lint 0 errors (3 pre-existing warnings in generated files), vite build 0, `npx tsc -p convex/tsconfig.json --noEmit` exit 0, vitest 25/25 across 4 files, secrets scan of dist/ and src/ clean, import.meta.env confined to src/lib/env.ts. Working tree is clean except the untracked prompt.md. 01-03 was never started — no partial work exists for it. Parallelization is off (config workflow.parallelization=false) and this runtime has no worktree isolation, so execution is sequential on the main tree. 01-03 declares autonomous=false with a blocking human-verify checkpoint at Task 4."
+}
