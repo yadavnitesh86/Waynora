@@ -7,6 +7,7 @@ vi.mock("../env", () => ({
     VITE_CONVEX_URL: "https://example.convex.cloud",
   },
   envError: [],
+  isDev: false,
 }));
 
 describe("askBackend", () => {

@@ -4,7 +4,8 @@ import RootLayout from "../layouts/RootLayout";
 import ProtectedRoute from "./ProtectedRoute";
 
 const Landing = lazy(() => import("./Landing"));
-const LoginPlaceholder = lazy(() => import("./LoginPlaceholder"));
+const SignIn = lazy(() => import("./SignIn"));
+const SignUp = lazy(() => import("./SignUp"));
 const ChatPlaceholder = lazy(() => import("./ChatPlaceholder"));
 const NotFound = lazy(() => import("./NotFound"));
 
@@ -24,7 +25,7 @@ export const router = createBrowserRouter([
         path: "/signin",
         element: (
           <Suspense fallback={null}>
-            <LoginPlaceholder />
+            <SignIn />
           </Suspense>
         ),
       },
@@ -32,7 +33,7 @@ export const router = createBrowserRouter([
         path: "/signup",
         element: (
           <Suspense fallback={null}>
-            <LoginPlaceholder />
+            <SignUp />
           </Suspense>
         ),
       },

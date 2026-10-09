@@ -18,3 +18,14 @@ export const CUSTOMER_MESSAGES: Record<AskErrorKind, string> = {
   abort: "The request was cancelled.",
   config: "The app is not configured correctly. Please contact support.",
 };
+
+/**
+ * Generic auth failure copy (TM-04, UI-SPEC copy contract).
+ * Auth forms map EVERY provider failure to one of these strings — raw
+ * provider error messages are never rendered in the UI.
+ */
+export const AUTH_GENERIC_FAILURE =
+  "We couldn't sign you in. Check your email and password and try again.";
+
+export const AUTH_SIGNUP_GENERIC_FAILURE =
+  "We couldn't create your account. Try a different email address, or sign in if you already have one.";
