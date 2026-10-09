@@ -12,7 +12,7 @@ export const { auth, signIn, signOut, store, isAuthenticated } = convexAuth({
 export { getAuthUserId };
 
 // The signed-in user's document, or null when signed out. Consumed by the
-// SPA through `useConvexQuery(api.auth.currentUser)` in src/auth/useCurrentUser.ts.
+// SPA through `useQuery(api.auth.currentUser)` in src/auth/useCurrentUser.ts.
 export const currentUser = query({
   args: {},
   handler: async (ctx) => {

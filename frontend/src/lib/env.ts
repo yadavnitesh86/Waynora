@@ -31,3 +31,7 @@ export const env = {
     return getEnv().VITE_CONVEX_URL;
   },
 };
+
+// Vite's build-mode flag, funneled through this module so no other file in
+// src/ reads the Vite environment object directly (auth plan Task 3 check).
+export const isDev: boolean = import.meta.env.DEV;

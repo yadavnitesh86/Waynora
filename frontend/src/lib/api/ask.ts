@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { env } from "../env";
+import { env, isDev } from "../env";
 import { CUSTOMER_MESSAGES, type AskResult } from "../errors";
 
 export const askRequestSchema = z.strictObject({
@@ -31,14 +31,14 @@ export async function askBackend(
     if (err instanceof DOMException && err.name === "AbortError") {
       return { ok: false, kind: "abort", message: CUSTOMER_MESSAGES.abort };
     }
-    if (import.meta.env.DEV) {
+    if (isDev) {
       console.error("[ask] Network error", err);
     }
     return { ok: false, kind: "network", message: CUSTOMER_MESSAGES.network };
   }
 
   if (!response.ok) {
-    if (import.meta.env.DEV) {
+    if (isDev) {
       console.error(`[ask] HTTP ${response.status}`);
     }
     return { ok: false, kind: "http", message: CUSTOMER_MESSAGES.http };
@@ -48,7 +48,7 @@ export async function askBackend(
   try {
     body = await response.json();
   } catch {
-    if (import.meta.env.DEV) {
+    if (isDev) {
       console.error("[ask] Failed to parse response body as JSON");
     }
     return { ok: false, kind: "malformed", message: CUSTOMER_MESSAGES.malformed };
@@ -56,7 +56,7 @@ export async function askBackend(
 
   const parsed = askResponseSchema.safeParse(body);
   if (!parsed.success) {
-    if (import.meta.env.DEV) {
+    if (isDev) {
       console.error("[ask] Malformed response", parsed.error);
     }
     return { ok: false, kind: "malformed", message: CUSTOMER_MESSAGES.malformed };
