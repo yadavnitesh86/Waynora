@@ -6,7 +6,7 @@ Waynora will be built as a five-phase vertical MVP: establish the React/Convex/A
 
 ## Phases
 
-- [ ] **Phase 1: Foundation, Contracts, and Auth** - Establish the typed SPA, exact backend boundary, safe Markdown, Convex auth, routing, and shared UI foundations.
+- [x] **Phase 1: Foundation, Contracts, and Auth** - Establish the typed SPA, exact backend boundary, safe Markdown, Convex auth, routing, and shared UI foundations. (completed 2026-10-10)
 - [ ] **Phase 2: Cookie Persistence and Chat Domain** - Build bounded, validated conversation storage and pure chat management primitives.
 - [ ] **Phase 3: Real Chat and Long-Request Lifecycle** - Deliver the core authenticated chat slice against the actual FastAPI `/ask` endpoint with honest waiting and recovery.
 - [ ] **Phase 4: Chat Management, 2048, and Responsive Experience** - Add sidebar management, the isolated waiting game, and cross-device interaction quality.
@@ -28,7 +28,7 @@ Waynora will be built as a five-phase vertical MVP: establish the React/Convex/A
   4. No private Convex credentials, passwords, API keys, or server-only values are exposed in browser code.
 
 **UI hint:** yes
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 **Wave 1**
@@ -41,7 +41,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 01-03: Build shared accessible shell primitives and verify foundation/auth contracts with unit and browser checks.
+- [x] 01-03: Build shared accessible shell primitives and verify foundation/auth contracts with unit and browser checks.
 
 ### Phase 2: Cookie Persistence and Chat Domain
 
@@ -137,7 +137,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation, Contracts, and Auth | 2/3 | In Progress|  |
+| 1. Foundation, Contracts, and Auth | 3/3 | Complete   | 2026-10-10 |
 | 2. Cookie Persistence and Chat Domain | 0/2 | Not started | - |
 | 3. Real Chat and Long-Request Lifecycle | 0/3 | Not started | - |
 | 4. Chat Management, 2048, and Responsive Experience | 0/3 | Not started | - |
