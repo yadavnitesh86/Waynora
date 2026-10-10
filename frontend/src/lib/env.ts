@@ -5,7 +5,19 @@ export const publicEnvSchema = z.strictObject({
   VITE_CONVEX_URL: z.string().url(),
 });
 
-const parseResult = publicEnvSchema.safeParse(import.meta.env);
+// Vite injects its own keys into import.meta.env (MODE, DEV, PROD, BASE_URL,
+// SSR, plus anything matching VITE_*). Validating the raw object with a strict
+// schema rejects those injected keys and blanks the app, so narrow to our
+// allowlist first - then unknown keys are still a real error.
+function pickPublicEnv(): Record<string, unknown> {
+  const raw = import.meta.env as Record<string, unknown>;
+  return {
+    VITE_API_BASE_URL: raw.VITE_API_BASE_URL,
+    VITE_CONVEX_URL: raw.VITE_CONVEX_URL,
+  };
+}
+
+const parseResult = publicEnvSchema.safeParse(pickPublicEnv());
 
 export const envError: string[] = parseResult.success
   ? []
