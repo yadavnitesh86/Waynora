@@ -101,8 +101,15 @@ describe("messageSchema boundary", () => {
   });
 
   it("rejects a missing createdAt", () => {
-    const { createdAt: _omit, ...rest } = validMessage();
-    expect(messageSchema.safeParse(rest).success).toBe(false);
+    expect(
+      messageSchema
+        .safeParse({
+          id: "m-1",
+          role: "user",
+          content: "Plan a trip to Japan",
+        })
+        .success,
+    ).toBe(false);
   });
 });
 
@@ -133,8 +140,16 @@ describe("conversationSchema boundary", () => {
   });
 
   it("rejects a missing messages array", () => {
-    const { messages: _omit, ...rest } = validConversation();
-    expect(conversationSchema.safeParse(rest).success).toBe(false);
+    expect(
+      conversationSchema
+        .safeParse({
+          id: "c-1",
+          title: "Trip to Japan",
+          createdAt: AT,
+          updatedAt: AT,
+        })
+        .success,
+    ).toBe(false);
   });
 
   it("rejects a malformed nested message", () => {
