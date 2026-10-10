@@ -1,13 +1,13 @@
 {
   "version": "1.0",
-  "timestamp": "2026-10-09T14:25:04.740Z",
+  "timestamp": "2026-10-10T14:15:00.000Z",
   "phase": "01",
   "phase_name": "foundation-contracts-and-auth",
   "phase_dir": ".planning/phases/01-foundation-contracts-and-auth",
   "plan": 3,
   "task": 4,
   "total_tasks": 4,
-  "status": "blocked-awaiting-human-verify",
+  "status": "phase-delivered-partially-verified",
   "wave_state": {
     "total_waves": 3,
     "completed_waves": [1, 2, 3],
@@ -18,77 +18,118 @@
   "completed_tasks": [
     {
       "id": 1,
-      "name": "Plan 01-01 — Foundation scaffold, design tokens, env validation, typed /ask boundary, safe Markdown, routes (4/4 tasks)",
+      "name": "Plan 01-01 — Foundation scaffold, design tokens, env validation, typed /ask boundary, safe Markdown, routes (4/4)",
       "status": "done",
       "commit": "7029ee3"
     },
     {
       "id": 2,
-      "name": "Plan 01-02 — Convex Auth Password provider, session wiring, auth forms, protected route (4/4 tasks)",
+      "name": "Plan 01-02 — Convex Auth Password provider, session wiring, auth forms, protected route (4/4)",
       "status": "done",
       "commit": "0e9a171"
     },
     {
       "id": 3,
-      "name": "01-03 Tasks 1-3 — shared UI primitives barrel, RootLayout/a11y foundations, contract regression suites (74/74 tests)",
+      "name": "Plan 01-03 — 8 UI primitives + barrel, RootLayout/a11y foundations, contract regression suites (3/4)",
       "status": "done",
       "commit": "55dcb68"
+    },
+    {
+      "id": 4,
+      "name": "Post-execution fixes — env strictObject rejected Vite's injected keys; nested BrowserRouter around RouterProvider",
+      "status": "done",
+      "commit": "edadd3b"
     }
   ],
   "remaining_tasks": [
     {
-      "id": 4,
-      "name": "01-03 Task 4: Human browser verification of foundation and auth flows (checkpoint:human-verify, gate=blocking)",
-      "status": "deferred-to-human"
+      "id": 5,
+      "name": "Task 4 browser items never walked individually: session persists across refresh",
+      "status": "unverified"
+    },
+    {
+      "id": 6,
+      "name": "Task 4 browser items never walked individually: real sign-out against a live session",
+      "status": "unverified"
+    },
+    {
+      "id": 7,
+      "name": "Task 4 browser items never walked individually: provider error copy (wrong password -> AUTH_GENERIC_FAILURE)",
+      "status": "unverified"
+    },
+    {
+      "id": 8,
+      "name": "Task 4 browser items never walked individually: 375px viewport responsive behaviour",
+      "status": "unverified"
     }
   ],
   "blockers": [
     {
-      "description": "Plan 01-03 Task 4 is a blocking human-verify checkpoint. The agent explicitly performed NO browser verification.",
-      "type": "human_action",
-      "workaround": "Run `npm run dev` + `npx convex dev` and walk the 9-item checklist in 01-03-SUMMARY.md. Phase 1 cannot be signed off without it."
+      "description": "Phase 5 aesthetic target is not agreed. User called the current UI 'too basic / looks AI-generated'.",
+      "type": "external",
+      "workaround": "Answered: Phase 5 owns the editorial landing identity (D-13, LAND-01..06, plan 05-01). But system-first fonts and restrained motion are locked for ALL phases, spacing tops at 96px (4xl), and no component library is permitted (D-02). Agree the target BEFORE Phases 2-4 build on these tokens."
+    },
+    {
+      "description": "FastAPI on :8000 is not running locally.",
+      "type": "external",
+      "workaround": "Landing and auth work fine; anything hitting /ask fails until the backend is started."
+    },
+    {
+      "description": "npx convex dev warns about multiple VITE_CONVEX_URL sources (root .env + frontend/.env.local).",
+      "type": "technical",
+      "workaround": "Harmless, but it blocks Convex auto-syncing that value. Dedupe later."
     }
   ],
   "human_actions_pending": [
     {
-      "action": "Run plan 01-03 Task 4 human-verify checkpoint — browser verification of the foundation and auth flows",
-      "context": "Gate is blocking; phase 1 cannot be marked complete until a human confirms the flows in a browser.",
-      "blocking": true
-    },
-    {
-      "action": "Commit frontend/prompt.md (the authoritative product brief referenced by 01-CONTEXT.md)",
-      "context": "Currently untracked (?? frontend/prompt.md) despite being named the source of truth.",
+      "action": "Walk the 4 open Task-4 browser items listed in remaining_tasks",
+      "context": "The human confirmed the app renders and navigates, but did not walk these individually. They are honestly open, not passed.",
       "blocking": false
     },
     {
-      "action": "When hosting the FastAPI API, set VITE_API_BASE_URL to the public URL and rebuild the frontend",
-      "context": "Vite inlines the value at build time; changing .env.local only affects the dev server.",
+      "action": "Settle the Phase 5 aesthetic target before planning Phases 2-4",
+      "context": "If the user wants an Awwwards-grade landing, that changes 01-UI-SPEC.md and the current tokens would be revised late.",
       "blocking": false
     },
     {
       "action": "Phase 5: npx convex env set SITE_URL https://your-domain",
-      "context": "Not needed for the Password-only provider used in Phase 1; required once OAuth or magic links are added.",
+      "context": "Not needed for the Password-only provider; required once OAuth or magic links are added.",
       "blocking": false
     }
   ],
   "decisions": [
     {
-      "decision": "Track frontend/convex/ in git, ignore only frontend/convex/_generated/",
-      "rationale": "The blanket ignore meant schema, auth, http and auth.config would never be committed — half of plan 01-02's deliverable had no version history or rollback. User-selected option.",
+      "decision": "frontend/convex/ is version-controlled; only convex/_generated/ is ignored",
+      "rationale": "The blanket ignore meant schema/auth/http/auth.config were never committed — half of 01-02's deliverable had no history or rollback. User-selected. Commit feea71f.",
       "phase": "01"
     },
     {
-      "decision": "Convex Auth JWT keypair generated with the official jose script, not openssl",
-      "rationale": "Plan 01-02 originally prescribed openssl; Convex Auth expects the jose exportPKCS8 format and a mismatch fails silently at session issuance.",
+      "decision": "Convex Auth JWT keys generated with the jose script, not openssl",
+      "rationale": "openssl output is not the format Convex Auth expects; a mismatch fails silently at session issuance.",
       "phase": "01"
     },
     {
-      "decision": "Teal accent #0F5C56 on canvas #F7F4EE, locked in 01-UI-SPEC.md",
-      "rationale": "Supersedes the looser wording in plan 01-01 Task 2; every visual decision defers to the UI-SPEC.",
+      "decision": "Never safeParse(import.meta.env) directly — narrow through pickPublicEnv()",
+      "rationale": "Vite injects MODE/DEV/PROD/BASE_URL/SSR; z.strictObject rejects them, so validation failed on every environment and blanked the app.",
+      "phase": "01"
+    },
+    {
+      "decision": "Exactly one router: createBrowserRouter + RouterProvider in App; main.tsx adds no BrowserRouter",
+      "rationale": "A data router provides its own <Router>; nesting two throws at mount.",
+      "phase": "01"
+    },
+    {
+      "decision": "Keep src/app.composition.test.tsx permanently",
+      "rationale": "It is the only test rendering the real main.tsx tree without mocking the router or auth layer. Both blank-page bugs would fail it.",
+      "phase": "01"
+    },
+    {
+      "decision": "Teal #0F5C56 / canvas #F7F4EE, system-first fonts, restrained motion",
+      "rationale": "Locked in 01-UI-SPEC.md. Fonts and motion constraints apply to ALL phases, not just Phase 1.",
       "phase": "01"
     }
   ],
   "uncommitted_files": [],
-  "next_action": "Human runs `npm run dev` + `npx convex dev` and walks the 9-item Task 4 checklist in 01-03-SUMMARY.md. Then /gsd-verify-work closes Phase 1 and /gsd-plan-phase 2 begins.",
-  "context_notes": "All 3 phase-1 plans are executed and committed (waves 1-2 and now wave 3). Gates green: typecheck 0, lint 0 errors (3 pre-existing generated-file warnings), build 0, vitest 74/74, app-code secrets scan clean, import.meta.env funnelled to src/lib/env.ts only, convex/ untouched by 01-03. 01-03 shipped src/components/ui/ (8 primitives + barrel), RootLayout with skip-link-to-#main, useDocumentTitle with meta description, axe-core harness, and ask/env/secrets boundary suites. Auth forms were refactored onto the primitives with copy unchanged. Task 4 is the only unfinished item and it is human-only by design — the agent recorded it as deferred-to-human and never claimed a browser pass. A prior false-alarm: broad greps over src/**/*.ts and dist/**/*.js flag test-fixture strings and React internals; scope forbidden-pattern checks to non-test app code only."
+  "next_action": "Settle the Phase 5 aesthetic target, then /gsd-plan-phase 2. Optionally walk the 4 open Task-4 browser items first to close Phase 1 properly.",
+  "context_notes": "Phase 1 is delivered and the app runs. Two blank-page bugs shipped in the same phase that reported 74/74 passing tests, both in the one composition no test rendered: AuthProvider over App over the real router. The fix plus structural mitigations (ErrorBoundary, app.composition.test.tsx, env.test.ts, jsdom url in vitest.config) are committed. Generalisable lesson: when every suite mocks the same layer, that layer is untested regardless of test count — and that pattern repeats whenever an executor mocks around a boundary instead of rendering through it. The user is design-sensitive and flagged the UI as too basic; the honest answer is that Phase 5 changes the landing substantially but fonts/motion are locked for all phases. That is a live decision, not a settled one. The user is executing Phases 2-5 later."
 }

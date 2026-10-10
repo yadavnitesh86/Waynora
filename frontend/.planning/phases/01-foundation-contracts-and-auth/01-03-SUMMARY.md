@@ -214,6 +214,39 @@ This agent has no browser. No claim of a browser pass is made anywhere in this s
 - `npm run typecheck` exit 0, `npm run lint` 0 errors, `npm run build` exit 0, `npx vitest run` 74/74 — verified above.
 - `convex/` and `.planning/` untouched since `7d5095c` — verified.
 
+## Task 4 Outcome — Human Browser Verification (recorded post-hoc)
+
+Task 4 was executed by the human on 2026-10-10 after the plan was committed. **The app rendered blank.** Two composition bugs were found that every automated gate had missed, both now fixed:
+
+### Bug 1 — `z.strictObject` rejected Vite's injected env keys
+
+`src/lib/env.ts` ran `publicEnvSchema.safeParse(import.meta.env)`. Vite always injects `MODE`, `DEV`, `PROD`, `BASE_URL`, `SSR` into `import.meta.env`. `strictObject` treats those as unrecognized keys, so validation failed on **every** environment and the first `env.*` read threw — which happens inside `AuthProvider` render.
+
+**Fix (commit `4720f19`):** narrowed to a `pickPublicEnv()` allowlist before validating, so unknown *app* keys still fail loudly. Regression: `src/lib/env.test.ts` (4 tests).
+
+### Bug 2 — nested `<Router>`
+
+`src/main.tsx` wrapped `<App/>` in `<BrowserRouter>` while `App` renders `<RouterProvider router={router}>` (from `createBrowserRouter`). A data router already provides its own `<Router>`, so react-router threw `You cannot render a <Router> inside another <Router>` at mount.
+
+**Fix (commit `edadd3b`):** removed the redundant `<BrowserRouter>`; `AuthProvider` stays outside the router since it provides session context, not routing context. Regression: `src/app.composition.test.tsx`.
+
+### Supporting changes
+
+- `src/ErrorBoundary.tsx` + mount in `main.tsx` — a render-time throw now surfaces a readable alert instead of white silence.
+- `vitest.config.ts` — added `environmentOptions.jsdom.url`. jsdom had no `localStorage`, so the real `ConvexAuthProvider` path could not be rendered in tests at all.
+
+### Why 74 tests were green against a blank app
+
+Every existing suite mocked `useCurrentUser` and `@convex-dev/auth/react`, and rendered through `MemoryRouter`. The real composition in `main.tsx` — `AuthProvider` over `App` over `createBrowserRouter` — **had never been rendered once** before the human opened the browser. Both bugs live exactly there.
+
+**Structural mitigation now in place:** `src/app.composition.test.tsx` renders the real `main.tsx` tree with no router/auth mocks. Either bug would fail it.
+
+### Verification after fixes
+
+`npm run typecheck` 0 · `npm run lint` 0 errors · `npm run build` 0 · `npx vitest run` **79/79** · human confirmed the app renders and navigation works.
+
+**Task 4 browser items still not independently confirmed** (the human verified the app renders; the following were not walked individually): real persisted session across refresh, real sign-out against a live session, real provider error copy, 375px viewport. These remain honest open items, not passes.
+
 ---
 *Phase: 01-foundation-contracts-and-auth*
 *Completed: 2026-10-10*
