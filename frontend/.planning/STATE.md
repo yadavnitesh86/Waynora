@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Initialization complete; ready to plan Phase 1
-last_updated: "2026-10-09T12:51:01.914Z"
-last_activity: 2026-10-09 -- Phase 1 execution started
+stopped_at: Phase 1 wave 3 (plan 01-03) not started; waves 1-2 complete and committed
+last_updated: "2026-10-10T00:00:00.000Z"
+last_activity: 2026-10-10 -- Session resumed; tracking reconciled after pause
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 3
-  completed_plans: 0
-  percent: 0
+  completed_plans: 2
+  percent: 67
 ---
 
 # Project State
@@ -26,11 +26,11 @@ See: .planning/PROJECT.md (updated 2026-10-09)
 ## Current Position
 
 Phase: 1 (Foundation, Contracts, and Auth) — EXECUTING
-Plan: 1 of 3
-Status: Executing Phase 1
-Last activity: 2026-10-09 -- Phase 1 execution started
+Plan: 3 of 3 (01-03 — shared UI primitives, a11y foundations, contract regression tests)
+Status: Waves 1–2 complete and verified; Wave 3 not started
+Last activity: 2026-10-10 -- Session resumed, tracking reconciled
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████░░░░] 67%
 
 ## Performance Metrics
 
@@ -85,6 +85,16 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-09
-Stopped at: Initialization complete; ready to plan Phase 1
-Resume file: None
+Last session: 2026-10-10
+Stopped at: Paused by user after wave 2 (plans 01-01, 01-02 done). Tracking divergences reconciled on resume: STATE.md, REQUIREMENTS.md, HANDOFF.json.
+Resume file: .planning/phases/01-foundation-contracts-and-auth/.continue-here.md
+
+**Verified divergences at resume (all resolved except the one flagged below):**
+
+| Artifact | Claimed | Actual | Resolution |
+|----------|---------|--------|------------|
+| STATE.md frontmatter | 0/3 plans, 0% | 2/3 plans complete | Updated to 2/3, 67% |
+| REQUIREMENTS.md | FOUND-01/02 Pending | Delivered by 01-01 | Marked Complete |
+| REQUIREMENTS.md | CHAT-04 Pending | `src/lib/api/ask.ts` ships the exact `/ask` contract with strictObject schemas | Marked Complete |
+| HANDOFF.json `uncommitted_files` | `frontend/prompt.md` untracked | Committed as `be25d47` | Stale entry, no action |
+| 01-01 SUMMARY | FOUND-03, FOUND-05, CHAT-04 complete | Only tokens + routes + titles exist; primitives/focus/keyboard are 01-03 tasks | FOUND-03 and FOUND-05 held at **Pending** |

@@ -9,8 +9,8 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 
 ### Foundation and Design
 
-- [ ] **FOUND-01**: The application runs as a typed React/Vite SPA using the selected project stack and existing Convex dependency.
-- [ ] **FOUND-02**: The application exposes a configurable public backend base URL and does not hardcode production endpoints or secrets.
+- [x] **FOUND-01**: The application runs as a typed React/Vite SPA using the selected project stack and existing Convex dependency.
+- [x] **FOUND-02**: The application exposes a configurable public backend base URL and does not hardcode production endpoints or secrets.
 - [ ] **FOUND-03**: The application has shared responsive design tokens and reusable layout primitives for landing, auth, chat, and waiting surfaces.
 - [ ] **FOUND-04**: The UI applies the installed frontend design skills, especially `design-taste-frontend` and `high-end-visual-design`, and avoids generic SaaS visual patterns.
 - [ ] **FOUND-05**: The application provides accessible route structure, document metadata, page titles, focus states, and keyboard navigation foundations.
@@ -38,7 +38,7 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 - [ ] **CHAT-01**: An authenticated user can create a new chat and see a clear empty state before sending a message.
 - [ ] **CHAT-02**: The chat composer accepts multi-line trip requests and Enter/Shift+Enter behavior is predictable and documented in the UI.
 - [ ] **CHAT-03**: Submitting a valid request immediately displays the user's message before waiting for the backend.
-- [ ] **CHAT-04**: The client sends the exact backend contract `POST /ask` with `{ question, thread_id? }` and validates `{ answer, thread_id }` before displaying a response.
+- [x] **CHAT-04**: The client sends the exact backend contract `POST /ask` with `{ question, thread_id? }` and validates `{ answer, thread_id }` before displaying a response.
 - [ ] **CHAT-05**: A returned `thread_id` is retained for supported follow-up messages in the same conversation.
 - [ ] **CHAT-06**: Assistant responses render readable Markdown including lists and tables through a safe renderer with raw HTML disabled and safe link handling.
 - [ ] **CHAT-07**: User and assistant messages are visually distinct, readable at long response lengths, and accessible to screen readers.
@@ -149,8 +149,8 @@ Updated during roadmap creation. Each v1 requirement maps to exactly one phase.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUND-01 | Phase 1 | Pending |
-| FOUND-02 | Phase 1 | Pending |
+| FOUND-01 | Phase 1 | Complete |
+| FOUND-02 | Phase 1 | Complete |
 | FOUND-03 | Phase 1 | Pending |
 | FOUND-04 | Phase 5 | Pending |
 | FOUND-05 | Phase 1 | Pending |
@@ -169,7 +169,7 @@ Updated during roadmap creation. Each v1 requirement maps to exactly one phase.
 | CHAT-01 | Phase 3 | Pending |
 | CHAT-02 | Phase 3 | Pending |
 | CHAT-03 | Phase 3 | Pending |
-| CHAT-04 | Phase 1 | Pending |
+| CHAT-04 | Phase 1 | Complete |
 | CHAT-05 | Phase 3 | Pending |
 | CHAT-06 | Phase 3 | Pending |
 | CHAT-07 | Phase 3 | Pending |
