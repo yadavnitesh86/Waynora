@@ -33,7 +33,9 @@ function createCookieJar() {
         .join("; ");
     },
     set cookie(raw: string) {
-      const [pair, ...attributes] = raw.split("; ");
+      const parts = raw.split("; ");
+      const pair = parts[0] ?? "";
+      const attributes = parts.slice(1);
       const separator = pair.indexOf("=");
       const name = pair.slice(0, separator);
       const value = pair.slice(separator + 1);
@@ -121,6 +123,10 @@ describe("cookie repository", () => {
     vi.unstubAllGlobals();
   });
 
+  /**
+   * Persisted order is retention order — newest first — because every write
+   * runs through `enforceCap` before the shards are laid out (D-19).
+   */
   describe("readConversations", () => {
     it("returns an empty state when no cookies exist", () => {
       expect(readConversations()).toEqual(EMPTY_RESULT);
@@ -128,8 +134,8 @@ describe("cookie repository", () => {
 
     it("returns parsed conversations when valid cookies exist", () => {
       const conversations = [
-        conversation("c-1"),
-        conversation("c-2", "2026-01-03T00:00:00Z"),
+        conversation("c-1", "2026-01-03T00:00:00Z"),
+        conversation("c-2"),
       ];
       writeConversations(conversations);
 
@@ -153,47 +159,52 @@ describe("cookie repository", () => {
     });
 
     it("reports recovery when the shard the index points at is missing (D-22)", () => {
-      const { index } = writeConversations([conversation("c-1")]);
+      writeConversations([conversation("c-1", "2026-01-03T00:00:00Z")]);
+      const indexBefore = indexCookieValueOf(jar);
       expireCookie(jar, "waynora_chat_0");
 
       const result = readConversations();
 
       expect(result.recovered).toBe(true);
       expect(result.conversations).toEqual([]);
-      expect(indexCookieValueOf(jar)).toBe(index);
+      expect(indexCookieValueOf(jar)).toBe(indexBefore);
     });
 
     it("salvages intact conversations when one shard is missing (D-22)", () => {
-      const { index } = writeConversations([
-        conversation("c-1"),
-        conversation("c-2", "2026-01-03T00:00:00Z"),
+      // Shard 0 carries the newest conversation, shard 1 the older one.
+      writeConversations([
+        conversation("c-1", "2026-01-03T00:00:00Z"),
+        conversation("c-2"),
       ]);
       expireCookie(jar, "waynora_chat_1");
 
       const result = readConversations();
 
       expect(result.recovered).toBe(true);
-      expect(result.conversations).toEqual([conversation("c-1")]);
-      expect(indexCookieValueOf(jar)).toBe(index);
+      expect(result.conversations).toEqual([
+        conversation("c-1", "2026-01-03T00:00:00Z"),
+      ]);
     });
 
     it("salvages intact conversations when one shard is corrupt (D-22)", () => {
       writeConversations([
-        conversation("c-1"),
-        conversation("c-2", "2026-01-03T00:00:00Z"),
+        conversation("c-1", "2026-01-03T00:00:00Z"),
+        conversation("c-2"),
       ]);
       jar.cookie = `waynora_chat_1=%E0%A4%A`;
 
-      expect(readConversations().conversations).toEqual([conversation("c-1")]);
+      expect(readConversations().conversations).toEqual([
+        conversation("c-1", "2026-01-03T00:00:00Z"),
+      ]);
     });
 
     it("returns an empty state for an unsupported envelope version (D-16)", () => {
-      const { index } = writeConversations([conversation("c-1")]);
+      writeConversations([conversation("c-1", "2026-01-03T00:00:00Z")]);
       const tampered = JSON.stringify({
-        ...(JSON.parse(index) as Record<string, unknown>),
+        ...(JSON.parse(indexCookieValueOf(jar)) as Record<string, unknown>),
         version: 2,
       });
-      jar.cookie = `${INDEX_COOKIE}=${tampered}`;
+      jar.cookie = `${INDEX_COOKIE}=${encodeURIComponent(tampered)}`;
 
       expect(readConversations()).toEqual(EMPTY_RESULT);
     });
@@ -251,14 +262,13 @@ describe("cookie repository", () => {
     });
 
     it("round-trips through a read after writing", () => {
-      const conversations = [
-        conversation("c-1"),
-        conversation("c-2", "2026-01-03T00:00:00Z"),
-      ];
+      // Written in arbitrary order; read back in retention order (newest first).
+      const newest = conversation("c-1", "2026-01-03T00:00:00Z");
+      const oldest = conversation("c-2");
 
-      writeConversations(conversations);
+      writeConversations([oldest, newest]);
 
-      expect(readConversations().conversations).toEqual(conversations);
+      expect(readConversations().conversations).toEqual([newest, oldest]);
     });
 
     it("drops stale data cookies left by an earlier, larger snapshot", () => {
@@ -298,10 +308,11 @@ describe("cookie repository", () => {
   });
 });
 
-/** Reader helper: the raw index cookie value that writeConversations produced. */
+/** Reader helper: the decoded index cookie value the repository persisted. */
 function indexCookieValueOf(jar: { cookie: string }): string {
   const entry = jar.cookie
     .split("; ")
     .find((candidate) => candidate.startsWith(`${INDEX_COOKIE}=`));
-  return entry!.slice(`${INDEX_COOKIE}=`.length);
+  if (!entry) return "";
+  return decodeURIComponent(entry.slice(`${INDEX_COOKIE}=`.length));
 }
