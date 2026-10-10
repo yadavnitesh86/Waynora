@@ -11,9 +11,9 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 
 - [x] **FOUND-01**: The application runs as a typed React/Vite SPA using the selected project stack and existing Convex dependency.
 - [x] **FOUND-02**: The application exposes a configurable public backend base URL and does not hardcode production endpoints or secrets.
-- [ ] **FOUND-03**: The application has shared responsive design tokens and reusable layout primitives for landing, auth, chat, and waiting surfaces.
+- [x] **FOUND-03**: The application has shared responsive design tokens and reusable layout primitives for landing, auth, chat, and waiting surfaces.
 - [ ] **FOUND-04**: The UI applies the installed frontend design skills, especially `design-taste-frontend` and `high-end-visual-design`, and avoids generic SaaS visual patterns.
-- [ ] **FOUND-05**: The application provides accessible route structure, document metadata, page titles, focus states, and keyboard navigation foundations.
+- [x] **FOUND-05**: The application provides accessible route structure, document metadata, page titles, focus states, and keyboard navigation foundations.
 
 ### Authentication
 
@@ -151,9 +151,9 @@ Updated during roadmap creation. Each v1 requirement maps to exactly one phase.
 |-------------|-------|--------|
 | FOUND-01 | Phase 1 | Complete |
 | FOUND-02 | Phase 1 | Complete |
-| FOUND-03 | Phase 1 | Pending |
+| FOUND-03 | Phase 1 | Complete |
 | FOUND-04 | Phase 5 | Pending |
-| FOUND-05 | Phase 1 | Pending |
+| FOUND-05 | Phase 1 | Complete |
 | AUTH-01 | Phase 1 | Complete |
 | AUTH-02 | Phase 1 | Complete |
 | AUTH-03 | Phase 1 | Complete |

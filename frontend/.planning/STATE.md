@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Phase 1 wave 3 (plan 01-03) not started; waves 1-2 complete and committed
-last_updated: "2026-10-10T00:00:00.000Z"
-last_activity: 2026-10-10 -- Session resumed; tracking reconciled after pause
+status: phase-complete-pending-human-verify
+stopped_at: Phase 1 all 3 plans executed; blocked on Task 4 human browser verification checkpoint
+last_updated: "2026-10-10T00:20:00.000Z"
+last_activity: 2026-10-10 -- Wave 3 (01-03) executed; 74/74 tests pass
 progress:
   total_phases: 5
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 2
-  percent: 67
+  completed_plans: 3
+  percent: 100
 ---
 
 # Project State
@@ -25,12 +25,12 @@ See: .planning/PROJECT.md (updated 2026-10-09)
 
 ## Current Position
 
-Phase: 1 (Foundation, Contracts, and Auth) — EXECUTING
-Plan: 3 of 3 (01-03 — shared UI primitives, a11y foundations, contract regression tests)
-Status: Waves 1–2 complete and verified; Wave 3 not started
-Last activity: 2026-10-10 -- Session resumed, tracking reconciled
+Phase: 1 (Foundation, Contracts, and Auth) — ALL 3 PLANS EXECUTED
+Plan: 3 of 3 (01-03 — shared UI primitives, a11y foundations, contract regression tests) — DONE
+Status: **Awaiting Task 4 human browser-verification checkpoint** (blocking gate)
+Last activity: 2026-10-10 -- Wave 3 executed; 74/74 tests, lint 0 errors, build + typecheck 0
 
-Progress: [██████░░░░] 67%
+Progress: [██████████] Phase 1 plans 3/3 (100%) — project 1 of 5 phases
 
 ## Performance Metrics
 
@@ -88,6 +88,15 @@ None yet.
 Last session: 2026-10-10
 Stopped at: Paused by user after wave 2 (plans 01-01, 01-02 done). Tracking divergences reconciled on resume: STATE.md, REQUIREMENTS.md, HANDOFF.json.
 Resume file: .planning/phases/01-foundation-contracts-and-auth/.continue-here.md
+
+**⚠️ BLOCKING GATE — Phase 1 Task 4 (human browser verification):**
+Plan 01-03 Task 4 is `checkpoint:human-verify`, `gate="blocking"`. The agent marked it `deferred-to-human` and performed NO browser verification. Phase 1 cannot be signed off until the user runs `npm run dev` + `npx convex dev` and walks the plan's 9-item checklist (listed verbatim in `01-03-SUMMARY.md`). Do not mark Phase 1 complete on the agent's word.
+
+**01-03 deliverables:** `src/components/ui/` (8 primitives + barrel: Button, TextField, ErrorText, Spinner, EmptyState, VisuallyHidden, SkipLink, PageHeader), `src/layouts/RootLayout.tsx` (skip link → `#main` landmark), `useDocumentTitle` with meta description, axe-core harness (`src/test/axe.ts`), and boundary suites `ask.boundary.test.ts` / `env.boundary.test.ts` / `secrets.test.ts`. Auth forms refactored onto the primitives with copy unchanged.
+
+**01-03 deviations worth knowing (7 documented in SUMMARY):**
+- Vite rewrites `new URL(..., import.meta.url)`, which broke `fileURLToPath` — resolved.
+- In-button Spinner's accessible name leaked into the button's name — caught by an existing auth regression test and fixed.
 
 **Verified divergences at resume (all resolved except the one flagged below):**
 

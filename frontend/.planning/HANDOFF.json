@@ -5,15 +5,15 @@
   "phase_name": "foundation-contracts-and-auth",
   "phase_dir": ".planning/phases/01-foundation-contracts-and-auth",
   "plan": 3,
-  "task": 0,
+  "task": 4,
   "total_tasks": 4,
-  "status": "paused",
+  "status": "blocked-awaiting-human-verify",
   "wave_state": {
     "total_waves": 3,
-    "completed_waves": [1, 2],
-    "next_wave": 3,
-    "plans_done": ["01-01", "01-02"],
-    "plans_remaining": ["01-03"]
+    "completed_waves": [1, 2, 3],
+    "next_wave": null,
+    "plans_done": ["01-01", "01-02", "01-03"],
+    "plans_remaining": []
   },
   "completed_tasks": [
     {
@@ -27,40 +27,26 @@
       "name": "Plan 01-02 — Convex Auth Password provider, session wiring, auth forms, protected route (4/4 tasks)",
       "status": "done",
       "commit": "0e9a171"
+    },
+    {
+      "id": 3,
+      "name": "01-03 Tasks 1-3 — shared UI primitives barrel, RootLayout/a11y foundations, contract regression suites (74/74 tests)",
+      "status": "done",
+      "commit": "55dcb68"
     }
   ],
   "remaining_tasks": [
     {
-      "id": 3,
-      "name": "01-03 Task 1: Build the shared accessible UI primitive barrel",
-      "status": "not_started"
-    },
-    {
       "id": 4,
-      "name": "01-03 Task 2: Focus, keyboard, and document-metadata foundations",
-      "status": "not_started"
-    },
-    {
-      "id": 5,
-      "name": "01-03 Task 3: Lock the contract boundaries with regression tests",
-      "status": "not_started"
-    },
-    {
-      "id": 6,
-      "name": "01-03 Task 4: Human verification of foundation and auth flows (checkpoint:human-verify, gate=blocking)",
-      "status": "not_started"
+      "name": "01-03 Task 4: Human browser verification of foundation and auth flows (checkpoint:human-verify, gate=blocking)",
+      "status": "deferred-to-human"
     }
   ],
   "blockers": [
     {
-      "description": "A rate limit killed the Wave 2 executor mid-work, leaving installed dependencies and written convex/ files in the tree with zero commits.",
-      "type": "external",
-      "workaround": "Reconciled manually and re-spawned with an explicit resume_from_partial_work inventory. Always run `git status --porcelain` before spawning an executor."
-    },
-    {
-      "description": ".gitignore line 22 ignored frontend/convex/* entirely, so Convex backend source was never version-controlled.",
-      "type": "technical",
-      "workaround": "Fixed in commit feea71f — now only frontend/convex/_generated/ is ignored. Do not re-add the blanket ignore."
+      "description": "Plan 01-03 Task 4 is a blocking human-verify checkpoint. The agent explicitly performed NO browser verification.",
+      "type": "human_action",
+      "workaround": "Run `npm run dev` + `npx convex dev` and walk the 9-item checklist in 01-03-SUMMARY.md. Phase 1 cannot be signed off without it."
     }
   ],
   "human_actions_pending": [
@@ -102,7 +88,7 @@
       "phase": "01"
     }
   ],
-  "uncommitted_files": ["frontend/prompt.md"],
-  "next_action": "/gsd-resume-work, then /gsd-execute-phase 1 --wave 3 to execute plan 01-03",
-  "context_notes": "Waves 1 and 2 are done and verified green: typecheck exit 0, lint 0 errors (3 pre-existing warnings in generated files), vite build 0, `npx tsc -p convex/tsconfig.json --noEmit` exit 0, vitest 25/25 across 4 files, secrets scan of dist/ and src/ clean, import.meta.env confined to src/lib/env.ts. Working tree is clean except the untracked prompt.md. 01-03 was never started — no partial work exists for it. Parallelization is off (config workflow.parallelization=false) and this runtime has no worktree isolation, so execution is sequential on the main tree. 01-03 declares autonomous=false with a blocking human-verify checkpoint at Task 4."
+  "uncommitted_files": [],
+  "next_action": "Human runs `npm run dev` + `npx convex dev` and walks the 9-item Task 4 checklist in 01-03-SUMMARY.md. Then /gsd-verify-work closes Phase 1 and /gsd-plan-phase 2 begins.",
+  "context_notes": "All 3 phase-1 plans are executed and committed (waves 1-2 and now wave 3). Gates green: typecheck 0, lint 0 errors (3 pre-existing generated-file warnings), build 0, vitest 74/74, app-code secrets scan clean, import.meta.env funnelled to src/lib/env.ts only, convex/ untouched by 01-03. 01-03 shipped src/components/ui/ (8 primitives + barrel), RootLayout with skip-link-to-#main, useDocumentTitle with meta description, axe-core harness, and ask/env/secrets boundary suites. Auth forms were refactored onto the primitives with copy unchanged. Task 4 is the only unfinished item and it is human-only by design — the agent recorded it as deferred-to-human and never claimed a browser pass. A prior false-alarm: broad greps over src/**/*.ts and dist/**/*.js flag test-fixture strings and React internals; scope forbidden-pattern checks to non-test app code only."
 }
