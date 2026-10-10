@@ -4,7 +4,7 @@ import SignUpForm from "../components/auth/SignUpForm";
 import { useDocumentTitle } from "../lib/useDocumentTitle";
 
 export default function SignUp() {
-  useDocumentTitle("Create your account", "Create your Waynora account");
+  useDocumentTitle("Create account", "Create your Waynora account");
 
   return (
     <AuthCard title="Create your account">

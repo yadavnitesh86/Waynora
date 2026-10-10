@@ -62,6 +62,11 @@ export default {
       },
       maxWidth: {
         prose: "var(--measure-prose)",
+        // UI-SPEC layout containers.
+        "container-sm": "var(--container-sm)",
+        "container-md": "var(--container-md)",
+        "container-lg": "var(--container-lg)",
+        "container-xl": "var(--container-xl)",
       },
     },
   },
