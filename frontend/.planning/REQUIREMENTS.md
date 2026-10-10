@@ -56,11 +56,11 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 
 ### Chat Persistence and Management
 
-- [ ] **PERSIST-01**: Conversations use a versioned, validated browser-cookie data model containing chat ID, title, timestamps, messages, roles, content, and backend thread ID where needed.
-- [ ] **PERSIST-02**: Chat history is stored in browser cookies rather than Convex or another database, and custom cookies never contain passwords, tokens, API keys, or secrets.
-- [ ] **PERSIST-03**: Cookie storage handles the approximately 4 KB per-cookie constraint through bounded chunking or an equivalent explicit strategy with safe cookie attributes.
-- [ ] **PERSIST-04**: Cookie reads validate the complete snapshot, recover safely from malformed or partial data, and never crash the application or silently accept invalid data.
-- [ ] **PERSIST-05**: The application enforces a reasonable retention and size cap, preserves useful recent chats, and visibly notifies the user when storage limits prevent persistence; it never silently truncates an itinerary.
+- [x] **PERSIST-01**: Conversations use a versioned, validated browser-cookie data model containing chat ID, title, timestamps, messages, roles, content, and backend thread ID where needed.
+- [x] **PERSIST-02**: Chat history is stored in browser cookies rather than Convex or another database, and custom cookies never contain passwords, tokens, API keys, or secrets.
+- [x] **PERSIST-03**: Cookie storage handles the approximately 4 KB per-cookie constraint through bounded chunking or an equivalent explicit strategy with safe cookie attributes.
+- [x] **PERSIST-04**: Cookie reads validate the complete snapshot, recover safely from malformed or partial data, and never crash the application or silently accept invalid data.
+- [x] **PERSIST-05**: The application enforces a reasonable retention and size cap, preserves useful recent chats, and visibly notifies the user when storage limits prevent persistence; it never silently truncates an itinerary.
 - [ ] **PERSIST-06**: A user can create, switch between, rename, and delete chats from a responsive history sidebar or panel.
 - [ ] **PERSIST-07**: A new chat receives a sensible short title derived from its first user message without requiring a naming dialog.
 - [ ] **PERSIST-08**: Chat history survives browser reload when the cookie snapshot is valid and the UI clearly handles empty or recovered history.
@@ -181,11 +181,11 @@ Updated during roadmap creation. Each v1 requirement maps to exactly one phase.
 | WAIT-04 | Phase 3 | Pending |
 | WAIT-05 | Phase 3 | Pending |
 | WAIT-06 | Phase 3 | Pending |
-| PERSIST-01 | Phase 2 | Pending |
-| PERSIST-02 | Phase 2 | Pending |
-| PERSIST-03 | Phase 2 | Pending |
-| PERSIST-04 | Phase 2 | Pending |
-| PERSIST-05 | Phase 2 | Pending |
+| PERSIST-01 | Phase 2 | Complete |
+| PERSIST-02 | Phase 2 | Complete |
+| PERSIST-03 | Phase 2 | Complete |
+| PERSIST-04 | Phase 2 | Complete |
+| PERSIST-05 | Phase 2 | Complete |
 | PERSIST-06 | Phase 4 | Pending |
 | PERSIST-07 | Phase 4 | Pending |
 | PERSIST-08 | Phase 4 | Pending |

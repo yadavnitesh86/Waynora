@@ -57,11 +57,11 @@ Plans:
   4. Cookie and chat-domain tests cover normal, boundary, migration, overflow, corruption, and recovery cases.
 
 **UI hint:** yes
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 
 Plans:
 
-- [ ] 02-01: Implement versioned Zod chat schemas, cookie codec/chunk repository, caps, pruning, recovery, and write notices.
+- [x] 02-01: Implement versioned Zod chat schemas, cookie codec/chunk repository, caps, pruning, recovery, and write notices.
 - [ ] 02-02: Implement pure conversation/title/message domain operations and exhaustive persistence boundary tests.
 
 ### Phase 3: Real Chat and Long-Request Lifecycle
@@ -138,7 +138,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation, Contracts, and Auth | 3/3 | Complete   | 2026-10-10 |
-| 2. Cookie Persistence and Chat Domain | 0/2 | Not started | - |
+| 2. Cookie Persistence and Chat Domain | 1/2 | In Progress|  |
 | 3. Real Chat and Long-Request Lifecycle | 0/3 | Not started | - |
 | 4. Chat Management, 2048, and Responsive Experience | 0/3 | Not started | - |
 | 5. Editorial Landing, Hardening, and Verification | 0/3 | Not started | - |
