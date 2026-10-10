@@ -1,12 +1,10 @@
-import { useId, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useAuthForm } from "./useAuthForm";
 import PasswordField from "./PasswordField";
 import { isValidNextPath } from "../../routes/ProtectedRoute";
-
-const EMAIL_INPUT =
-  "w-full min-h-[44px] px-md py-sm border rounded-md bg-surface-raised text-ink";
+import { Button, ErrorText, TextField } from "../ui";
 
 /**
  * Email + password sign-in form (UI-SPEC `/signin` surface).
@@ -17,8 +15,6 @@ export default function SignInForm() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [signedIn, setSignedIn] = useState(false);
-  const emailId = useId();
-  const emailErrorId = `${emailId}-error`;
 
   const { values, errors, isSubmitting, formError, setField, submit } =
     useAuthForm({
@@ -41,30 +37,15 @@ export default function SignInForm() {
       aria-busy={isSubmitting}
       className="flex flex-col gap-md"
     >
-      <div>
-        <label
-          htmlFor={emailId}
-          className="block text-small font-medium text-ink mb-2xs"
-        >
-          Email address
-        </label>
-        <input
-          id={emailId}
-          type="email"
-          autoComplete="email"
-          value={values.email}
-          onChange={(event) => setField("email", event.target.value)}
-          aria-invalid={errors.email ? true : undefined}
-          aria-describedby={errors.email ? emailErrorId : undefined}
-          placeholder="you@example.com"
-          className={`${EMAIL_INPUT} ${errors.email ? "border-danger" : "border-line"}`}
-        />
-        {errors.email && (
-          <p id={emailErrorId} role="alert" className="text-small text-danger mt-2xs">
-            {errors.email}
-          </p>
-        )}
-      </div>
+      <TextField
+        label="Email address"
+        type="email"
+        autoComplete="email"
+        value={values.email}
+        onChange={(event) => setField("email", event.target.value)}
+        error={errors.email}
+        placeholder="you@example.com"
+      />
 
       <PasswordField
         label="Password"
@@ -74,20 +55,11 @@ export default function SignInForm() {
         error={errors.password}
       />
 
-      {formError && (
-        <p role="alert" className="text-small text-danger">
-          {formError}
-        </p>
-      )}
+      {formError === null ? null : <ErrorText>{formError}</ErrorText>}
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        aria-busy={isSubmitting}
-        className="min-h-[44px] px-lg py-sm bg-accent text-accent-ink font-semibold rounded-md shadow-sm hover:bg-accent/90 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-      >
+      <Button type="submit" isSubmitting={isSubmitting}>
         Sign in
-      </button>
+      </Button>
 
       {signedIn && (
         <p role="status" aria-live="polite" className="text-small text-success">
