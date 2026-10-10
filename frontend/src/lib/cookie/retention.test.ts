@@ -121,9 +121,9 @@ describe("enforceCap", () => {
   });
 
   it("enforces MAX_TOTAL_BYTES by evicting oldest first", () => {
-    // Each conversation is ~2.5 KB, so six of them exceed the 50 KB cap.
-    const input = Array.from({ length: 6 }, (_, i) =>
-      conversation(daysAgoFrom(i + 1), { contentLength: 2500 }),
+    // Each conversation is ~25 KB, so four of them exceed the 50 KB cap.
+    const input = Array.from({ length: 4 }, (_, i) =>
+      conversation(daysAgoFrom(i + 1), { contentLength: 25_000 }),
     );
     expect(calculateTotalSize(input)).toBeGreaterThan(MAX_TOTAL_BYTES);
 
