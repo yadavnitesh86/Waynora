@@ -1,3 +1,6 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, it, expect } from "vitest";
 import { render } from "@testing-library/react";
 import { Markdown } from "./Markdown";
@@ -37,5 +40,21 @@ describe("Markdown", () => {
     expect(link?.getAttribute("href")).toBe("https://example.com");
     expect(link?.getAttribute("rel")).toBe("noopener noreferrer");
     expect(link?.getAttribute("target")).toBe("_blank");
+  });
+});
+
+describe("Markdown safety source guard (D-07)", () => {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const source = readFileSync(join(here, "Markdown.tsx"), "utf8");
+
+  it("never renders raw HTML", () => {
+    expect(source.includes("rehype-raw")).toBe(false);
+    expect(source.includes("dangerouslySetInnerHTML")).toBe(false);
+  });
+
+  it("renders through react-markdown + remark-gfm only", () => {
+    expect(source.includes("react-markdown")).toBe(true);
+    expect(source.includes("remarkGfm")).toBe(true);
+    expect(source.includes("allowedElements")).toBe(true);
   });
 });
