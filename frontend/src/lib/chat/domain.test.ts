@@ -1,3 +1,8 @@
+// @vitest-environment node
+// The domain operations are pure functions (D-29): no DOM, no
+// browser globals, so the node environment is the correct — and
+// lighter — place to run them. The persistence-boundary tests
+// below stub `document` explicitly, which works in node too.
 import { describe, expect, it } from "vitest";
 import {
   addMessage,
