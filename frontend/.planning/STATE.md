@@ -1,17 +1,19 @@
 ---
-gsd_state_version: 1.0
+gsd_state_version: "1.0"
 milestone: v1.0
-milestone_name: milestone
+current_phase: 02
+current_phase_name: Cookie Persistence and Chat Domain
 status: executing
-stopped_at: Phase 2 context gathered
-last_updated: "2026-10-10T13:52:28.470Z"
-last_activity: 2026-10-10
+stopped_at: Completed 02-02-PLAN.md
+last_updated: "2026-10-11T04:45:37.512Z"
+last_activity: 2026-10-11
+last_activity_desc: Phase 02 plan 02 complete — pure chat domain operations
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 5
-  completed_plans: 4
-  percent: 80
+  completed_plans: 5
+milestone_name: milestone
 ---
 
 # Project State
@@ -21,16 +23,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-10-09)
 
 **Core value:** A user can submit a trip request, wait through the real 5–15 minute agent generation, and receive the actual AI-generated travel plan without fabricated progress or results.
-**Current focus:** Phase 02 — cookie-persistence-and-chat-domain
+**Current focus:** Phase 02 — Cookie Persistence and Chat Domain
 
 ## Current Position
 
-Phase: 02 (cookie-persistence-and-chat-domain) — EXECUTING
-Plan: 2 of 2 (02-01 — cookie persistence layer complete)
-Status: 1 of 2 plans complete; 78/78 cookie tests green, 157/157 full suite
-Last activity: 2026-10-10 — 02-01 shipped: Zod envelope schemas, chunk codec with salvage, repository, retention caps
+Phase: 02 (Cookie Persistence and Chat Domain) — EXECUTING
+Plan: 2 of 2
+Status: 2 of 2 plans complete; 30/30 domain tests green, 187/187 full suite
+Last activity: 2026-10-11 — 02-02 shipped: pure chat domain operations (create/add/update/title/in-flight/error) with persistence-boundary round-trip tests
 
-Progress: [████████░░] 80%
+Progress: [██████████] 100%
 
 ### Phase 1 post-execution fixes (2026-10-10)
 
@@ -72,6 +74,11 @@ Both bugs were in code **no test rendered** — every suite mocked the auth hook
 - Trend: —
 
 | Phase 02 P01 | 48min | 3 tasks | 8 files |
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 02 P02 | 49min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -91,6 +98,10 @@ Recent decisions affecting current work:
 - **2026-10-10 (Phase 2):** `getCookie` returns null when `decodeURIComponent` throws — a tampered cookie is corrupt data, not a crash (D-21).
 - **2026-10-10 (Phase 2):** Persisted conversation order is retention order (newest first) — reads return the same order writes produce, so Phase 3 needs no re-sort.
 - **2026-10-10 (Phase 2):** The index cookie stores a per-conversation segment map, not just a chunk count — lets a lost shard be attributed to exactly one conversation.
+- [Phase 02]: markInFlight records the in-flight timestamp on conversation.updatedAt — the 02-01 metadata schema is a strictObject with no timestamp field, so updatedAt is the only schema-valid slot for D-27's boolean-flag-plus-timestamp; it also keeps the in-flight conversation newest in retention order
+- [Phase 02]: Domain tests run in the node environment (@vitest-environment node): pure functions need no DOM, and dropping one jsdom instance keeps the load-sensitive composition regression stable under full-suite parallelism
+- [Phase 02]: TDD RED commits include a type-correct, behavior-wrong scaffold so tests fail on their planned assertions rather than on module resolution (tdd.md #3770 INVALID_RED); both RED records validated RED_EVIDENCE_OK
+- [Phase 02]: Task 2 GREEN is test-only: the domain + repository integration already worked; the plan's naive { cookie: '' } document stub cannot round-trip cookies, fixed with the browser-semantics cookie jar from repository.test.ts
 
 ### Pending Todos
 
@@ -114,8 +125,8 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-10T13:52:28.401Z
-Stopped at: Phase 2 context gathered
+Last session: 2026-10-11T04:45:02.814Z
+Stopped at: Completed 02-02-PLAN.md
 Resume file: None
 
 **⚠️ TASK 4 (human browser verify) — PARTIALLY DONE, NOT FABRICATED:**

@@ -64,8 +64,8 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 - [ ] **PERSIST-06**: A user can create, switch between, rename, and delete chats from a responsive history sidebar or panel.
 - [ ] **PERSIST-07**: A new chat receives a sensible short title derived from its first user message without requiring a naming dialog.
 - [ ] **PERSIST-08**: Chat history survives browser reload when the cookie snapshot is valid and the UI clearly handles empty or recovered history.
-- [ ] **PERSIST-09**: A failed request preserves the submitted user message and existing conversation history for recovery or deliberate retry.
-- [ ] **PERSIST-10**: In-flight request metadata is handled conservatively across reloads so the UI does not replay an expensive server request automatically.
+- [x] **PERSIST-09**: A failed request preserves the submitted user message and existing conversation history for recovery or deliberate retry.
+- [x] **PERSIST-10**: In-flight request metadata is handled conservatively across reloads so the UI does not replay an expensive server request automatically.
 
 ### 2048 Waiting Game
 
@@ -189,8 +189,8 @@ Updated during roadmap creation. Each v1 requirement maps to exactly one phase.
 | PERSIST-06 | Phase 4 | Pending |
 | PERSIST-07 | Phase 4 | Pending |
 | PERSIST-08 | Phase 4 | Pending |
-| PERSIST-09 | Phase 2 | Pending |
-| PERSIST-10 | Phase 2 | Pending |
+| PERSIST-09 | Phase 2 | Complete |
+| PERSIST-10 | Phase 2 | Complete |
 | GAME-01 | Phase 4 | Pending |
 | GAME-02 | Phase 4 | Pending |
 | GAME-03 | Phase 4 | Pending |
