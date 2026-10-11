@@ -3,7 +3,7 @@
 // browser globals, so the node environment is the correct — and
 // lighter — place to run them. The persistence-boundary tests
 // below stub `document` explicitly, which works in node too.
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import {
   addMessage,
   createConversation,
@@ -13,7 +13,18 @@ import {
   markInFlight,
   updateMessage,
 } from "./domain";
+import { readConversations, writeConversations } from "../cookie/repository";
+import { enforceCap } from "../cookie/retention";
 import { CUSTOMER_MESSAGES } from "../errors";
+
+vi.mock("../env", () => ({
+  env: {
+    VITE_API_BASE_URL: "http://localhost:8000",
+    VITE_CONVEX_URL: "https://example.convex.cloud",
+  },
+  envError: [],
+  isDev: false,
+}));
 
 const NOW = "2026-01-01T00:00:00Z";
 const LATER = "2026-01-02T00:00:00Z";
@@ -332,6 +343,98 @@ describe("chat domain operations", () => {
       expect(conversation).not.toBe(result);
       expect(conversation.messages[0]!.metadata).toBeUndefined();
       expect(conversation.messages[0]!.content).toBe("Plan a trip");
+    });
+  });
+});
+
+describe("persistence boundary integration", () => {
+  beforeEach(() => {
+    vi.stubGlobal("document", { cookie: "" });
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("persists and reads back a single conversation", () => {
+    const conversation = addMessage(
+      createConversation("c1", NOW),
+      createMessage("m1", "user", "Plan a trip to Japan", NOW),
+    );
+
+    writeConversations([conversation]);
+
+    expect(readConversations().conversations).toEqual([conversation]);
+  });
+
+  it("preserves in-flight state across persist/read round-trip (PERSIST-10)", () => {
+    const conversation = markInFlight(
+      addMessage(
+        createConversation("c1", NOW),
+        createMessage("m1", "user", "Plan a trip", NOW),
+      ),
+      "m1",
+      LATER,
+    );
+
+    writeConversations([conversation]);
+
+    const result = readConversations();
+    expect(result.conversations).toHaveLength(1);
+    expect(result.conversations[0]!.messages[0]!.metadata?.inFlight).toBe(
+      true,
+    );
+  });
+
+  it("preserves error state and the submitted message across persist/read round-trip (PERSIST-09)", () => {
+    const conversation = markError(
+      addMessage(
+        createConversation("c1", NOW),
+        createMessage("m1", "user", "Plan a trip to Japan", NOW),
+      ),
+      "m1",
+      CUSTOMER_MESSAGES.network,
+    );
+
+    writeConversations([conversation]);
+
+    const result = readConversations();
+    expect(result.conversations).toHaveLength(1);
+    const message = result.conversations[0]!.messages[0]!;
+    expect(message.content).toBe("Plan a trip to Japan");
+    expect(message.metadata?.error).toBe(CUSTOMER_MESSAGES.network);
+    expect(message.metadata?.inFlight).toBe(false);
+  });
+
+  it("preserves multiple conversations in retention order", () => {
+    const oldest = addMessage(
+      createConversation("c-old", NOW),
+      createMessage("m1", "user", "First request", NOW),
+    );
+    const middle = addMessage(
+      createConversation("c-mid", NOW),
+      createMessage("m2", "user", "Second request", "2026-01-02T00:00:00Z"),
+    );
+    const newest = addMessage(
+      createConversation("c-new", NOW),
+      createMessage("m3", "user", "Third request", "2026-01-03T00:00:00Z"),
+    );
+    const expected = enforceCap([oldest, middle, newest]).conversations;
+
+    writeConversations([oldest, middle, newest]);
+
+    const result = readConversations();
+    expect(result.conversations).toEqual(expected);
+    expect(result.conversations.map((conversation) => conversation.id)).toEqual(
+      ["c-new", "c-mid", "c-old"],
+    );
+  });
+
+  it("reads back empty when no cookies exist", () => {
+    expect(readConversations()).toEqual({
+      conversations: [],
+      recovered: false,
+      evicted: [],
     });
   });
 });
