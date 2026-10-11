@@ -29,6 +29,47 @@ vi.mock("../env", () => ({
 const NOW = "2026-01-01T00:00:00Z";
 const LATER = "2026-01-02T00:00:00Z";
 
+/**
+ * `document.cookie` is a single string, so a plain object
+ * assignment overwrites instead of appending — which makes
+ * every persist/read round-trip impossible. This double
+ * behaves like the real browser jar: writes set one named
+ * cookie, `Max-Age<=0` deletes, reads render every stored
+ * cookie.
+ */
+function createCookieJar() {
+  const jar = new Map<string, string>();
+
+  return {
+    get cookie(): string {
+      return Array.from(jar.entries())
+        .map(([name, value]) => `${name}=${value}`)
+        .join("; ");
+    },
+    set cookie(raw: string) {
+      const parts = raw.split("; ");
+      const pair = parts[0] ?? "";
+      const attributes = parts.slice(1);
+      const separator = pair.indexOf("=");
+      const name = pair.slice(0, separator);
+      const value = pair.slice(separator + 1);
+
+      const maxAgeAttribute = attributes.find((attribute) =>
+        attribute.toLowerCase().startsWith("max-age="),
+      );
+      const maxAge = maxAgeAttribute
+        ? Number(maxAgeAttribute.slice("max-age=".length))
+        : undefined;
+
+      if (maxAge !== undefined && maxAge <= 0) {
+        jar.delete(name);
+        return;
+      }
+      jar.set(name, value);
+    },
+  };
+}
+
 describe("chat domain operations", () => {
   describe("createConversation", () => {
     it("returns a new conversation titled New chat with no messages", () => {
@@ -348,8 +389,11 @@ describe("chat domain operations", () => {
 });
 
 describe("persistence boundary integration", () => {
+  let jar: ReturnType<typeof createCookieJar>;
+
   beforeEach(() => {
-    vi.stubGlobal("document", { cookie: "" });
+    jar = createCookieJar();
+    vi.stubGlobal("document", jar);
   });
 
   afterEach(() => {
