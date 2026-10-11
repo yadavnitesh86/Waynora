@@ -1,0 +1,195 @@
+﻿npm notice run waynora@1.0.0 npx
+npm notice run vitest run src/lib/chat/domain.test.ts --reporter=tap-flat
+TAP version 13
+1..25
+not ok 1 - src/lib/chat/domain.test.ts > chat domain operations > createConversation > returns a new conversation titled New chat with no messages # time=57.94ms
+    ---
+    error:
+        name: "AssertionError"
+        message: "expected { id: 'c1', title: 'stub', …(3) } to deeply equal { id: 'c1', title: 'New chat', …(3) }"
+    at: "C:/Users/yadav_alldafn/OneDrive/New folder/Documents/01_projects/Gen ai project/Working/Waynora/frontend/src/lib/chat/domain.test.ts:19:45"
+    actual: "Object {
+  \"createdAt\": \"2026-01-01T00:00:00Z\",
+  \"id\": \"c1\",
+  \"messages\": Array [],
+  \"title\": \"stub\",
+  \"updatedAt\": \"2026-01-01T00:00:00Z\",
+}"
+    expected: "Object {
+  \"createdAt\": \"2026-01-01T00:00:00Z\",
+  \"id\": \"c1\",
+  \"messages\": Array [],
+  \"title\": \"New chat\",
+  \"updatedAt\": \"2026-01-01T00:00:00Z\",
+}"
+    ...
+ok 2 - src/lib/chat/domain.test.ts > chat domain operations > createConversation > returns fresh objects rather than shared references # time=3.86ms
+not ok 3 - src/lib/chat/domain.test.ts > chat domain operations > createMessage > returns a message with no metadata # time=8.12ms
+    ---
+    error:
+        name: "AssertionError"
+        message: "expected { id: 'm1', role: 'user', …(2) } to deeply equal { id: 'm1', role: 'user', …(2) }"
+    at: "C:/Users/yadav_alldafn/OneDrive/New folder/Documents/01_projects/Gen ai project/Working/Waynora/frontend/src/lib/chat/domain.test.ts:39:63"
+    actual: "Object {
+  \"content\": \"Plan a trip (stub)\",
+  \"createdAt\": \"2026-01-01T00:00:00Z\",
+  \"id\": \"m1\",
+  \"role\": \"user\",
+}"
+    expected: "Object {
+  \"content\": \"Plan a trip\",
+  \"createdAt\": \"2026-01-01T00:00:00Z\",
+  \"id\": \"m1\",
+  \"role\": \"user\",
+}"
+    ...
+ok 4 - src/lib/chat/domain.test.ts > chat domain operations > createMessage > supports the assistant role # time=1.63ms
+not ok 5 - src/lib/chat/domain.test.ts > chat domain operations > addMessage > appends the message and advances updatedAt to its createdAt # time=6.86ms
+    ---
+    error:
+        name: "AssertionError"
+        message: "expected [] to deeply equal [ { id: 'm1', role: 'user', …(2) } ]"
+    at: "C:/Users/yadav_alldafn/OneDrive/New folder/Documents/01_projects/Gen ai project/Working/Waynora/frontend/src/lib/chat/domain.test.ts:67:31"
+    actual: "Array []"
+    expected: "Array [
+  Object {
+    \"content\": \"Plan a trip (stub)\",
+    \"createdAt\": \"2026-01-02T00:00:00Z\",
+    \"id\": \"m1\",
+    \"role\": \"user\",
+  },
+]"
+    ...
+not ok 6 - src/lib/chat/domain.test.ts > chat domain operations > addMessage > appends after existing messages # time=4.98ms
+    ---
+    error:
+        name: "AssertionError"
+        message: "expected [] to deeply equal [ 'm1', 'm2' ]"
+    at: "C:/Users/yadav_alldafn/OneDrive/New folder/Documents/01_projects/Gen ai project/Working/Waynora/frontend/src/lib/chat/domain.test.ts:86:60"
+    actual: "Array []"
+    expected: "Array [
+  \"m1\",
+  \"m2\",
+]"
+    ...
+ok 7 - src/lib/chat/domain.test.ts > chat domain operations > addMessage > does not mutate the original conversation # time=4.74ms
+not ok 8 - src/lib/chat/domain.test.ts > chat domain operations > updateMessage > patches the matching message # time=1.75ms
+    ---
+    error:
+        name: "TypeError"
+        message: "Cannot read properties of undefined (reading 'content')"
+    at: "C:/Users/yadav_alldafn/OneDrive/New folder/Documents/01_projects/Gen ai project/Working/Waynora/frontend/src/lib/chat/domain.test.ts:117:34"
+    ...
+ok 9 - src/lib/chat/domain.test.ts > chat domain operations > updateMessage > leaves messages with other ids untouched # time=1.24ms
+not ok 10 - src/lib/chat/domain.test.ts > chat domain operations > updateMessage > does not mutate the original message # time=3.99ms
+    ---
+    error:
+        name: "TypeError"
+        message: "Cannot read properties of undefined (reading 'content')"
+    at: "C:/Users/yadav_alldafn/OneDrive/New folder/Documents/01_projects/Gen ai project/Working/Waynora/frontend/src/lib/chat/domain.test.ts:143:40"
+    ...
+not ok 11 - src/lib/chat/domain.test.ts > chat domain operations > deriveTitle > uses the first user message content # time=7.33ms
+    ---
+    error:
+        name: "AssertionError"
+        message: "expected 'stub' to be 'Plan a trip to Japan' // Object.is equality"
+    at: "C:/Users/yadav_alldafn/OneDrive/New folder/Documents/01_projects/Gen ai project/Working/Waynora/frontend/src/lib/chat/domain.test.ts:154:37"
+    actual: "stub"
+    expected: "Plan a trip to Japan"
+    ...
+not ok 12 - src/lib/chat/domain.test.ts > chat domain operations > deriveTitle > skips assistant messages to find the first user message # time=2.86ms
+    ---
+    error:
+        name: "AssertionError"
+        message: "expected 'stub' to be 'Plan a trip to Japan' // Object.is equality"
+    at: "C:/Users/yadav_alldafn/OneDrive/New folder/Documents/01_projects/Gen ai project/Working/Waynora/frontend/src/lib/chat/domain.test.ts:163:37"
+    actual: "stub"
+    expected: "Plan a trip to Japan"
+    ...
+not ok 13 - src/lib/chat/domain.test.ts > chat domain operations > deriveTitle > falls back to New chat for whitespace-only content # time=2.50ms
+    ---
+    error:
+        name: "AssertionError"
+        message: "expected 'stub' to be 'New chat' // Object.is equality"
+    at: "C:/Users/yadav_alldafn/OneDrive/New folder/Documents/01_projects/Gen ai project/Working/Waynora/frontend/src/lib/chat/domain.test.ts:169:37"
+    actual: "stub"
+    expected: "New chat"
+    ...
+ok 14 - src/lib/chat/domain.test.ts > chat domain operations > deriveTitle > falls back to New chat when there are no messages # time=0.56ms
+not ok 15 - src/lib/chat/domain.test.ts > chat domain operations > deriveTitle > falls back to New chat when there is no user message # time=2.22ms
+    ---
+    error:
+        name: "AssertionError"
+        message: "expected 'stub' to be 'New chat' // Object.is equality"
+    at: "C:/Users/yadav_alldafn/OneDrive/New folder/Documents/01_projects/Gen ai project/Working/Waynora/frontend/src/lib/chat/domain.test.ts:181:37"
+    actual: "stub"
+    expected: "New chat"
+    ...
+not ok 16 - src/lib/chat/domain.test.ts > chat domain operations > deriveTitle > truncates content longer than 50 characters to exactly 50 # time=6.65ms
+    ---
+    error:
+        name: "AssertionError"
+        message: "expected 'stub' to have a length of 50 but got 4"
+    at: "C:/Users/yadav_alldafn/OneDrive/New folder/Documents/01_projects/Gen ai project/Working/Waynora/frontend/src/lib/chat/domain.test.ts:190:21"
+    actual: "4"
+    expected: "50"
+    ...
+not ok 17 - src/lib/chat/domain.test.ts > chat domain operations > deriveTitle > keeps content of exactly 50 characters whole # time=2.37ms
+    ---
+    error:
+        name: "AssertionError"
+        message: "expected 'stub' to be 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb…' // Object.is equality"
+    at: "C:/Users/yadav_alldafn/OneDrive/New folder/Documents/01_projects/Gen ai project/Working/Waynora/frontend/src/lib/chat/domain.test.ts:198:37"
+    actual: "stub"
+    expected: "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    ...
+not ok 18 - src/lib/chat/domain.test.ts > chat domain operations > markInFlight > sets metadata.inFlight to true on the matching message # time=1.38ms
+    ---
+    error:
+        name: "TypeError"
+        message: "Cannot read properties of undefined (reading 'metadata')"
+    at: "C:/Users/yadav_alldafn/OneDrive/New folder/Documents/01_projects/Gen ai project/Working/Waynora/frontend/src/lib/chat/domain.test.ts:211:34"
+    ...
+ok 19 - src/lib/chat/domain.test.ts > chat domain operations > markInFlight > records the marking time on updatedAt (D-27 timestamp) # time=0.77ms
+not ok 20 - src/lib/chat/domain.test.ts > chat domain operations > markInFlight > preserves existing metadata fields # time=1.21ms
+    ---
+    error:
+        name: "TypeError"
+        message: "Cannot read properties of undefined (reading 'metadata')"
+    at: "C:/Users/yadav_alldafn/OneDrive/New folder/Documents/01_projects/Gen ai project/Working/Waynora/frontend/src/lib/chat/domain.test.ts:238:34"
+    ...
+not ok 21 - src/lib/chat/domain.test.ts > chat domain operations > markInFlight > does not mutate the original conversation # time=1.91ms
+    ---
+    error:
+        name: "TypeError"
+        message: "Cannot read properties of undefined (reading 'metadata')"
+    at: "C:/Users/yadav_alldafn/OneDrive/New folder/Documents/01_projects/Gen ai project/Working/Waynora/frontend/src/lib/chat/domain.test.ts:253:40"
+    ...
+not ok 22 - src/lib/chat/domain.test.ts > chat domain operations > markError > attaches the error and clears inFlight # time=2.22ms
+    ---
+    error:
+        name: "TypeError"
+        message: "Cannot read properties of undefined (reading 'metadata')"
+    at: "C:/Users/yadav_alldafn/OneDrive/New folder/Documents/01_projects/Gen ai project/Working/Waynora/frontend/src/lib/chat/domain.test.ts:274:34"
+    ...
+not ok 23 - src/lib/chat/domain.test.ts > chat domain operations > markError > preserves the submitted message content (PERSIST-09) # time=1.01ms
+    ---
+    error:
+        name: "TypeError"
+        message: "Cannot read properties of undefined (reading 'content')"
+    at: "C:/Users/yadav_alldafn/OneDrive/New folder/Documents/01_projects/Gen ai project/Working/Waynora/frontend/src/lib/chat/domain.test.ts:292:34"
+    ...
+not ok 24 - src/lib/chat/domain.test.ts > chat domain operations > markError > preserves existing metadata fields like threadId # time=1.04ms
+    ---
+    error:
+        name: "TypeError"
+        message: "Cannot read properties of undefined (reading 'metadata')"
+    at: "C:/Users/yadav_alldafn/OneDrive/New folder/Documents/01_projects/Gen ai project/Working/Waynora/frontend/src/lib/chat/domain.test.ts:308:34"
+    ...
+not ok 25 - src/lib/chat/domain.test.ts > chat domain operations > markError > does not mutate the original conversation or its messages # time=1.43ms
+    ---
+    error:
+        name: "TypeError"
+        message: "Cannot read properties of undefined (reading 'metadata')"
+    at: "C:/Users/yadav_alldafn/OneDrive/New folder/Documents/01_projects/Gen ai project/Working/Waynora/frontend/src/lib/chat/domain.test.ts:328:40"
+    ...
