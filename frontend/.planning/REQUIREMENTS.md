@@ -42,17 +42,17 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 - [ ] **CHAT-05**: A returned `thread_id` is retained for supported follow-up messages in the same conversation.
 - [ ] **CHAT-06**: Assistant responses render readable Markdown including lists and tables through a safe renderer with raw HTML disabled and safe link handling.
 - [ ] **CHAT-07**: User and assistant messages are visually distinct, readable at long response lengths, and accessible to screen readers.
-- [ ] **CHAT-08**: The UI prevents duplicate submissions while one request is active without discarding additional text the user is composing.
-- [ ] **CHAT-09**: The client never fabricates a travel plan, agent result, progress event, or successful response when the backend fails.
+- [x] **CHAT-08**: The UI prevents duplicate submissions while one request is active without discarding additional text the user is composing.
+- [x] **CHAT-09**: The client never fabricates a travel plan, agent result, progress event, or successful response when the backend fails.
 
 ### Request Lifecycle and Waiting Experience
 
-- [ ] **WAIT-01**: The request lifecycle distinguishes idle, submitting, actively waiting, succeeded, network failure, timeout, HTTP failure, malformed response, and unexpected application failure states.
-- [ ] **WAIT-02**: An active request remains supported for approximately 15 minutes, uses cleanup-safe timeout and abort handling, and does not use a normal short timeout that interrupts legitimate work.
+- [x] **WAIT-01**: The request lifecycle distinguishes idle, submitting, actively waiting, succeeded, network failure, timeout, HTTP failure, malformed response, and unexpected application failure states.
+- [x] **WAIT-02**: An active request remains supported for approximately 15 minutes, uses cleanup-safe timeout and abort handling, and does not use a normal short timeout that interrupts legitimate work.
 - [ ] **WAIT-03**: The waiting UI shows an active indicator, honest elapsed time, the 5–15 minute expectation, and copy based on elapsed time rather than render count.
 - [ ] **WAIT-04**: Waiting messages rotate through multiple non-repeating variants across time bands, especially after five minutes, without claiming specialist completion or fake percentage progress.
 - [ ] **WAIT-05**: Timeout and interruption messaging explains that server-side execution may continue, preserves the submitted request, and requires deliberate user action before retrying.
-- [ ] **WAIT-06**: The request controller ignores stale results after chat changes or unmount and cleans up timers, listeners, and abort resources.
+- [x] **WAIT-06**: The request controller ignores stale results after chat changes or unmount and cleans up timers, listeners, and abort resources.
 
 ### Chat Persistence and Management
 
@@ -173,14 +173,14 @@ Updated during roadmap creation. Each v1 requirement maps to exactly one phase.
 | CHAT-05 | Phase 3 | Pending |
 | CHAT-06 | Phase 3 | Pending |
 | CHAT-07 | Phase 3 | Pending |
-| CHAT-08 | Phase 3 | Pending |
-| CHAT-09 | Phase 3 | Pending |
-| WAIT-01 | Phase 3 | Pending |
-| WAIT-02 | Phase 3 | Pending |
+| CHAT-08 | Phase 3 | Complete |
+| CHAT-09 | Phase 3 | Complete |
+| WAIT-01 | Phase 3 | Complete |
+| WAIT-02 | Phase 3 | Complete |
 | WAIT-03 | Phase 3 | Pending |
 | WAIT-04 | Phase 3 | Pending |
 | WAIT-05 | Phase 3 | Pending |
-| WAIT-06 | Phase 3 | Pending |
+| WAIT-06 | Phase 3 | Complete |
 | PERSIST-01 | Phase 2 | Complete |
 | PERSIST-02 | Phase 2 | Complete |
 | PERSIST-03 | Phase 2 | Complete |

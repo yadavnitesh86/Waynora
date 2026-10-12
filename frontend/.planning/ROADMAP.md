@@ -78,13 +78,13 @@ Plans:
   4. Network, timeout, HTTP, malformed, and unexpected failures preserve the prompt/history and provide explicit, non-automatic recovery without exposing raw diagnostics.
 
 **UI hint:** yes
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 
 Plans:
 
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — Typed /ask client, request controller state machine, timeout/abort lifecycle, request IDs, and error taxonomy.
+- [x] 03-01-PLAN.md — Typed /ask client, request controller state machine, timeout/abort lifecycle, request IDs, and error taxonomy.
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -147,6 +147,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Foundation, Contracts, and Auth | 3/3 | Complete   | 2026-10-10 |
 | 2. Cookie Persistence and Chat Domain | 2/2 | In Progress|  |
-| 3. Real Chat and Long-Request Lifecycle | 0/3 | Not started | - |
+| 3. Real Chat and Long-Request Lifecycle | 1/3 | In Progress | - |
 | 4. Chat Management, 2048, and Responsive Experience | 0/3 | Not started | - |
 | 5. Editorial Landing, Hardening, and Verification | 0/3 | Not started | - |
