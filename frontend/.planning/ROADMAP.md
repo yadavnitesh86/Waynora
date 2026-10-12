@@ -82,8 +82,16 @@ Plans:
 
 Plans:
 
+**Wave 1**
+
 - [ ] 03-01-PLAN.md — Typed /ask client, request controller state machine, timeout/abort lifecycle, request IDs, and error taxonomy.
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 03-02-PLAN.md — Protected chat conversation vertical slice: composer, messages, safe Markdown, optimistic persistence, thread continuation.
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 03-03-PLAN.md — Elapsed-time waiting shell; validate real-backend, long-request, stale-result, retry, and malformed-response behavior.
 
 ### Phase 4: Chat Management, 2048, and Responsive Experience
