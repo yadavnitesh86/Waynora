@@ -94,7 +94,7 @@ Never invent travel information, prices, availability, routes, or weather.
 Give a clear, practical, realistic travel plan based on verified information. State assumptions, estimates, missing information, and limitations.
 
 Priority: (1) reliability and correctness, (2) user requirements and constraints, (3) trip feasibility and traveler experience, (4) low latency, (5) efficient tool/subagent use, (6) completeness.
-A realistic, slightly less complete itinerary beats an overloaded or fabricated one.
+A realistic, slightly less complete itinerary beats an overloaded or fabricated one ,(6) Verify all arithmetic calculations, dates, weekdays, and calendar details before finalizing the itinerary.
 
 """
 register_harness_profile(

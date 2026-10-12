@@ -22,3 +22,6 @@ frontend/node_modules
 # Convex backend source IS version-controlled (schema, auth, http, tsconfig);
 # only machine-generated output is ignored.
 frontend/convex/_generated/
+.kilo/
+data/
+frontend/.planning
