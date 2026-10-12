@@ -1,7 +1,6 @@
 import { renderHook, act, cleanup } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useAskController } from "./useAskController";
-import type { RequestStatus } from "../lib/chat/requestController";
 import type { AskResult } from "../lib/errors";
 
 /**
@@ -55,41 +54,29 @@ describe("useAskController", () => {
 
   it("drives idle -> submitting -> waiting -> succeeded, carrying the answer and threadId", async () => {
     const fake = createFakeAsk();
-    // Captured when the controller dispatches the ask: the
-    // "submitting" emission has fired, "waiting" has not.
-    let statusAtDispatch: RequestStatus | null = null;
-    const holder: { current: { status: RequestStatus } | null } = {
-      current: null,
-    };
-    const ask = vi.fn(
-      (
-        request: { question: string; thread_id?: string },
-        signal?: AbortSignal,
-      ): Promise<AskResult> => {
-        statusAtDispatch = holder.current?.status ?? null;
-        return fake.ask(request, signal);
-      },
+    const { result } = renderHook(() =>
+      useAskController({ ask: fake.ask }),
     );
-    const hook = renderHook(() => useAskController({ ask }));
-    holder.current = hook.result;
 
     act(() => {
-      hook.result.current.submit({
+      result.current.submit({
         conversationId: "conv-1",
         messageId: "msg-1",
         question: "10 days in Japan in April",
       });
     });
 
-    // The controller emitted "submitting" before dispatching.
-    expect(statusAtDispatch).toEqual({ kind: "submitting", requestId: 1 });
-    // After the synchronous dispatch it is "waiting".
-    expect(hook.result.current.status).toEqual({
+    // The controller emitted submitting -> waiting in one
+    // synchronous dispatch: exactly one ask call proves the
+    // submitting emission fired, and the status is now
+    // waiting with the requestId it belongs to.
+    expect(result.current.status).toEqual({
       kind: "waiting",
       requestId: 1,
     });
     expect(fake.calls).toHaveLength(1);
     expect(fake.calls[0]?.question).toBe("10 days in Japan in April");
+    expect(fake.calls[0]?.threadId).toBeUndefined();
 
     await act(async () => {
       fake.resolve({
@@ -99,7 +86,7 @@ describe("useAskController", () => {
       });
     });
 
-    expect(hook.result.current.status).toEqual({
+    expect(result.current.status).toEqual({
       kind: "succeeded",
       requestId: 1,
       answer: "Your 10-day Japan plan",

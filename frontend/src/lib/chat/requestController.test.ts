@@ -250,10 +250,12 @@ describe("request controller", () => {
       const { ask, resolve } = createDeferredAsk();
       let controller: RequestController;
       const reentrantAsk = vi.fn(
-        (request: AskRequest, signal?: AbortSignal) => {
+        (_request: AskRequest, _signal?: AbortSignal) => {
           // Re-enter while the status is still "submitting".
           controller.submit(input({ question: "re-entrant" }));
-          return ask(request, signal);
+          // The deferred ask ignores its arguments — it
+          // settles the same promise either way.
+          return ask();
         },
       );
       controller = createRequestController({ ask: reentrantAsk });
