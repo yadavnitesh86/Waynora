@@ -1,17 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { AskRequest } from "../lib/api/ask";
 import type { AskResult } from "../lib/errors";
-import type {
-  RequestController,
-  RequestStatus,
-  SubmitInput,
+import {
+  createRequestController,
+  type RequestController,
+  type RequestStatus,
+  type SubmitInput,
 } from "../lib/chat/requestController";
 
 /**
- * RED scaffold — type-correct, behavior-wrong (tdd.md #3770).
- * Exports the real hook shape so the tests fail on their planned
- * assertions, never on module resolution. The real adapter lands
- * in the GREEN commit.
+ * React adapter for the request controller (WAIT-06).
+ *
+ * Mirrors the controller's emissions into React state and
+ * owns the controller's lifecycle: one controller per mount,
+ * disposed on unmount and on conversation change so an
+ * in-flight request is aborted and its late result can never
+ * reach React state. The hook never renders, fabricates, or
+ * transforms an answer — it only mirrors controller status
+ * (CHAT-09).
  */
 
 export interface UseAskControllerOptions {
@@ -27,18 +33,61 @@ export interface UseAskController {
 }
 
 export function useAskController(
-  _options?: UseAskControllerOptions,
+  options?: UseAskControllerOptions,
 ): UseAskController {
+  const ask = options?.ask;
+  const timeoutMs = options?.timeoutMs;
+  const conversationId = options?.conversationId;
+
+  // One controller per mount, created lazily on first render
+  // so the injected options are captured.
   const controllerRef = useRef<RequestController | null>(null);
+  if (controllerRef.current === null) {
+    controllerRef.current = createRequestController({ ask, timeoutMs });
+  }
+
   const [status, setStatus] = useState<RequestStatus>({ kind: "idle" });
 
-  // RED scaffold: never creates a controller, never subscribes,
-  // never disposes — every behavior assertion fails.
-  const submit = useCallback((_input: SubmitInput) => {
-    setStatus({ kind: "idle" });
+  // Subscribe to the active controller and mirror every
+  // emission into React state. Keyed on conversationId: when
+  // the conversation changes, the cleanup below disposes the
+  // old controller and clears the ref, and this effect
+  // re-runs against a fresh instance.
+  useEffect(() => {
+    if (controllerRef.current === null) {
+      controllerRef.current = createRequestController({ ask, timeoutMs });
+    }
+    const controller = controllerRef.current;
+    const unsubscribe = controller.subscribe((next) => {
+      setStatus(next);
+    });
+    return unsubscribe;
+  }, [conversationId]);
+
+  // Cleanup on unmount and conversation change (WAIT-06):
+  // dispose the controller — the in-flight request is aborted
+  // and any result arriving afterwards is dropped silently by
+  // the controller's stale-result rule. The ref is cleared so
+  // the subscription effect above creates a fresh idle
+  // controller for the next conversation.
+  useEffect(() => {
+    return () => {
+      const controller = controllerRef.current;
+      controllerRef.current = null;
+      controller?.dispose();
+      setStatus({ kind: "idle" });
+    };
+  }, [conversationId]);
+
+  // Stable wrappers: submit and stop delegate to the
+  // controller unchanged; the hook adds no transitions of its
+  // own.
+  const submit = useCallback((input: SubmitInput) => {
+    controllerRef.current?.submit(input);
   }, []);
+
   const stop = useCallback(() => {
-    setStatus({ kind: "idle" });
+    controllerRef.current?.stop();
   }, []);
 
   return { status, submit, stop };
