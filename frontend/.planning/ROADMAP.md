@@ -82,9 +82,9 @@ Plans:
 
 Plans:
 
-- [ ] 03-01: Implement typed `/ask` client, request controller state machine, timeout/abort lifecycle, request IDs, and error taxonomy.
-- [ ] 03-02: Build the protected chat conversation vertical slice with composer, messages, safe Markdown, optimistic persistence, and thread continuation.
-- [ ] 03-03: Build elapsed-time waiting shell and validate real backend, long-request, stale-result, retry, and malformed-response behavior.
+- [ ] 03-01-PLAN.md — Typed /ask client, request controller state machine, timeout/abort lifecycle, request IDs, and error taxonomy.
+- [ ] 03-02-PLAN.md — Protected chat conversation vertical slice: composer, messages, safe Markdown, optimistic persistence, thread continuation.
+- [ ] 03-03-PLAN.md — Elapsed-time waiting shell; validate real-backend, long-request, stale-result, retry, and malformed-response behavior.
 
 ### Phase 4: Chat Management, 2048, and Responsive Experience
 
