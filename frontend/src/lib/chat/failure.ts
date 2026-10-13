@@ -45,7 +45,12 @@ export function mapRequestFailure(
   askKind: AskErrorKind,
   abortSource: "timeout" | "user" | null,
 ): RequestFailureKind {
-  if (askKind === "network" || askKind === "http" || askKind === "malformed") {
+  if (
+    askKind === "network" ||
+    askKind === "http" ||
+    askKind === "malformed" ||
+    askKind === "timeout"
+  ) {
     return askKind;
   }
   if (askKind === "abort") {
