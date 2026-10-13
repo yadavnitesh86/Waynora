@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAskController } from "../hooks/useAskController";
+import { useElapsedClock } from "../hooks/useElapsedClock";
 import {
   readConversations,
   writeConversations,
@@ -19,6 +20,7 @@ import { EmptyState, PageHeader } from "../components/ui";
 import ChatComposer from "../components/chat/ChatComposer";
 import ChatThread from "../components/chat/ChatThread";
 import StorageNotice from "../components/chat/StorageNotice";
+import WaitingShell from "../components/chat/WaitingShell";
 
 /** C-02 — the exact meta description for this route. */
 const META_DESCRIPTION = "Your trip planning chat";
@@ -72,6 +74,7 @@ export default function Chat() {
 
   const busy = status.kind === "submitting" || status.kind === "waiting";
   const hasMessages = conversation.messages.length > 0;
+  const elapsed = useElapsedClock();
 
   /** Persists and surfaces PERSIST-05 without ever blocking the request. */
   function persist(next: Conversation) {
@@ -238,6 +241,10 @@ export default function Chat() {
           />
         </div>
       )}
+
+      {busy ? (
+        <WaitingShell elapsedMs={elapsed} onStop={stop} />
+      ) : null}
 
       {showStorageNotice ? <StorageNotice /> : null}
 
