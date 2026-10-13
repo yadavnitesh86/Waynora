@@ -10,7 +10,7 @@ import os
 from langgraph.checkpoint.memory import InMemorySaver
 load_dotenv()
 logfire.configure(token=os.getenv("LOGFIRE_TOKEN"))
-config = {"configurable": {"thread_id": "Test_run_01"}}
+config = {"configurable": {"thread_id": "Test_run_03"}}
 memory = InMemorySaver() 
 async def record_agent_run(User_input:str ) -> dict:
    agent= await build_agent(checkpointer=memory)
@@ -34,8 +34,8 @@ async def record_agent_run(User_input:str ) -> dict:
 
 if __name__ == "__main__":
     print("reached till main")
-    asyncio.run(record_agent_run("""Plan a budget-friendly 6-day trip from Delhi, India, to London, United Kingdom, for 2 adults. Assume travel dates are 10–15 November 2026, and the total budget is ₹2,50,000 for both travelers, including round-trip flights, accommodation, local transport, food, attractions, and a reasonable contingency. If these dates or costs cannot be verified, clearly state your assumptions and do not present estimates as confirmed prices.
+    asyncio.run(record_agent_run("""My partner and I will arrive at Charles de Gaulle Airport in Paris at 09:00 on 14 November 2026 and leave from the same airport at 20:00 on 15 November 2026. We need accommodation costing no more than €150 per night, and we have €250 total for attraction tickets.
 
-Organize the itinerary day by day, with morning, afternoon, and evening activities. Recommend the cheapest practical round-trip flight options, including likely baggage restrictions, layovers, and total journey time where reliable data is available. Suggest affordable accommodation in a well-connected area, with the estimated total stay cost and transport access.
+We want to see the Eiffel Tower, Louvre Museum, Notre-Dame Cathedral, Montmartre, Sacré-Cœur, Arc de Triomphe, and Champs-Élysées. We would also like to take a Seine river cruise if time and budget allow.
 
-Include major London attractions, identify free attractions versus paid attractions, and note where advance booking is recommended. Recommend affordable places to eat or specific budget-friendly food areas. Estimate expenses in both INR and GBP, explain the exchange-rate assumption, and calculate the overall budget. Account for airport transfers, realistic travel time between activities, opening-day constraints where known, and rest time. If the budget is unrealistic, explain why and propose the most practical adjustments. """ ))
+Create a two-day sightseeing plan with transport options, estimated journey times, meals, and approximate attraction costs. We want to experience the main highlights without rushing excessively. Please suggest which attractions are most worthwhile if we cannot comfortably fit everything into the available time. """ ))
