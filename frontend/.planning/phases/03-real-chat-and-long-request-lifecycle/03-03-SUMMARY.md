@@ -145,17 +145,20 @@ Each task was committed atomically:
 
 ## Task 4 Checkpoint: Human Verification (blocking)
 
-**Status:** Awaiting human verification
+**Status:** Resolved under auto-mode (human-verify checkpoint auto-approved) with the plan's honest resume-signal: "backend unavailable — external limitation documented". Checkpoint closed as an external limitation, not as completed human verification.
 
-**Automated verification completed:**
+**Backend check (external limitation, documented per AGENTS.md / CHAT-09):** FastAPI backend on localhost:8000 was attempted by the executor and is unreachable (connection refused) in this environment. No live-backend browser walkthrough was performed.
+
+**Automated verification completed (all green):**
 - All 314 tests pass (29 test files)
 - `tsc --noEmit` exit 0
 - Honesty grep: no banned patterns in rendering code
 - isDev gate: confirmed in ErrorBoundary.tsx
+- `npm run build` (production build) succeeds
 
-**Backend check:** FastAPI on localhost:8000 unreachable (connection refused). Recorded as external limitation per AGENTS.md.
+**Honesty note:** No human observed any browser state. The isDev-gated ErrorBoundary production panel is unit-tested only; a visual check of the production build has not been performed.
 
-**Human browser verification still needed:**
+**Human browser verification still needed (OPEN external limitation — to be walked by a human when a live backend is available):**
 1. Start the FastAPI backend (uvicorn main:app on port 8000)
 2. Sign in at the dev URL, submit a real trip request
 3. Confirm the waiting shell shows advancing M:SS and honest band copy
