@@ -5,7 +5,7 @@ import RootLayout from "../layouts/RootLayout";
 import Landing from "../routes/Landing";
 import SignIn from "../routes/SignIn";
 import SignUp from "../routes/SignUp";
-import ChatPlaceholder from "../routes/ChatPlaceholder";
+import Chat from "../routes/Chat";
 import NotFound from "../routes/NotFound";
 import { router } from "../routes";
 import { Spinner } from "../components/ui";
@@ -54,8 +54,10 @@ const ROUTE_CASES: RouteCase[] = [
   },
   {
     path: "/chat",
-    name: "chat placeholder (authenticated)",
-    title: "Chat · Waynora",
+    name: "chat (authenticated)",
+    // C-01/C-02: the document title is the conversation title, which is
+    // "New chat" before the first user message (D-26).
+    title: "New chat · Waynora",
     authenticated: true,
   },
   {
@@ -73,7 +75,7 @@ function renderRoute(path: string) {
           <Route path="/" element={<Landing />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
-          <Route path="/chat" element={<ChatPlaceholder />} />
+          <Route path="/chat" element={<Chat />} />
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>

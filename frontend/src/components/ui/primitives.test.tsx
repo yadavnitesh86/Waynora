@@ -9,7 +9,6 @@ import EmptyState from "./EmptyState";
 import VisuallyHidden from "./VisuallyHidden";
 import SkipLink from "./SkipLink";
 import PageHeader from "./PageHeader";
-import TextArea from "./TextArea";
 import * as barrel from "./index";
 
 const PRIMITIVE_EXPORTS = [

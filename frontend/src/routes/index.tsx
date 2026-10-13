@@ -6,7 +6,7 @@ import ProtectedRoute from "./ProtectedRoute";
 const Landing = lazy(() => import("./Landing"));
 const SignIn = lazy(() => import("./SignIn"));
 const SignUp = lazy(() => import("./SignUp"));
-const ChatPlaceholder = lazy(() => import("./ChatPlaceholder"));
+const Chat = lazy(() => import("./Chat"));
 const NotFound = lazy(() => import("./NotFound"));
 
 export const router = createBrowserRouter([
@@ -42,7 +42,7 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={null}>
             <ProtectedRoute>
-              <ChatPlaceholder />
+              <Chat />
             </ProtectedRoute>
           </Suspense>
         ),
