@@ -58,7 +58,7 @@ describe("WaitingShell", () => {
   });
 
   it("the elapsed readout does NOT have aria-live", () => {
-    const { container } = render(
+    render(
       <WaitingShell elapsedMs={65_000} onStop={() => {}} />,
     );
     // The readout "1:05" must not be inside a live region

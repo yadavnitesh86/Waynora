@@ -68,9 +68,10 @@ describe("ErrorBoundary", () => {
     mockIsDev.value = false;
     const reloadSpy = vi.fn();
     const original = window.location;
-    // @ts-expect-error test stub
-    delete window.location;
-    window.location = { ...original, reload: reloadSpy };
+    Object.defineProperty(window, "location", {
+      value: { ...original, reload: reloadSpy },
+      writable: true,
+    });
 
     render(
       <ErrorBoundary>
@@ -81,7 +82,10 @@ describe("ErrorBoundary", () => {
     fireEvent.click(screen.getByRole("button", { name: "Reload the page" }));
     expect(reloadSpy).toHaveBeenCalledTimes(1);
 
-    window.location = original;
+    Object.defineProperty(window, "location", {
+      value: original,
+      writable: true,
+    });
   });
 
   it("componentDidCatch console.errors and never renders diagnostics", () => {
