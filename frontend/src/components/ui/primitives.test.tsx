@@ -9,6 +9,7 @@ import EmptyState from "./EmptyState";
 import VisuallyHidden from "./VisuallyHidden";
 import SkipLink from "./SkipLink";
 import PageHeader from "./PageHeader";
+import TextArea from "./TextArea";
 import * as barrel from "./index";
 
 const PRIMITIVE_EXPORTS = [
@@ -20,10 +21,11 @@ const PRIMITIVE_EXPORTS = [
   "VisuallyHidden",
   "SkipLink",
   "PageHeader",
+  "TextArea",
 ] as const;
 
 describe("ui barrel", () => {
-  it("exports all eight primitives from one module", () => {
+  it("exports all nine primitives from one module", () => {
     for (const name of PRIMITIVE_EXPORTS) {
       expect(barrel[name], name).toBeDefined();
     }

@@ -34,7 +34,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function TextAre
   const textareaId = id ?? generatedId;
   const hintId = `${textareaId}-hint`;
   const errorId = `${textareaId}-error`;
-  const nativeRef = useRef<HTMLTextAreaElement>(null);
+  const nativeRef = useRef<HTMLTextAreaElement | null>(null);
 
   const describedBy = [
     hint === undefined ? null : hintId,

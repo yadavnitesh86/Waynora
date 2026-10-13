@@ -248,17 +248,18 @@ describe("request controller", () => {
 
     it("ignores a re-entrant submit issued while still submitting", () => {
       const { ask, resolve } = createDeferredAsk();
-      let controller: RequestController;
-      const reentrantAsk = vi.fn(
-        (_request: AskRequest, _signal?: AbortSignal) => {
-          // Re-enter while the status is still "submitting".
-          controller.submit(input({ question: "re-entrant" }));
-          // The deferred ask ignores its arguments — it
-          // settles the same promise either way.
-          return ask();
-        },
-      );
-      controller = createRequestController({ ask: reentrantAsk });
+      const controllerRef: { current: RequestController | null } = {
+        current: null,
+      };
+      const reentrantAsk = vi.fn(() => {
+        // Re-enter while the status is still "submitting".
+        controllerRef.current?.submit(input({ question: "re-entrant" }));
+        // The deferred ask ignores its arguments — it
+        // settles the same promise either way.
+        return ask();
+      });
+      const controller = createRequestController({ ask: reentrantAsk });
+      controllerRef.current = controller;
       const statuses: RequestStatus[] = [];
       controller.subscribe((status) => statuses.push(status));
 

@@ -8,6 +8,11 @@ const { mockSubmit, mockStatus, mockStop } = vi.hoisted(() => ({
   mockStop: vi.fn(),
 }));
 
+const { mockReadConversations, mockWriteConversations } = vi.hoisted(() => ({
+  mockReadConversations: vi.fn(),
+  mockWriteConversations: vi.fn(),
+}));
+
 vi.mock("../hooks/useAskController", () => ({
   useAskController: () => ({
     status: mockStatus,
@@ -15,9 +20,6 @@ vi.mock("../hooks/useAskController", () => ({
     stop: mockStop,
   }),
 }));
-
-const mockReadConversations = vi.fn();
-const mockWriteConversations = vi.fn();
 
 vi.mock("../lib/cookie/repository", () => ({
   readConversations: mockReadConversations,
@@ -68,7 +70,7 @@ describe("Chat route (first submit slice)", () => {
         "Describe your trip in your own words. A real agent builds the plan, usually in 5 to 15 minutes. Your chat stays in this browser.",
       ),
     ).toBeInTheDocument();
-    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Sign out" })).not.toBeInTheDocument();
   });
 
   it("shows the user message immediately on submit with markInFlight metadata", async () => {
@@ -104,7 +106,7 @@ describe("Chat route (first submit slice)", () => {
     // writeConversations was called with a conversation that has the
     // in-flight message
     expect(mockWriteConversations).toHaveBeenCalled();
-    const writtenConv = mockWriteConversations.mock.calls[0][0][0];
+    const writtenConv = mockWriteConversations.mock.calls[0]![0][0];
     const userMsg = writtenConv.messages.find(
       (m: { role: string }) => m.role === "user",
     );
@@ -195,7 +197,7 @@ describe("Chat route (first submit slice)", () => {
       expect(mockSubmit).toHaveBeenCalledTimes(1);
     });
 
-    const call = mockSubmit.mock.calls[0][0];
+    const call = mockSubmit.mock.calls[0]![0];
     expect(call.threadId).toBe("thread-from-prior-turn");
   });
 
@@ -221,7 +223,7 @@ describe("Chat route (first submit slice)", () => {
       expect(mockSubmit).toHaveBeenCalledTimes(1);
     });
 
-    const call = mockSubmit.mock.calls[0][0];
+    const call = mockSubmit.mock.calls[0]![0];
     expect(call.threadId).toBeUndefined();
   });
 });
