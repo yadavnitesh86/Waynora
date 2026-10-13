@@ -49,7 +49,10 @@ export default function Chat() {
   /** The message owned by the live request; null whenever idle. */
   const [activeMessageId, setActiveMessageId] = useState<string | null>(null);
 
-  const { status, submit } = useAskController({
+  // `stop` MUST be destructured from the hook: a bare `stop` identifier
+  // resolves to the DOM global `window.stop()`, which aborts nothing
+  // (code review CR-01 — D-32/WAIT-05 depend on this wiring).
+  const { status, submit, stop } = useAskController({
     conversationId: conversation.id,
   });
 
@@ -74,7 +77,10 @@ export default function Chat() {
 
   const busy = status.kind === "submitting" || status.kind === "waiting";
   const hasMessages = conversation.messages.length > 0;
-  const elapsed = useElapsedClock();
+  // The clock is request-scoped (code review CR-02): it runs only while a
+  // request is in flight, so the readout opens at 0:00 and band A no matter
+  // how long the route was idle before the submit.
+  const elapsed = useElapsedClock(busy);
 
   /** Persists and surfaces PERSIST-05 without ever blocking the request. */
   function persist(next: Conversation) {

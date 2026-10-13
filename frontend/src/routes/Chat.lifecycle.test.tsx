@@ -327,3 +327,80 @@ describe("Chat lifecycle — TIMEOUT-COPY", () => {
     ).toBeInTheDocument();
   });
 });
+
+describe("Chat lifecycle — STOP-WAITING (CR-01 regression)", () => {
+  it("Stop waiting aborts the controller's request and renders the aborted recovery copy", async () => {
+    render(
+      <MemoryRouter>
+        <Chat />
+      </MemoryRouter>,
+    );
+    await screen.findByText("Where do you want to go?");
+
+    typeAndSubmit("A trip to Lisbon");
+    expect(
+      await screen.findByText("Waynora is planning your trip"),
+    ).toBeInTheDocument();
+
+    // Click Stop waiting — must reach the CONTROLLER's stop(), not the
+    // DOM global window.stop() (which aborts nothing).
+    fireEvent.click(screen.getByRole("button", { name: "Stop waiting" }));
+
+    // The controller aborted the in-flight request's signal.
+    const signal = mockAsk.mock.calls[0]?.[1] as AbortSignal | undefined;
+    expect(signal?.aborted).toBe(true);
+
+    // The pending ask settles the way askBackend does on abort.
+    await act(async () => {
+      settleAsk?.({ ok: false, kind: "abort", message: "stopped" });
+    });
+
+    // Aborted recovery copy (D-32 / WAIT-05) — the server may still run.
+    expect(await screen.findByText("Waiting stopped.")).toBeInTheDocument();
+    expect(
+      screen.getByText(/Your trip may still be building on our side/),
+    ).toBeInTheDocument();
+    // The user's prompt is preserved above the recovery block.
+    expect(inTranscript().getByText("A trip to Lisbon")).toBeInTheDocument();
+  });
+});
+
+describe("Chat lifecycle — ELAPSED BASELINE (CR-02 regression)", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  it("opens at 0:00 / band A even after a long idle period before submitting", () => {
+    render(
+      <MemoryRouter>
+        <Chat />
+      </MemoryRouter>,
+    );
+
+    // Flush initial render
+    act(() => {
+      vi.advanceTimersByTime(0);
+    });
+
+    // Four minutes of idle reading before the user submits — this time
+    // must NOT leak into the request's elapsed readout.
+    act(() => {
+      vi.advanceTimersByTime(240_000);
+    });
+
+    typeAndSubmit("A trip to Kyoto");
+
+    // Flush the submit
+    act(() => {
+      vi.advanceTimersByTime(0);
+    });
+
+    // The shell opens at 0:00 with band A copy — honest baseline.
+    expect(
+      screen.getByText("Waynora is planning your trip"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("0:00")).toBeInTheDocument();
+    expect(screen.getByText("Reading your request.")).toBeInTheDocument();
+    expect(screen.queryByText("4:00")).not.toBeInTheDocument();
+  });
+});
