@@ -8,7 +8,7 @@ Waynora will be built as a five-phase vertical MVP: establish the React/Convex/A
 
 - [x] **Phase 1: Foundation, Contracts, and Auth** - Establish the typed SPA, exact backend boundary, safe Markdown, Convex auth, routing, and shared UI foundations. (completed 2026-10-10)
 - [ ] **Phase 2: Cookie Persistence and Chat Domain** - Build bounded, validated conversation storage and pure chat management primitives.
-- [ ] **Phase 3: Real Chat and Long-Request Lifecycle** - Deliver the core authenticated chat slice against the actual FastAPI `/ask` endpoint with honest waiting and recovery.
+- [x] **Phase 3: Real Chat and Long-Request Lifecycle** - Deliver the core authenticated chat slice against the actual FastAPI `/ask` endpoint with honest waiting and recovery. (completed 2026-10-13)
 - [ ] **Phase 4: Chat Management, 2048, and Responsive Experience** - Add sidebar management, the isolated waiting game, and cross-device interaction quality.
 - [ ] **Phase 5: Editorial Landing, Hardening, and Verification** - Ship the premium public experience and validate security, deployment, accessibility, and all v1 workflows.
 
@@ -78,7 +78,7 @@ Plans:
   4. Network, timeout, HTTP, malformed, and unexpected failures preserve the prompt/history and provide explicit, non-automatic recovery without exposing raw diagnostics.
 
 **UI hint:** yes
-**Plans:** 1/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 
@@ -88,11 +88,11 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 03-02-PLAN.md — Protected chat conversation vertical slice: composer, messages, safe Markdown, optimistic persistence, thread continuation.
+- [x] 03-02-PLAN.md — Protected chat conversation vertical slice: composer, messages, safe Markdown, optimistic persistence, thread continuation.
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 03-03-PLAN.md — Elapsed-time waiting shell; validate real-backend, long-request, stale-result, retry, and malformed-response behavior.
+- [x] 03-03-PLAN.md — Elapsed-time waiting shell; validate real-backend, long-request, stale-result, retry, and malformed-response behavior.
 
 ### Phase 4: Chat Management, 2048, and Responsive Experience
 
@@ -147,6 +147,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 |-------|----------------|--------|-----------|
 | 1. Foundation, Contracts, and Auth | 3/3 | Complete   | 2026-10-10 |
 | 2. Cookie Persistence and Chat Domain | 2/2 | In Progress|  |
-| 3. Real Chat and Long-Request Lifecycle | 1/3 | In Progress | - |
+| 3. Real Chat and Long-Request Lifecycle | 3/3 | Complete   | 2026-10-13 |
 | 4. Chat Management, 2048, and Responsive Experience | 0/3 | Not started | - |
 | 5. Editorial Landing, Hardening, and Verification | 0/3 | Not started | - |

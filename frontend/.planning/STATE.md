@@ -1,19 +1,17 @@
 ---
-gsd_state_version: "1.0"
+gsd_state_version: 1.0
 milestone: v1.0
-current_phase: 03
-current_phase_name: Real Chat and Long-Request Lifecycle
-status: executing
-stopped_at: Completed 03-01-PLAN.md
-last_updated: "2026-10-12T14:13:27.262Z"
-last_activity: 2026-10-12
-last_activity_desc: Phase 03 execution started
+milestone_name: milestone
+status: phase-03-complete
+stopped_at: Completed 03-03-PLAN.md — Phase 03 complete
+last_updated: "2026-10-13T12:30:00.000Z"
+last_activity: 2026-10-13 -- Phase 03 complete: 03-03 waiting shell, ErrorBoundary, lifecycle validation
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 8
-  completed_plans: 6
-milestone_name: milestone
+  completed_plans: 8
+  percent: 50
 ---
 
 # Project State
@@ -27,12 +25,48 @@ See: .planning/PROJECT.md (updated 2026-10-09)
 
 ## Current Position
 
-Phase: 03 (Real Chat and Long-Request Lifecycle) — EXECUTING
-Plan: 2 of 3
-Status: Ready to execute
-Last activity: 2026-10-12 — Phase 03 execution started
+Phase: 03 (Real Chat and Long-Request Lifecycle) — COMPLETE
+Plan: 3 of 3 (all complete)
+Status: **03-03 COMPLETE** (SUMMARY written)
+Last activity: 2026-10-13 -- Phase 03 complete: waiting shell, ErrorBoundary, lifecycle validation
 
-Progress: [██████████] 100%
+### 03-02 status
+
+| Task | Scope | Status |
+|------|-------|--------|
+| 1 | TextArea primitive, ChatComposer, Chat first-submit slice | **DONE** — `8ff4271` |
+| 2 | ChatThread, UserMessage/AssistantMessage anatomy, safe Markdown answers, RecoveryBlock (7 kinds), succeed/fail/retry wiring | **DONE** |
+| 3 | Route swap to real Chat, delete ChatPlaceholder, document title/meta (C-01/C-02), PageHeader h1 (C-03), axe verification | **DONE** |
+
+Tasks 2–3 shipped together in `dda0f53`. `03-02-SUMMARY.md` exists.
+
+**Green:** 24 files / 282 tests, `tsc --noEmit` exit 0, `eslint` 0 errors, 0 `rehype-raw`/`dangerouslySetInnerHTML` in `src/components/chat/`, 0 `ChatPlaceholder` references in `src/routes/`.
+
+**Deviations recorded in the SUMMARY (3):**
+
+- `src/test/a11y.test.tsx` was also modified — it imported `ChatPlaceholder` directly, so deleting the placeholder would not compile otherwise.
+- The RED commit `c734266` left the tree red (6 tsc errors, 5 eslint errors, 1 failing barrel test); cleared in `8ff4271`.
+- Tasks 2–3 committed as one commit rather than per-task test/feat pairs, because they share one test file and one implementation file.
+
+**Known moderate, non-blocking axe finding on `/chat`:** `heading-order`, because the route `<h1>` is followed by `EmptyState`'s contracted `<h3>`. Surfaced in test output; does not fail the gate.
+
+### 03-03 — what is deliberately NOT built yet
+
+- `WaitingShell` (C-10…C-13 + band copy), `useElapsedClock`, and `waitingCopy.ts` are in the UI-SPEC Component Inventory but **not** in 03-02's file lists. They are 03-03's scope.
+- The `Stop waiting` control (C-14, D-32) is not wired: `stop` is available from the controller but `Chat.tsx` does not call it yet.
+- `ErrorBoundary`'s `<pre>` traceback is not gated behind `isDev` (D-37). Still open.
+
+### Validation debt cleared during Task 1 (green tree)
+
+The RED commit `c734266` left the tree failing `tsc`, `eslint`, and one barrel test. All were fixed in `8ff4271` so the plan's verification commands now pass:
+
+- `TextArea.tsx` ref typed as `MutableRefObject` (readonly-`current` assignment)
+- `Chat.test.tsx` repository mocks hoisted via `vi.hoisted` (temporal-dead-zone `ReferenceError`) and mock-call indexing asserted
+- `TextArea.test.tsx` unused imports removed
+- `requestController.test.ts` `prefer-const` + unused params fixed (03-01 debt)
+- `primitives.test.tsx` barrel expectation updated 8 → 9 primitives
+
+Committed alongside, unrelated to the wave: `f080bdd` (`app/Evals/trace_recorder.py` manual eval-prompt edit).
 
 ### Phase 1 post-execution fixes (2026-10-10)
 
@@ -80,6 +114,7 @@ Both bugs were in code **no test rendered** — every suite mocked the auth hook
 |------|----------|-------|-------|
 | Phase 02 P02 | 49min | 2 tasks | 2 files |
 | Phase 03 P01 | 120min | 3 tasks | 6 files |
+| Phase 03 P02 | 95min | 3 tasks | 13 created / 5 modified / 1 deleted |
 
 ## Accumulated Context
 
@@ -106,7 +141,10 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-None yet.
+- **03-03 (not started):** `WaitingShell` (C-10 heading, C-11/C-12 elapsed readout at `M:SS` mono tabular-nums and **no** live region, C-13 expectation line, C-14 `Stop waiting` wired to the controller's `stop()`), `useElapsedClock` (1000ms interval, cleaned up on unmount), `waitingCopy.ts` (pure `selectBand`/`selectVariant`, 6 bands x 2 variants, elapsed-driven, no consecutive repeats), plus the per-second re-render discipline the thread must honour.
+- **03-03:** wire `aborted` via the `Stop waiting` control (D-32) so the recovery copy explains the server may still be running.
+- **D-37 (open):** gate `ErrorBoundary`'s `<pre>` traceback behind `isDev` and render the contracted production panel.
+- **Pre-existing state drift (unrelated to this wave):** `state.json` lists phase 02 as `in_progress` although both 02-01 and 02-02 have SUMMARYs and STATE.md counts it as `completed_phases: 2`. `HANDOFF.json` is far staler — it still reports `phase: 01`, `next_action` "/gsd-plan-phase 2", and an empty `uncommitted_files`. Neither has been updated by any wave so far.
 
 ### Blockers/Concerns
 
@@ -126,9 +164,11 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-10-12T14:13:27.141Z
-Stopped at: Completed 03-01-PLAN.md
+Last session: 2026-10-13T11:00:00.000Z
+Stopped at: Completed 03-02-PLAN.md — 03-03 not started
 Resume file: None
+
+**Resume with:** 03-03 — read `.planning/phases/03-real-chat-and-long-request-lifecycle/03-03-PLAN.md`. The waiting shell (`WaitingShell`, C-10…C-14), `useElapsedClock`, `waitingCopy.ts`, and the `Stop waiting` escape hatch attach to the route state `Chat.tsx` already threads out (`status`, `activeMessageId`, `stop`).
 
 **⚠️ TASK 4 (human browser verify) — PARTIALLY DONE, NOT FABRICATED:**
 
