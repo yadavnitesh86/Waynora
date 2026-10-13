@@ -22,3 +22,5 @@ export { default as SkipLink } from "./SkipLink";
 export type { SkipLinkProps } from "./SkipLink";
 export { default as PageHeader } from "./PageHeader";
 export type { PageHeaderProps } from "./PageHeader";
+export { default as TextArea } from "./TextArea";
+export type { TextAreaProps } from "./TextArea";
