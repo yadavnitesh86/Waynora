@@ -66,7 +66,7 @@ Plans:
 
 ### Phase 3: Real Chat and Long-Request Lifecycle
 
-**Goal:** An authenticated user can submit a real travel request, wait honestly for the synchronous backend, receive its actual answer, continue the thread, or recover safely from failure.
+**Goal:** As a signed-in traveler, I want to submit a real travel request and wait honestly for the synchronous backend, so that I receive the actual answer, can continue the thread, and recover safely from failure.
 **Mode:** mvp
 **Depends on:** Phase 2
 **Requirements:** [CHAT-01, CHAT-02, CHAT-03, CHAT-05, CHAT-06, CHAT-07, CHAT-08, CHAT-09, WAIT-01, WAIT-02, WAIT-03, WAIT-04, WAIT-05, WAIT-06]
