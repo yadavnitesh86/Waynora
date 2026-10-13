@@ -1,4 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
+import { isDev } from "./lib/env";
+import Button from "./components/ui/Button";
 
 interface Props {
   children: ReactNode;
@@ -16,9 +18,9 @@ interface State {
  * and actionable. Removed from the happy path entirely - it renders children
  * unchanged when nothing has thrown.
  *
- * Deliberately does NOT touch the /ask error contract: this is a developer
- * surface for crashes, not a user-facing product error. Copy here is written
- * for the person debugging, not for an end user.
+ * D-37 / QUAL-01: the diagnostic pre block (error.message + stack) renders
+ * ONLY when isDev is true. In a production build the UI never shows a raw
+ * traceback - it renders the customer-safe production panel instead.
  */
 export default class ErrorBoundary extends Component<Props, State> {
   state: State = { error: null };
@@ -36,6 +38,34 @@ export default class ErrorBoundary extends Component<Props, State> {
     const { error } = this.state;
     if (error === null) {
       return this.props.children;
+    }
+
+    // D-37: in production, render the customer-safe panel. Raw tracebacks
+    // never reach the UI (QUAL-01).
+    if (!isDev) {
+      return (
+        <div
+          role="alert"
+          className="flex min-h-screen flex-col items-center justify-center gap-md bg-canvas px-md font-sans"
+        >
+          <div className="w-full max-w-container-lg border border-line bg-surface p-lg">
+            <h1 className="text-h2 font-semibold text-ink">
+              Something unexpected happened.
+            </h1>
+            <p className="mt-md text-body text-ink-muted">
+              Something went wrong on our side. Reload the page to try again.
+            </p>
+            <Button
+              variant="secondary"
+              size="md"
+              onClick={() => window.location.reload()}
+              className="mt-lg"
+            >
+              Reload the page
+            </Button>
+          </div>
+        </div>
+      );
     }
 
     return (
