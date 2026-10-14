@@ -85,7 +85,7 @@ export default function WaitingShell({
             (GAME-01). Honest decoration: no progress implication, no link
             to the request beyond sharing the waiting phase. */}
         {isWaiting ? (
-          <div className="rounded-md border border-line bg-canvas p-sm">
+          <div className="rounded-md border border-line bg-canvas p-xs sm:p-sm">
             <h4 className="font-sans text-small font-semibold text-ink">
               Waiting lounge
             </h4>

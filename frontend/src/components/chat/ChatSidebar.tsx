@@ -133,7 +133,10 @@ export default function ChatSidebar({
         aria-label="Chat history"
         className={[
           "fixed inset-y-0 left-0 z-30 flex w-72 flex-col border-r border-line bg-surface",
-          "transition-transform duration-200 ease-out",
+          // QUAL-04: the drawer slide is transform-only at the locked 200ms
+          // ease-out; motion-reduce plus the global override in globals.css
+          // collapse it to an instant state change.
+          "transition-transform duration-200 ease-out motion-reduce:transition-none",
           "md:static md:z-auto md:shrink-0",
           isOpen
             ? "visible translate-x-0"
