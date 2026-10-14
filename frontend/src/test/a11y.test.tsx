@@ -1,6 +1,8 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Conversation } from "../lib/cookie/schema";
+import type { AskResult } from "../lib/errors";
 import RootLayout from "../layouts/RootLayout";
 import Landing from "../routes/Landing";
 import SignIn from "../routes/SignIn";
@@ -9,16 +11,22 @@ import Chat from "../routes/Chat";
 import NotFound from "../routes/NotFound";
 import { router } from "../routes";
 import { Spinner } from "../components/ui";
+import Game2048 from "../components/game/Game2048";
+import { initGame } from "../lib/game/2048/engine";
 import { expectNoAxeViolations } from "./axe";
 
-const { mockAuthState, mockSignOut } = vi.hoisted(() => ({
-  mockAuthState: {
-    isAuthenticated: false,
-    isLoading: false,
-    userId: null as string | null,
-  },
-  mockSignOut: vi.fn(),
-}));
+const { mockAuthState, mockSignOut, mockAsk, mockReadConversations, mockWriteConversations } =
+  vi.hoisted(() => ({
+    mockAuthState: {
+      isAuthenticated: false,
+      isLoading: false,
+      userId: null as string | null,
+    },
+    mockSignOut: vi.fn(),
+    mockAsk: vi.fn(),
+    mockReadConversations: vi.fn(),
+    mockWriteConversations: vi.fn(),
+  }));
 
 vi.mock("../auth/useCurrentUser", () => ({
   useAuthState: () => mockAuthState,
@@ -27,6 +35,15 @@ vi.mock("../auth/useCurrentUser", () => ({
 
 vi.mock("@convex-dev/auth/react", () => ({
   useAuthActions: () => ({ signIn: vi.fn(), signOut: mockSignOut }),
+}));
+
+// The network boundary is faked so the waiting room (and its 2048 board)
+// can be reached without a backend; the repository is faked so these
+// accessibility runs are hermetic regardless of leftover cookies.
+vi.mock("../lib/api/ask", () => ({ askBackend: mockAsk }));
+vi.mock("../lib/cookie/repository", () => ({
+  readConversations: mockReadConversations,
+  writeConversations: mockWriteConversations,
 }));
 
 interface RouteCase {
@@ -98,8 +115,53 @@ function tabbableElements(): HTMLElement[] {
   );
 }
 
+/** Conversations handed to the chat route by the repository fake. */
+let snapshot: Conversation[] = [];
+
+function stubSnapshot(conversations: Conversation[]) {
+  snapshot = conversations;
+}
+
+function makeConversation(
+  overrides: Partial<Conversation> = {},
+): Conversation {
+  return {
+    id: "conv-1",
+    title: "New chat",
+    createdAt: "2026-01-01T00:00:00Z",
+    updatedAt: "2026-01-01T00:00:00Z",
+    messages: [],
+    ...overrides,
+  };
+}
+
+function userMessage(id: string, content: string) {
+  return {
+    id,
+    role: "user" as const,
+    content,
+    createdAt: "2026-01-01T00:00:00Z",
+  };
+}
+
 beforeEach(() => {
   mockSignOut.mockReset();
+  snapshot = [];
+  // The ask promise stays pending so the waiting room remains mounted
+  // while axe runs over it.
+  mockAsk.mockImplementation(() => new Promise<AskResult>(() => {}));
+  mockReadConversations.mockImplementation(() => ({
+    conversations: snapshot,
+    recovered: false,
+    evicted: [],
+  }));
+  mockWriteConversations.mockImplementation(
+    (conversations: Conversation[]) => ({
+      conversations,
+      recovered: false,
+      evicted: [],
+    }),
+  );
   // axe-core's html-has-lang rule needs a document language to be present.
   document.documentElement.setAttribute("lang", "en");
 });
@@ -245,5 +307,72 @@ describe("reduced motion", () => {
     expect(status.querySelectorAll("span[aria-hidden='true'] span")).toHaveLength(3);
 
     vi.unstubAllGlobals();
+  });
+});
+
+describe("axe-core on chat history and waiting surfaces", () => {
+  it("has no critical or serious violations with the history drawer open over its scrim", async () => {
+    mockAuthState.isAuthenticated = true;
+    stubSnapshot([
+      makeConversation({
+        id: "conv-japan",
+        title: "Japan plan",
+        messages: [userMessage("msg-japan", "Japan itinerary please")],
+      }),
+      makeConversation({
+        id: "conv-paris",
+        title: "Paris plan",
+        messages: [userMessage("msg-paris", "Paris itinerary please")],
+      }),
+    ]);
+
+    const { container } = renderRoute("/chat");
+    await screen.findByText("Japan itinerary please");
+
+    // The open drawer overlays the thread with its decorative scrim —
+    // both the panel contents and the overlay state get audited.
+    fireEvent.click(screen.getByRole("button", { name: "Open chat history" }));
+    expect(
+      screen.getByRole("navigation", { name: "Chat history" }),
+    ).toBeInTheDocument();
+
+    await expectNoAxeViolations(container);
+  });
+
+  it("has no critical or serious violations in the active waiting room with the 2048 board", async () => {
+    mockAuthState.isAuthenticated = true;
+
+    const { container } = renderRoute("/chat");
+    await screen.findByText("Where do you want to go?");
+
+    const textarea = screen.getByLabelText("Your trip request");
+    fireEvent.change(textarea, { target: { value: "10 days in Japan" } });
+    fireEvent.keyDown(textarea, { key: "Enter", code: "Enter", shiftKey: false });
+
+    expect(
+      await screen.findByRole("grid", { name: "2048 game board" }),
+    ).toBeInTheDocument();
+
+    await expectNoAxeViolations(container);
+  });
+
+  it("has no critical or serious violations on the 2048 win overlay", async () => {
+    const base = initGame(() => 0.5);
+    const { container } = render(
+      <Game2048 initialState={{ ...base, won: true }} />,
+    );
+    expect(screen.getByText("You win!")).toBeInTheDocument();
+
+    await expectNoAxeViolations(container);
+  });
+
+  it("has no critical or serious violations on the 2048 game-over overlay", async () => {
+    const base = initGame(() => 0.5);
+    const { container } = render(
+      <Game2048 initialState={{ ...base, gameOver: true }} />,
+    );
+    expect(screen.getByText("Game Over")).toBeInTheDocument();
+
+    await expectNoAxeViolations(container);
   });
 });
