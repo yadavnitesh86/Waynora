@@ -148,5 +148,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Foundation, Contracts, and Auth | 3/3 | Complete   | 2026-10-10 |
 | 2. Cookie Persistence and Chat Domain | 2/2 | In Progress|  |
 | 3. Real Chat and Long-Request Lifecycle | 3/3 | Complete   | 2026-10-13 |
-| 4. Chat Management, 2048, and Responsive Experience | 3/3 | Complete   | 2026-10-14 |
+| 4. Chat Management, 2048, and Responsive Experience | 3/3 | In Progress|  |
 | 5. Editorial Landing, Hardening, and Verification | 0/3 | Not started | - |
