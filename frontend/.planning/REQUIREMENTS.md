@@ -70,12 +70,12 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 ### 2048 Waiting Game
 
 - [ ] **GAME-01**: The waiting interface contains a lightweight 4×4 2048 game only while an AI request is actively waiting.
-- [ ] **GAME-02**: The game implements standard tile movement, merging, spawning, scoring, and best score tracking for the current game session.
-- [ ] **GAME-03**: The game supports win and game-over states and provides a restart control.
-- [ ] **GAME-04**: The game supports keyboard arrow controls on desktop and swipe/pointer controls on touch devices.
-- [ ] **GAME-05**: Game logic is separated into deterministic, testable functions independent from React UI and chat state.
-- [ ] **GAME-06**: Game controls do not submit chat messages, steal arrow keys from focused text inputs, scroll-jack the page, or cancel/restart the AI request.
-- [ ] **GAME-07**: Game controls, status, score, restart, win, and game-over states are usable with keyboard and assistive technology.
+- [x] **GAME-02**: The game implements standard tile movement, merging, spawning, scoring, and best score tracking for the current game session.
+- [x] **GAME-03**: The game supports win and game-over states and provides a restart control.
+- [x] **GAME-04**: The game supports keyboard arrow controls on desktop and swipe/pointer controls on touch devices.
+- [x] **GAME-05**: Game logic is separated into deterministic, testable functions independent from React UI and chat state.
+- [x] **GAME-06**: Game controls do not submit chat messages, steal arrow keys from focused text inputs, scroll-jack the page, or cancel/restart the AI request.
+- [x] **GAME-07**: Game controls, status, score, restart, win, and game-over states are usable with keyboard and assistive technology.
 
 ### Error Handling, Security, and Quality
 
@@ -192,12 +192,12 @@ Updated during roadmap creation. Each v1 requirement maps to exactly one phase.
 | PERSIST-09 | Phase 2 | Complete |
 | PERSIST-10 | Phase 2 | Complete |
 | GAME-01 | Phase 4 | Pending |
-| GAME-02 | Phase 4 | Pending |
-| GAME-03 | Phase 4 | Pending |
-| GAME-04 | Phase 4 | Pending |
-| GAME-05 | Phase 4 | Pending |
-| GAME-06 | Phase 4 | Pending |
-| GAME-07 | Phase 4 | Pending |
+| GAME-02 | Phase 4 | Complete |
+| GAME-03 | Phase 4 | Complete |
+| GAME-04 | Phase 4 | Complete |
+| GAME-05 | Phase 4 | Complete |
+| GAME-06 | Phase 4 | Complete |
+| GAME-07 | Phase 4 | Complete |
 | QUAL-01 | Phase 5 | Pending |
 | QUAL-02 | Phase 5 | Pending |
 | QUAL-03 | Phase 5 | Pending |

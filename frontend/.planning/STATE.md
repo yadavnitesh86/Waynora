@@ -1,20 +1,18 @@
 ---
-gsd_state_version: "1.0"
+gsd_state_version: 1.0
 milestone: v1.0
-current_phase: 04
-current_phase_name: Chat Management, 2048, and Responsive Experience
+milestone_name: milestone
 current_plan: 3
 status: executing
-stopped_at: Completed 04-01-PLAN.md (multi-conversation chat management)
-last_updated: "2026-10-14T06:47:10.536Z"
+stopped_at: Completed 04-02-PLAN.md (2048 engine and accessible game UI)
+last_updated: "2026-10-14T12:16:48.091Z"
 last_activity: 2026-10-14
-last_activity_desc: Phase 04 execution started
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 11
-  completed_plans: 9
-milestone_name: milestone
+  completed_plans: 10
+  percent: 60
 ---
 
 # Project State
@@ -28,13 +26,20 @@ See: .planning/PROJECT.md (updated 2026-10-09)
 
 ## Current Position
 
-Current Plan: 2
+Current Plan: 3
 Total Plans in Phase: 3
 
 Phase: 04 (Chat Management, 2048, and Responsive Experience) — EXECUTING
 Plans: 3 plans created (04-01, 04-02, 04-03)
-Status: Executing Phase 04
-Last activity: 2026-10-14 — Completed 04-01 (multi-conversation chat management); next is 04-02 (2048 engine)
+Status: Ready to execute
+Last activity: 2026-10-14 — Completed 04-02 (deterministic 2048 engine + accessible game UI); next is 04-03
+
+### 04-02 status (2026-10-14)
+
+**DONE** — commits `86343a1` (engine + 32 node tests), `375c80c` (Tile/GameBoard + tailwind tile keyframes), `5859897` (Game2048 controller + 16 interaction/axe tests). `04-02-SUMMARY.md` exists. Green: 34 files / 428 tests, tsc exit 0, eslint 0 errors.
+
+- Deviations (both test-infra, in SUMMARY): `src/test/setup.ts` gained an in-memory Storage shim because this vitest+jsdom exposes no `window.localStorage`; `src/app.composition.test.tsx` findBy timeout raised 1s→10s (its known load sensitivity became a deterministic flake with the added suites).
+- `Game2048` is self-contained (`rng`/`initialState` test seams, localStorage best score only) and ready to mount into `WaitingShell`'s reserved game slot for GAME-01.
 
 ### 03-02 status
 
@@ -122,6 +127,7 @@ Both bugs were in code **no test rendered** — every suite mocked the auth hook
 | Phase 03 P01 | 120min | 3 tasks | 6 files |
 | Phase 03 P02 | 95min | 3 tasks | 13 created / 5 modified / 1 deleted |
 | Phase 04 P04-01 | 62min | 3 tasks | 8 files |
+| Phase 04 P04-02 | 86min | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -149,6 +155,11 @@ Recent decisions affecting current work:
 - [Phase 04]: 04-01: A rename advances updatedAt so retention treats an edited conversation as most recently used (D-20); blank renames rejected at input and hook
 - [Phase 04]: 04-01: The ask controller keeps its conversationId key; the first submit of an empty history defers its dispatch one commit so the fresh controller owns the request instead of the re-init aborting it
 - [Phase 04]: 04-01: The terminal-status guard is keyed on (conversationId, requestId) because a fresh controller restarts requestId at 1 after a switch
+- [Phase 04]: [04-02] Engine keeps a module-level monotonic tile-id counter (ids only); values/positions/scores/outcomes stay pure functions of (state, direction, rng) — Tests never assert on ids; determinism preserved while tiles keep stable React keys
+- [Phase 04]: [04-02] Game2048 exposes rng and initialState props as explicit test seams — Win/game-over overlay states become testable without playing hundreds of moves; no module mocking needed
+- [Phase 04]: [04-02] Keyboard play is doubly isolated: handler on the focused board container plus an activeElement typing guard (input/textarea/select) — Defense in depth for GAME-06: arrows never steal from the composer and page scroll is never hijacked
+- [Phase 04]: [04-02] Tile color ramp reuses only locked palette tokens; tokens.css untouched — 01-UI-SPEC tokens are locked; distinctive value colors achieved by repurposing existing tokens instead of adding new variables
+- [Phase 04]: [04-02] Best score persists to localStorage waynora:2048:best with try/catch fallback to session-only — GAME-02 requires best-score tracking; privacy modes or blocked storage must degrade, never crash
 
 ### Pending Todos
 
@@ -175,11 +186,11 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-10-14T06:47:09.767Z
-Stopped at: Completed 04-01-PLAN.md (multi-conversation chat management)
+Last session: 2026-10-14T12:15:04.891Z
+Stopped at: Completed 04-02-PLAN.md (2048 engine and accessible game UI)
 Resume file: None
 
-**Resume with:** 03-03 — read `.planning/phases/03-real-chat-and-long-request-lifecycle/03-03-PLAN.md`. The waiting shell (`WaitingShell`, C-10…C-14), `useElapsedClock`, `waitingCopy.ts`, and the `Stop waiting` escape hatch attach to the route state `Chat.tsx` already threads out (`status`, `activeMessageId`, `stop`).
+**Resume with:** 04-03 — read `.planning/phases/04-chat-management-2048-and-responsive-experience/04-03-PLAN.md`. The 2048 game (`src/components/game/Game2048.tsx`) mounts into `WaitingShell`'s reserved game slot (see `src/components/chat/WaitingShell.tsx`); it must render only while a request is actively waiting (GAME-01) and must not touch the ask controller.
 
 **⚠️ TASK 4 (human browser verify) — PARTIALLY DONE, NOT FABRICATED:**
 
