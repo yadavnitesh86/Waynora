@@ -12,7 +12,8 @@ A user can submit a trip request from the chat, wait through the real 5–15 min
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Playable 2048 mini-game embedded in the waiting experience — *Validated in Phase 04: Chat Management, 2048, and Responsive Experience*
+- [x] Cookie-based chat persistence with explicit size-limit handling and chat management (create/switch/rename/delete, auto-titles) — *Chat management half validated in Phase 04 (create/switch/rename/delete, auto-titles); persistence half validated in Phase 2*
 
 ### Active
 
@@ -20,10 +21,8 @@ A user can submit a trip request from the chat, wait through the real 5–15 min
 - [ ] Convex-backed authentication: signup, login, logout, protected chat, session persistence
 - [ ] Chat interface wired to the real Python `POST /ask` endpoint (no mocked plans)
 - [ ] Long-running request lifecycle supporting waits up to ~15 minutes with honest waiting messages
-- [ ] Playable 2048 mini-game embedded in the waiting experience
-- [ ] Cookie-based chat persistence with explicit size-limit handling and chat management (create/switch/rename/delete, auto-titles)
 - [ ] Friendly error handling that preserves user input and conversation history
-- [ ] Responsive (desktop/tablet/mobile), accessible, verified implementation
+- [ ] Responsive (desktop/tablet/mobile), accessible, verified implementation — *Phase 04 automated gates green; real-viewport human pass still open (`04-HUMAN-UAT.md`), Phase 5 owns final verification*
 
 ### Out of Scope
 
@@ -35,6 +34,7 @@ A user can submit a trip request from the chat, wait through the real 5–15 min
 
 ## Context
 
+- **Current state (2026-10-14): Phases 1–4 complete (11/11 plans, 80%).** React/Vite SPA with Convex auth, cookie-persisted chat history, real `/ask` lifecycle with honest waiting + embedded 2048, sidebar conversation management, and responsive/accessibility test gates. Remaining: Phase 5 (editorial landing, hardening, final verification). Open human-verify items are tracked in `.planning/phases/*/*-HUMAN-UAT.md` (Phase 1: four session/auth items; Phase 04: four viewport/touch/live-wait items).
 - **Frontend skeleton (this repo, `frontend/`)**: `package.json` currently has only `convex ^1.46.0` as a dependency (`type: commonjs`, dev script `convex dev`). No React framework is installed yet — the UI framework must be chosen during Phase 1 consistent with the environment (Node-based, Windows).
 - **Convex**: `convex/schema.ts` is an empty `defineSchema({})`; `_generated/` present. Convex handles authentication and user-related server data ONLY — never chat history.
 - **Python backend (parent dir)**: FastAPI app (`main.py`) exposing `POST /ask` with `AskRequest {question, thread_id?}` → `AskResponse {answer, thread_id}`. Synchronous, non-streamed; LangGraph + AsyncSqliteSaver checkpointer provides conversation memory keyed by `thread_id`, and the response returns `thread_id` for continuation. CORS is wide open (`allow_origins=["*"]`). Errors surface as HTTP 500 with a generic detail string.
@@ -84,4 +84,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-10-09 after initialization*
+*Last updated: 2026-10-14 after Phase 04 completion*
