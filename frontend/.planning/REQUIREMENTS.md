@@ -61,9 +61,9 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 - [x] **PERSIST-03**: Cookie storage handles the approximately 4 KB per-cookie constraint through bounded chunking or an equivalent explicit strategy with safe cookie attributes.
 - [x] **PERSIST-04**: Cookie reads validate the complete snapshot, recover safely from malformed or partial data, and never crash the application or silently accept invalid data.
 - [x] **PERSIST-05**: The application enforces a reasonable retention and size cap, preserves useful recent chats, and visibly notifies the user when storage limits prevent persistence; it never silently truncates an itinerary.
-- [ ] **PERSIST-06**: A user can create, switch between, rename, and delete chats from a responsive history sidebar or panel.
-- [ ] **PERSIST-07**: A new chat receives a sensible short title derived from its first user message without requiring a naming dialog.
-- [ ] **PERSIST-08**: Chat history survives browser reload when the cookie snapshot is valid and the UI clearly handles empty or recovered history.
+- [x] **PERSIST-06**: A user can create, switch between, rename, and delete chats from a responsive history sidebar or panel.
+- [x] **PERSIST-07**: A new chat receives a sensible short title derived from its first user message without requiring a naming dialog.
+- [x] **PERSIST-08**: Chat history survives browser reload when the cookie snapshot is valid and the UI clearly handles empty or recovered history.
 - [x] **PERSIST-09**: A failed request preserves the submitted user message and existing conversation history for recovery or deliberate retry.
 - [x] **PERSIST-10**: In-flight request metadata is handled conservatively across reloads so the UI does not replay an expensive server request automatically.
 
@@ -186,9 +186,9 @@ Updated during roadmap creation. Each v1 requirement maps to exactly one phase.
 | PERSIST-03 | Phase 2 | Complete |
 | PERSIST-04 | Phase 2 | Complete |
 | PERSIST-05 | Phase 2 | Complete |
-| PERSIST-06 | Phase 4 | Pending |
-| PERSIST-07 | Phase 4 | Pending |
-| PERSIST-08 | Phase 4 | Pending |
+| PERSIST-06 | Phase 4 | Complete |
+| PERSIST-07 | Phase 4 | Complete |
+| PERSIST-08 | Phase 4 | Complete |
 | PERSIST-09 | Phase 2 | Complete |
 | PERSIST-10 | Phase 2 | Complete |
 | GAME-01 | Phase 4 | Pending |

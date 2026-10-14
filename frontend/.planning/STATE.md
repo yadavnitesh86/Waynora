@@ -1,17 +1,20 @@
 ---
-gsd_state_version: 1.0
+gsd_state_version: "1.0"
 milestone: v1.0
-milestone_name: milestone
-status: phase-04-planned
-stopped_at: Planned Phase 04 (04-01, 04-02, 04-03)
-last_updated: "2026-10-13T14:02:00.000Z"
-last_activity: 2026-10-13 -- Phase 04 planned: Chat Management, 2048, and Responsive Experience
+current_phase: 04
+current_phase_name: Chat Management, 2048, and Responsive Experience
+current_plan: 3
+status: executing
+stopped_at: Completed 04-01-PLAN.md (multi-conversation chat management)
+last_updated: "2026-10-14T06:47:10.536Z"
+last_activity: 2026-10-14
+last_activity_desc: Phase 04 execution started
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 11
-  completed_plans: 8
-  percent: 72
+  completed_plans: 9
+milestone_name: milestone
 ---
 
 # Project State
@@ -25,10 +28,13 @@ See: .planning/PROJECT.md (updated 2026-10-09)
 
 ## Current Position
 
-Phase: 04 (Chat Management, 2048, and Responsive Experience) — READY TO EXECUTE
+Current Plan: 2
+Total Plans in Phase: 3
+
+Phase: 04 (Chat Management, 2048, and Responsive Experience) — EXECUTING
 Plans: 3 plans created (04-01, 04-02, 04-03)
-Status: **PLANS WRITTEN**
-Last activity: 2026-10-13 -- Phase 04 planned: chat sidebar CRUD, deterministic 2048 engine & accessible UI, waiting room integration and responsive polish
+Status: Executing Phase 04
+Last activity: 2026-10-14 — Completed 04-01 (multi-conversation chat management); next is 04-02 (2048 engine)
 
 ### 03-02 status
 
@@ -115,6 +121,7 @@ Both bugs were in code **no test rendered** — every suite mocked the auth hook
 | Phase 02 P02 | 49min | 2 tasks | 2 files |
 | Phase 03 P01 | 120min | 3 tasks | 6 files |
 | Phase 03 P02 | 95min | 3 tasks | 13 created / 5 modified / 1 deleted |
+| Phase 04 P04-01 | 62min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -138,6 +145,10 @@ Recent decisions affecting current work:
 - [Phase 02]: Domain tests run in the node environment (@vitest-environment node): pure functions need no DOM, and dropping one jsdom instance keeps the load-sensitive composition regression stable under full-suite parallelism
 - [Phase 02]: TDD RED commits include a type-correct, behavior-wrong scaffold so tests fail on their planned assertions rather than on module resolution (tdd.md #3770 INVALID_RED); both RED records validated RED_EVIDENCE_OK
 - [Phase 02]: Task 2 GREEN is test-only: the domain + repository integration already worked; the plan's naive { cookie: '' } document stub cannot round-trip cookies, fixed with the browser-semantics cookie jar from repository.test.ts
+- [Phase 04]: 04-01: Active conversation id is local React state with fallback to the newest conversation (an explicit 04-CONTEXT option), not a ?c= query param — the route has no router dependency
+- [Phase 04]: 04-01: A rename advances updatedAt so retention treats an edited conversation as most recently used (D-20); blank renames rejected at input and hook
+- [Phase 04]: 04-01: The ask controller keeps its conversationId key; the first submit of an empty history defers its dispatch one commit so the fresh controller owns the request instead of the re-init aborting it
+- [Phase 04]: 04-01: The terminal-status guard is keyed on (conversationId, requestId) because a fresh controller restarts requestId at 1 after a switch
 
 ### Pending Todos
 
@@ -164,8 +175,8 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-10-13T11:00:00.000Z
-Stopped at: Completed 03-02-PLAN.md — 03-03 not started
+Last session: 2026-10-14T06:47:09.767Z
+Stopped at: Completed 04-01-PLAN.md (multi-conversation chat management)
 Resume file: None
 
 **Resume with:** 03-03 — read `.planning/phases/03-real-chat-and-long-request-lifecycle/03-03-PLAN.md`. The waiting shell (`WaitingShell`, C-10…C-14), `useElapsedClock`, `waitingCopy.ts`, and the `Stop waiting` escape hatch attach to the route state `Chat.tsx` already threads out (`status`, `activeMessageId`, `stop`).

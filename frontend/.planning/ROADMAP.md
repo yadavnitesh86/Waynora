@@ -108,11 +108,11 @@ Plans:
   4. Landing/auth/chat/history/waiting/game surfaces remain usable on desktop, tablet, and mobile with keyboard and assistive technology support.
 
 **UI hint:** yes
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 
 Plans:
 
-- [ ] 04-01: Build chat sidebar CRUD, auto-title UI, empty states, persistence notices, and responsive navigation.
+- [x] 04-01: Build chat sidebar CRUD, auto-title UI, empty states, persistence notices, and responsive navigation.
 - [ ] 04-02: Implement pure deterministic 2048 reducer and accessible board/control UI with keyboard and touch input.
 - [ ] 04-03: Integrate waiting room, focus/reduced-motion behavior, mobile layouts, and cross-device interaction tests.
 
@@ -148,5 +148,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Foundation, Contracts, and Auth | 3/3 | Complete   | 2026-10-10 |
 | 2. Cookie Persistence and Chat Domain | 2/2 | In Progress|  |
 | 3. Real Chat and Long-Request Lifecycle | 3/3 | Complete   | 2026-10-13 |
-| 4. Chat Management, 2048, and Responsive Experience | 0/3 | Not started | - |
+| 4. Chat Management, 2048, and Responsive Experience | 1/3 | In Progress | - |
 | 5. Editorial Landing, Hardening, and Verification | 0/3 | Not started | - |
