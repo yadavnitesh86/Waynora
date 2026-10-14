@@ -6,7 +6,7 @@ import {
   act,
   within,
 } from "@testing-library/react";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import type { Conversation } from "../lib/cookie/schema";
 import type { AskResult } from "../lib/errors";
 
@@ -35,6 +35,28 @@ vi.mock("../lib/cookie/repository", () => ({
 import Chat from "./Chat";
 import { expectNoAxeViolations } from "../test/axe";
 
+/**
+ * A reload-faithful fake of the cookie repository: reads hand back
+ * whatever the last write stored, so unmounting and re-rendering the
+ * route is a genuine simulated reload for the persistence assertions
+ * (PERSIST-08).
+ *
+ * The implementations are (re)applied in `beforeEach`, because a per-test
+ * override (the eviction case) would otherwise outlive its test — and a
+ * test that stops writing through to the store would silently break every
+ * later reload assertion.
+ */
+const store = { conversations: [] as Conversation[] };
+const readImpl = () => ({
+  conversations: store.conversations,
+  recovered: false,
+  evicted: [],
+});
+const writeImpl = (conversations: Conversation[]) => {
+  store.conversations = conversations;
+  return { conversations, recovered: false, evicted: [] };
+};
+
 /** Settles the in-flight ask by hand so the test picks the outcome. */
 let settleAsk: ((result: AskResult) => void) | null = null;
 
@@ -53,18 +75,29 @@ function makeConversation(
   };
 }
 
+function userMessage(id: string, content: string) {
+  return {
+    id,
+    role: "user" as const,
+    content,
+    createdAt: "2026-01-01T00:00:00Z",
+  };
+}
+
 function stubSnapshot(conversations: Conversation[]) {
-  mockReadConversations.mockReturnValue({
-    conversations,
-    recovered: false,
-    evicted: [],
-  });
+  store.conversations = conversations;
 }
 
 /** The most recent conversation handed to `writeConversations`. */
 function lastWrittenConversation(): Conversation | undefined {
   const calls = mockWriteConversations.mock.calls;
   return calls[calls.length - 1]?.[0]?.[0];
+}
+
+/** The full newest-first list handed to the most recent write. */
+function lastWrittenConversations(): Conversation[] {
+  const calls = mockWriteConversations.mock.calls;
+  return calls[calls.length - 1]?.[0] ?? [];
 }
 
 /** The `{ question, thread_id }` payload of the nth ask call. */
@@ -88,6 +121,22 @@ function inTranscript() {
   return within(screen.getByRole("list", { name: "Conversation" }));
 }
 
+/** The history sidebar, so title lookups never collide with the h1. */
+function sidebar() {
+  return within(screen.getByRole("navigation", { name: "Chat history" }));
+}
+
+/** Clicks a conversation row in the sidebar, addressed by its title. */
+function selectConversationInSidebar(title: string) {
+  fireEvent.click(sidebar().getByText(title).closest("button") as HTMLElement);
+}
+
+afterEach(() => {
+  // Undo per-test overrides (including `crypto.randomUUID` spies) so no
+  // test leaks an implementation into the next one.
+  vi.restoreAllMocks();
+});
+
 beforeEach(() => {
   vi.clearAllMocks();
   settleAsk = null;
@@ -97,11 +146,8 @@ beforeEach(() => {
         settleAsk = resolve;
       }),
   );
-  mockWriteConversations.mockReturnValue({
-    conversations: [],
-    recovered: false,
-    evicted: [],
-  });
+  mockReadConversations.mockImplementation(readImpl);
+  mockWriteConversations.mockImplementation(writeImpl);
   stubSnapshot([makeConversation()]);
   // axe-core's html-has-lang rule needs a document language.
   document.documentElement.setAttribute("lang", "en");
@@ -476,5 +522,246 @@ describe("Chat route accessibility", () => {
     ).toBeInTheDocument();
 
     await expectNoAxeViolations(container);
+  });
+});
+
+describe("Chat route (multi-conversation management)", () => {
+  it("renders the history sidebar with its trigger and primary action", async () => {
+    render(<Chat />);
+    await screen.findByText("Where do you want to go?");
+
+    expect(
+      screen.getByRole("navigation", { name: "Chat history" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Open chat history" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "New chat" })).toBeInTheDocument();
+  });
+
+  it("switches conversations and updates the rendered thread and h1", async () => {
+    stubSnapshot([
+      makeConversation({
+        id: "conv-japan",
+        title: "Japan plan",
+        messages: [userMessage("msg-japan", "Japan itinerary please")],
+      }),
+      makeConversation({
+        id: "conv-paris",
+        title: "Paris plan",
+        messages: [userMessage("msg-paris", "Paris itinerary please")],
+      }),
+    ]);
+
+    render(<Chat />);
+    expect(
+      await screen.findByText("Japan itinerary please"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Paris itinerary please")).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      "Japan plan",
+    );
+
+    selectConversationInSidebar("Paris plan");
+
+    expect(
+      await screen.findByText("Paris itinerary please"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Japan itinerary please")).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      "Paris plan",
+    );
+  });
+
+  it("creates a new chat and resets the thread to the empty composer state", async () => {
+    vi.spyOn(crypto, "randomUUID").mockReturnValue(
+      "55555555-5555-4555-8555-555555555555",
+    );
+    stubSnapshot([
+      makeConversation({
+        id: "conv-japan",
+        title: "Japan plan",
+        messages: [userMessage("msg-japan", "Japan itinerary please")],
+      }),
+    ]);
+
+    render(<Chat />);
+    await screen.findByText("Japan itinerary please");
+
+    fireEvent.click(screen.getByRole("button", { name: "New chat" }));
+
+    expect(
+      await screen.findByText("Where do you want to go?"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Japan itinerary please")).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      "New chat",
+    );
+    // The new chat persisted at the head of the list, newest first.
+    expect(lastWrittenConversations().map((c) => c.id)).toEqual([
+      "55555555-5555-4555-8555-555555555555",
+      "conv-japan",
+    ]);
+    // No request was dispatched by creating a chat.
+    expect(mockAsk).not.toHaveBeenCalled();
+  });
+
+  it("persists a rename across a simulated reload", async () => {
+    stubSnapshot([
+      makeConversation({ id: "conv-1", title: "New chat", messages: [] }),
+    ]);
+
+    const view = render(<Chat />);
+    await screen.findByText("Where do you want to go?");
+
+    fireEvent.click(
+      sidebar().getByRole("button", { name: "Rename New chat" }),
+    );
+    fireEvent.change(screen.getByLabelText("Chat title"), {
+      target: { value: "Japan with the kids" },
+    });
+    fireEvent.submit(screen.getByLabelText("Chat title").closest("form")!);
+
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      "Japan with the kids",
+    );
+
+    // Simulated reload: the fresh mount reads what the last write stored.
+    view.unmount();
+    render(<Chat />);
+
+    expect(await screen.findByRole("heading", { level: 1 })).toHaveTextContent(
+      "Japan with the kids",
+    );
+    expect(
+      screen.getByRole("button", { name: "Rename Japan with the kids" }),
+    ).toBeInTheDocument();
+    expect(lastWrittenConversations()[0]?.title).toBe(
+      "Japan with the kids",
+    );
+  });
+
+  it("deletes the active conversation, moves the selection, and persists it across a reload", async () => {
+    stubSnapshot([
+      makeConversation({
+        id: "conv-japan",
+        title: "Japan plan",
+        messages: [userMessage("msg-japan", "Japan itinerary please")],
+      }),
+      makeConversation({
+        id: "conv-paris",
+        title: "Paris plan",
+        messages: [userMessage("msg-paris", "Paris itinerary please")],
+      }),
+    ]);
+
+    const view = render(<Chat />);
+    await screen.findByText("Japan itinerary please");
+
+    fireEvent.click(
+      sidebar().getByRole("button", { name: "Delete Japan plan" }),
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }));
+
+    // The selection moved to the next most recent conversation.
+    expect(
+      await screen.findByText("Paris itinerary please"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("Japan itinerary please")).not.toBeInTheDocument();
+    expect(lastWrittenConversations().map((c) => c.id)).toEqual(["conv-paris"]);
+
+    view.unmount();
+    render(<Chat />);
+
+    expect(
+      await screen.findByText("Paris itinerary please"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Delete Japan plan" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("creates its first conversation on the first submit of an empty history", async () => {
+    stubSnapshot([]);
+    vi.spyOn(crypto, "randomUUID").mockReturnValue(
+      "66666666-6666-4666-8666-666666666666",
+    );
+
+    render(<Chat />);
+    await screen.findByText("Where do you want to go?");
+
+    typeAndSubmit("10 days in Japan in April");
+
+    // The deferred dispatch still fired exactly once, against the
+    // conversation that was created in the same tick.
+    await waitFor(() => expect(mockAsk).toHaveBeenCalledTimes(1));
+    expect(askPayload(0)).toEqual({
+      question: "10 days in Japan in April",
+      thread_id: undefined,
+    });
+    expect(
+      await inTranscript().findByText("10 days in Japan in April"),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
+      "10 days in Japan in April",
+    );
+
+    // The answer still lands on the created conversation.
+    await act(async () => {
+      settleAsk?.({ ok: true, answer: ANSWER, threadId: "thread-empty-1" });
+    });
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Your Japan itinerary",
+      }),
+    ).toBeInTheDocument();
+    expect(lastWrittenConversations()[0]?.title).toBe(
+      "10 days in Japan in April",
+    );
+    expect(lastWrittenConversations()[0]?.threadId).toBe("thread-empty-1");
+  });
+
+  it("aborts the in-flight request on switch and drops its late result", async () => {
+    stubSnapshot([
+      makeConversation({
+        id: "conv-japan",
+        title: "Japan plan",
+        messages: [],
+      }),
+      makeConversation({
+        id: "conv-paris",
+        title: "Paris plan",
+        messages: [],
+      }),
+    ]);
+
+    render(<Chat />);
+    await screen.findByText("Where do you want to go?");
+
+    typeAndSubmit("A long question about Japan");
+    await waitFor(() => expect(mockAsk).toHaveBeenCalledTimes(1));
+    const firstSignal = mockAsk.mock.calls[0]?.[1];
+
+    selectConversationInSidebar("Paris plan");
+
+    // WAIT-06: the conversation switch disposed the old controller, so the
+    // in-flight request was aborted and the waiting UI is gone.
+    expect(firstSignal?.aborted).toBe(true);
+    expect(
+      await screen.findByText("Where do you want to go?"),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        "A request is already running. Your text stays here until it finishes.",
+      ),
+    ).not.toBeInTheDocument();
+
+    // The late answer never reaches the newly selected conversation.
+    await act(async () => {
+      settleAsk?.({ ok: true, answer: "A late answer", threadId: "thread-late" });
+    });
+    expect(screen.queryByText("A late answer")).not.toBeInTheDocument();
+    expect(mockAsk).toHaveBeenCalledTimes(1);
   });
 });
