@@ -765,3 +765,105 @@ describe("Chat route (multi-conversation management)", () => {
     expect(mockAsk).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("Chat route waiting game integration (GAME-01, GAME-06)", () => {
+  it("shows the 2048 board only while the request is actively waiting and unmounts it cleanly on success", async () => {
+    render(<Chat />);
+    await screen.findByText("Where do you want to go?");
+    // Nothing is waiting yet — no board (GAME-01).
+    expect(
+      screen.queryByRole("grid", { name: "2048 game board" }),
+    ).not.toBeInTheDocument();
+
+    typeAndSubmit("10 days in Japan in April");
+    expect(
+      await screen.findByRole("grid", { name: "2048 game board" }),
+    ).toBeInTheDocument();
+
+    await act(async () => {
+      settleAsk?.({ ok: true, answer: ANSWER, threadId: "thread-game-1" });
+    });
+
+    // The terminal status unmounts the shell — board gone, answer and
+    // prompt intact, nothing corrupted by the transition.
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Your Japan itinerary",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("grid", { name: "2048 game board" }),
+    ).not.toBeInTheDocument();
+    expect(
+      inTranscript().getByText("10 days in Japan in April"),
+    ).toBeInTheDocument();
+  });
+
+  it("unmounts the board when Stop waiting aborts the request", async () => {
+    render(<Chat />);
+    await screen.findByText("Where do you want to go?");
+
+    typeAndSubmit("A trip to Paris");
+    // The controller has already moved on to `waiting` (the ask promise is
+    // pending), so the board is up.
+    expect(
+      await screen.findByRole("grid", { name: "2048 game board" }),
+    ).toBeInTheDocument();
+
+    // GAME-06: stop aborts the request and the game leaves with the shell.
+    fireEvent.click(screen.getByRole("button", { name: "Stop waiting" }));
+    const signal = mockAsk.mock.calls[0]?.[1];
+    expect(signal?.aborted).toBe(true);
+
+    await act(async () => {
+      settleAsk?.({ ok: false, kind: "abort", message: "stopped" });
+    });
+    expect(await screen.findByText("Waiting stopped.")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("grid", { name: "2048 game board" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("game moves never submit a chat message or abort the in-flight request", async () => {
+    render(<Chat />);
+    await screen.findByText("Where do you want to go?");
+
+    typeAndSubmit("10 days in Japan in April");
+    const board = await screen.findByRole("grid", {
+      name: "2048 game board",
+    });
+
+    fireEvent.keyDown(board, { key: "ArrowLeft" });
+    fireEvent.keyDown(board, { key: "ArrowUp" });
+    fireEvent.keyDown(board, { key: "ArrowRight" });
+
+    // Exactly one ask, still in flight, shell still up: playing changed
+    // nothing about the request lifecycle.
+    expect(mockAsk).toHaveBeenCalledTimes(1);
+    expect(mockAsk.mock.calls[0]?.[1]?.aborted).toBe(false);
+    expect(screen.getByRole("button", { name: "Stop waiting" })).toBeInTheDocument();
+
+    await act(async () => {
+      settleAsk?.({ ok: true, answer: ANSWER, threadId: "thread-game-2" });
+    });
+    expect(
+      await screen.findByRole("heading", {
+        level: 2,
+        name: "Your Japan itinerary",
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("has no critical or serious axe violations in the waiting room with the 2048 board mounted", async () => {
+    const { container } = render(<Chat />);
+    await screen.findByText("Where do you want to go?");
+
+    typeAndSubmit("10 days in Japan in April");
+    expect(
+      await screen.findByRole("grid", { name: "2048 game board" }),
+    ).toBeInTheDocument();
+
+    await expectNoAxeViolations(container);
+  });
+});

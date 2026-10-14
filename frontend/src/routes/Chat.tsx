@@ -376,8 +376,16 @@ export default function Chat() {
             </div>
           )}
 
+          {/* GAME-01: the waiting shell shows only while a request is in
+              flight, and its 2048 board mounts only once the request is
+              actively waiting — never during the brief submitting phase,
+              never after a terminal status unmounts the shell. */}
           {busy ? (
-            <WaitingShell elapsedMs={elapsed} onStop={stop} />
+            <WaitingShell
+              elapsedMs={elapsed}
+              onStop={stop}
+              isWaiting={status.kind === "waiting"}
+            />
           ) : null}
 
           {showStorageNotice ? <StorageNotice /> : null}
