@@ -2,8 +2,7 @@ import asyncio
 
 from deepagents import HarnessProfile, create_deep_agent, register_harness_profile
 from dotenv import load_dotenv
-from langchain_community.tools import DuckDuckGoSearchRun
-
+from app.agents.Deep_agent.search_tool import web_search
 from app.agents.Deep_agent.Middleware import PromptInjectionDetected, middleware
 from app.agents.sub_agent.AccommodationWeather_subagent.AccommodationWeather import (
     create_AW_subagent,
@@ -105,7 +104,6 @@ register_harness_profile(
         )
     ),
 )
-ddg_search_tool = DuckDuckGoSearchRun()
 
 
 async def get_subagents():
@@ -123,7 +121,7 @@ async def build_agent(checkpointer):
         middleware=middleware,
         checkpointer=checkpointer,
         subagents=await get_subagents(),
-        tools=[ddg_search_tool],
+        tools=[web_search],
     )
 
 
@@ -141,7 +139,3 @@ async def ask(agent, question: str, thread_id: str) -> str:
     except PromptInjectionDetected:
         return REFUSAL
 
-
-if __name__ == "__main__":
-    question = str(input("Ask question : "))
-    asyncio.run(ask(question))

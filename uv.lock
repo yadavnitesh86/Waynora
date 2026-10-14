@@ -2706,6 +2706,23 @@ wheels = [
 ]
 
 [[package]]
+name = "parallel-web"
+version = "1.3.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "anyio" },
+    { name = "distro" },
+    { name = "httpx" },
+    { name = "pydantic" },
+    { name = "sniffio" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/22/56/94d725d6c22626554388979ce5b71d4679473053f9e3f4202d001c77ee65/parallel_web-1.3.5.tar.gz", hash = "sha256:f45e4504845b60d090b62c6f4040cdd6b0b184616cf6809702e5d90364a0241d", size = 163548, upload-time = "2026-09-29T23:10:27.85Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/87/c4/b688ad99a5ac7b6983c2871e83a62f70b186df37e7a21a6362abb5d2b8fc/parallel_web-1.3.5-py3-none-any.whl", hash = "sha256:a8614ce0376d6c0754faae117369ccdb1e3f48743c2218cb912701973210186b", size = 178309, upload-time = "2026-09-29T23:10:26.565Z" },
+]
+
+[[package]]
 name = "pathable"
 version = "0.6.0"
 source = { registry = "https://pypi.org/simple" }
@@ -4236,6 +4253,7 @@ dependencies = [
     { name = "langgraph" },
     { name = "langgraph-checkpoint-sqlite" },
     { name = "logfire", extra = ["system-metrics"] },
+    { name = "parallel-web" },
     { name = "portkey-ai" },
     { name = "python-dotenv" },
     { name = "rail" },
@@ -4269,6 +4287,7 @@ requires-dist = [
     { name = "langgraph", specifier = ">=1.2.11" },
     { name = "langgraph-checkpoint-sqlite", specifier = ">=3.1.1" },
     { name = "logfire", extras = ["system-metrics"], specifier = ">=5.1.1" },
+    { name = "parallel-web", specifier = ">=1.3.5" },
     { name = "portkey-ai", specifier = ">=2.3.4" },
     { name = "python-dotenv", specifier = ">=1.2.3" },
     { name = "rail", git = "https://github.com/SharmaVrishab/rail.git" },
