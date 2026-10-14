@@ -36,8 +36,17 @@ describe("main.tsx composition (regression: nested routers)", () => {
         <App />
       </ConvexAuthProvider>,
     );
+    // The default 1s findBy timeout is a wall-clock budget: under full-suite
+    // parallelism this real composition (auth client + router + landing)
+    // routinely needs longer, which made the regression test flaky whenever
+    // another jsdom-heavy suite was added (observed with the 04-02 game
+    // suites). 10s keeps the regression semantics and removes the flake.
     expect(
-      await screen.findByText(/Plan a trip worth the wait/i),
+      await screen.findByText(
+        /Plan a trip worth the wait/i,
+        {},
+        { timeout: 10_000 },
+      ),
     ).toBeTruthy();
   });
 });
