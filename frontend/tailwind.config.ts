@@ -60,6 +60,24 @@ export default {
         md: "var(--shadow-md)",
         lg: "var(--shadow-lg)",
       },
+      // 2048 tile pop — opacity/transform only, 200ms ease-out (locked motion
+      // contract, D-14). The global prefers-reduced-motion override in
+      // globals.css collapses this to 0.01ms for users who ask for less.
+      keyframes: {
+        "tile-in": {
+          "0%": { transform: "scale(0.6)", opacity: "0" },
+          "100%": { transform: "scale(1)", opacity: "1" },
+        },
+        "tile-merge": {
+          "0%": { transform: "scale(0.85)" },
+          "50%": { transform: "scale(1.08)" },
+          "100%": { transform: "scale(1)" },
+        },
+      },
+      animation: {
+        "tile-in": "tile-in 200ms ease-out",
+        "tile-merge": "tile-merge 200ms ease-out",
+      },
       maxWidth: {
         prose: "var(--measure-prose)",
         // UI-SPEC layout containers.
