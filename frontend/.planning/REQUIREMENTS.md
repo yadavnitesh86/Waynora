@@ -69,7 +69,7 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 
 ### 2048 Waiting Game
 
-- [ ] **GAME-01**: The waiting interface contains a lightweight 4×4 2048 game only while an AI request is actively waiting.
+- [x] **GAME-01**: The waiting interface contains a lightweight 4×4 2048 game only while an AI request is actively waiting.
 - [x] **GAME-02**: The game implements standard tile movement, merging, spawning, scoring, and best score tracking for the current game session.
 - [x] **GAME-03**: The game supports win and game-over states and provides a restart control.
 - [x] **GAME-04**: The game supports keyboard arrow controls on desktop and swipe/pointer controls on touch devices.
@@ -191,7 +191,7 @@ Updated during roadmap creation. Each v1 requirement maps to exactly one phase.
 | PERSIST-08 | Phase 4 | Complete |
 | PERSIST-09 | Phase 2 | Complete |
 | PERSIST-10 | Phase 2 | Complete |
-| GAME-01 | Phase 4 | Pending |
+| GAME-01 | Phase 4 | Complete |
 | GAME-02 | Phase 4 | Complete |
 | GAME-03 | Phase 4 | Complete |
 | GAME-04 | Phase 4 | Complete |
