@@ -31,16 +31,13 @@ function resolveRecoveryKind(error: string | undefined): RecoveryKind {
 }
 
 /**
- * User turn (CHAT-07, D-30): a real `You` caption plus the one raised card on
- * the surface — elevation marks whose words these are, and the assistant turn
- * stays flat. Three states on the same card:
+ * User turn (CHAT-07, D-30): a real `You` caption plus a double-bezel letterpress card.
+ * Elevation marks whose words these are, and the assistant turn stays flat.
+ * Three states on the same card:
  *
  * - default: the prompt alone
  * - in-flight: the prompt plus the C-15 footer (Spinner + caption)
  * - failed / reload-recovered: the prompt plus a RecoveryBlock
- *
- * The prompt is never removed by any state — PERSIST-09 means the words the
- * user typed survive every failure.
  */
 function UserMessage({ message, isActive, onRetry }: UserMessageProps) {
   const metadata = message.metadata;
@@ -53,12 +50,15 @@ function UserMessage({ message, isActive, onRetry }: UserMessageProps) {
     !showRecovery && !showReloadRecovery && inFlight;
 
   return (
-    <div>
-      <p className="mb-2xs text-caption text-ink-muted">You</p>
-      <div className="max-w-[48ch] rounded-lg border border-line bg-surface-raised px-lg py-md shadow-xs">
-        <p className="text-body leading-[1.65] text-ink">{message.content}</p>
+    <div className="my-sm">
+      <div className="mb-1.5 flex items-center gap-1.5 text-caption font-mono text-ink-muted font-semibold tracking-wider">
+        <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+        <span>You</span>
+      </div>
+      <div className="max-w-[56ch] rounded-2xl rounded-tl-xs border border-line/80 bg-surface-raised px-lg py-md sm:px-xl sm:py-lg shadow-sm transition-all">
+        <p className="text-body leading-[1.68] text-ink font-normal">{message.content}</p>
         {showInFlightFooter ? (
-          <div className="mt-sm flex items-center gap-2xs text-caption text-ink-muted">
+          <div className="mt-md flex items-center gap-2 rounded-lg bg-accent-soft/70 px-sm py-1.5 text-caption text-accent font-medium border border-accent/20">
             <Spinner size="sm" />
             <span>{IN_FLIGHT_CAPTION}</span>
           </div>

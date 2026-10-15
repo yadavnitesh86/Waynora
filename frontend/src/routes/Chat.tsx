@@ -4,7 +4,7 @@ import ChatComposer from "../components/chat/ChatComposer";
 import ChatSidebar from "../components/chat/ChatSidebar";
 import ChatThread from "../components/chat/ChatThread";
 import StorageNotice from "../components/chat/StorageNotice";
-import WaitingShell from "../components/chat/WaitingShell";
+import { WaitingTimer, WaitingLounge } from "../components/chat/WaitingShell";
 import { useAskController } from "../hooks/useAskController";
 import { useConversations } from "../hooks/useConversations";
 import { useElapsedClock } from "../hooks/useElapsedClock";
@@ -328,12 +328,12 @@ export default function Chat() {
   }, [status, activeConversation, syncConversation]);
 
   return (
-    <div className="mx-auto w-full max-w-container-xl px-md py-3xl">
-      <div className="md:grid md:grid-cols-[auto_1fr] md:items-start md:gap-xl">
+    <div className="w-full px-sm sm:px-md md:px-lg py-md md:py-xl min-h-[calc(100vh-70px)]">
+      <div className="md:grid md:grid-cols-[auto_1fr] md:items-start md:gap-xl w-full">
         {/* The main column comes first in DOM order so the route h1 leads
             the heading outline; CSS order puts the sidebar on its left
             from `md` up. */}
-        <div className="min-w-0 md:order-2">
+        <div className="min-w-0 md:order-2 w-full max-w-container-xl mx-auto px-xs sm:px-sm md:px-md">
           <div className="flex items-center gap-sm">
             {/* QUAL-04: the drawer trigger lives in the header on small
                 screens only; the desktop panel has its own collapse toggle. */}
@@ -401,39 +401,48 @@ export default function Chat() {
             />
           </div>
 
-          {hasMessages ? (
-            <ChatThread
-              messages={activeConversation.messages}
-              activeMessageId={activeMessageId}
-              onRetry={handleRetry}
-            />
-          ) : (
-            <div className="mb-lg">
-              <EmptyState
-                title="Where do you want to go?"
-                body="Describe your trip in your own words. A real agent builds the plan, usually in 5 to 15 minutes. Your chat stays in this browser."
-              />
+          {/* Main workspace: 2 columns when waiting (Chat on left, stationary Game Lounge on right) */}
+          <div
+            className={
+              busy && status.kind === "waiting"
+                ? "grid gap-lg lg:grid-cols-[1fr_360px] lg:items-start w-full"
+                : "w-full max-w-4xl"
+            }
+          >
+            {/* Left Column: Full Chat Area */}
+            <div className="min-w-0 flex flex-col min-h-[calc(100vh-220px)]">
+              {hasMessages ? (
+                <div className="flex-1 pb-10">
+                  <ChatThread
+                    messages={activeConversation.messages}
+                    activeMessageId={activeMessageId}
+                    onRetry={handleRetry}
+                  />
+                </div>
+              ) : (
+                <div className="mb-lg flex-1">
+                  <EmptyState
+                    title="Where do you want to go?"
+                    body="Describe your trip in your own words. A real agent builds the plan, usually in 5 to 15 minutes. Your chat stays in this browser."
+                  />
+                </div>
+              )}
+
+              {showStorageNotice ? <StorageNotice /> : null}
+
+              {/* D-33: page-level scroll with a sticky compact interaction dock */}
+              <div className="sticky bottom-0 border-t border-line/50 bg-canvas/95 backdrop-blur-md pb-md pt-sm z-20">
+                <ChatComposer onSubmit={handleSubmit} busy={busy} />
+                {busy ? (
+                  <WaitingTimer elapsedMs={elapsed} onStop={stop} />
+                ) : null}
+              </div>
             </div>
-          )}
 
-          {/* GAME-01: the waiting shell shows only while a request is in
-              flight, and its 2048 board mounts only once the request is
-              actively waiting — never during the brief submitting phase,
-              never after a terminal status unmounts the shell. */}
-          {busy ? (
-            <WaitingShell
-              elapsedMs={elapsed}
-              onStop={stop}
-              isWaiting={status.kind === "waiting"}
-            />
-          ) : null}
-
-          {showStorageNotice ? <StorageNotice /> : null}
-
-          {/* D-33: page-level scroll with a sticky composer — never a nested
-              scroll container. */}
-          <div className="sticky bottom-0 border-t border-line bg-canvas pb-xl pt-md">
-            <ChatComposer onSubmit={handleSubmit} busy={busy} />
+            {/* Right Column: Stationary Game Lounge in dedicated space (does not move with scroll) */}
+            {busy && status.kind === "waiting" ? (
+              <WaitingLounge className="sticky top-6 self-start" />
+            ) : null}
           </div>
         </div>
 

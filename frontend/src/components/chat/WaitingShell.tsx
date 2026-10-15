@@ -16,87 +16,111 @@ export interface WaitingShellProps {
 }
 
 /**
- * Atmospheric waiting shell (WAIT-03, WAIT-04, 05-UI-SPEC Surface 8).
+ * Compact waiting timer strip (Points 4, 5, 6).
  *
- * Double-bezel card structure, pulsing dots indicator, prominent tabular
- * mono elapsed clock, blockquote band copy with display serif styling,
- * and an isolated 2048 waiting lounge.
+ * Shows running elapsed time and honest timing expectation, with stop button.
+ * Unnecessary information (specialists, bulky quotes) removed.
  */
-export default function WaitingShell({
+export function WaitingTimer({
   elapsedMs,
   onStop,
-  isWaiting = false,
-}: WaitingShellProps) {
+}: {
+  elapsedMs: number;
+  onStop: () => void;
+}) {
   const band = selectBand(elapsedMs);
   const variant = selectVariant(elapsedMs);
   const copy = BAND_COPY[band][variant];
   const readout = formatElapsed(elapsedMs);
 
   return (
-    <div className="w-full max-w-container-md rounded-[1.25rem] border border-line bg-surface p-1.5 shadow-sm">
-      <div className="rounded-xl border border-line/70 bg-surface-raised/60 p-md sm:p-lg">
-        <div className="grid gap-lg lg:grid-cols-2 lg:items-start">
-          <div className="flex flex-col">
-            {/* Active status row with Spinner + 3 pulsing dots */}
-            <div className="flex items-center gap-sm">
-              <Spinner size="md" />
-              <div className="flex items-center gap-1.5" aria-hidden="true">
-                <span className="h-2 w-2 rounded-full bg-accent animate-pulse-subtle" />
-                <span className="h-2 w-2 rounded-full bg-accent animate-pulse-subtle [animation-delay:200ms]" />
-                <span className="h-2 w-2 rounded-full bg-accent animate-pulse-subtle [animation-delay:400ms]" />
-              </div>
-              <h3 className="font-display text-h3 font-semibold text-ink tracking-tight">
-                Waynora is planning your trip
-              </h3>
-            </div>
+    <div className="mt-2 rounded-xl border border-gold/30 bg-surface/95 px-3 py-2 shadow-xs backdrop-blur-md">
+      <h3 className="sr-only">Waynora is planning your trip</h3>
 
-            {/* Elapsed readout + honest expectation line */}
-            <div className="mt-md rounded-md bg-canvas/80 border border-line/60 px-md py-sm flex flex-wrap items-baseline gap-xs">
-              <span className="text-caption font-semibold uppercase tracking-wider text-ink-muted">Elapsed</span>
-              <span className="font-mono text-body font-semibold tabular-nums text-accent">
-                {readout}
-              </span>
-              <span className="text-caption text-ink-muted ml-auto">
-                Plans usually take 5 to 15 minutes.
-              </span>
-            </div>
-
-            {/* Live band copy pull-quote — the only live region in the shell */}
-            <div
-              aria-live="polite"
-              aria-atomic="true"
-              className="mt-md border-l-2 border-accent/60 pl-md py-1 font-display italic text-lead text-ink/90 leading-snug"
-            >
-              {copy}
-            </div>
-
-            {/* Stop waiting control */}
-            <div className="mt-lg">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={onStop}
-                className="hover:border-danger hover:text-danger transition-colors"
-              >
-                Stop waiting
-              </Button>
-            </div>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        {/* Running time & expectation */}
+        <div className="flex items-center gap-2">
+          <div className="relative flex h-5 w-5 shrink-0 items-center justify-center text-accent">
+            <Spinner size="sm" />
           </div>
 
-          {/* Waiting lounge — 2048 game during active wait */}
-          {isWaiting ? (
-            <div className="rounded-lg border border-line bg-canvas p-xs sm:p-sm">
-              <h4 className="font-display text-small font-semibold text-ink">
-                Waiting lounge
-              </h4>
-              <p className="mt-2xs text-caption text-ink-muted">
-                A game of 2048 to pass the time. Playing never affects your
-                request.
-              </p>
-              <Game2048 />
-            </div>
-          ) : null}
+          <div className="flex items-baseline gap-1.5 font-mono text-[13px]">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-gold-muted">
+              Elapsed
+            </span>
+            <span className="font-mono text-body font-bold tabular-nums text-accent px-1.5 py-0.5 rounded bg-accent-soft/70">
+              {readout}
+            </span>
+          </div>
+
+          <span className="text-line/80">•</span>
+
+          <span className="text-caption text-ink-muted font-medium">
+            Plans usually take 5 to 15 minutes.
+          </span>
         </div>
+
+        {/* Stop control & live copy */}
+        <div className="flex items-center gap-2">
+          <div
+            aria-live="polite"
+            aria-atomic="true"
+            className="text-caption text-ink-muted/80 italic max-w-[180px] truncate"
+          >
+            {copy}
+          </div>
+
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={onStop}
+            className="h-7 rounded-full px-2.5 text-[11px] text-ink-muted hover:border-danger hover:text-danger hover:bg-danger/5 transition-all"
+          >
+            Stop waiting
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * 2048 game lounge component in the right-side companion slot (Points 2 & 3).
+ */
+export function WaitingLounge({ className = "" }: { className?: string }) {
+  return (
+    <div
+      className={`rounded-2xl border border-line/80 bg-surface/95 p-sm sm:p-md shadow-card backdrop-blur-md ${className}`}
+    >
+      <h4 className="font-display text-small font-semibold text-ink tracking-tight">
+        Waiting lounge
+      </h4>
+      <p className="mt-2xs text-caption text-ink-muted leading-relaxed mb-sm">
+        A game of 2048 to pass the time. Playing never affects your request.
+      </p>
+      <Game2048 />
+    </div>
+  );
+}
+
+/**
+ * Streamlined waiting shell & companion game lounge (WAIT-03, WAIT-04, GAME-01).
+ *
+ * Left column: Streamlined waiting status & running chronograph.
+ * Right column: 2048 expedition lounge in the dedicated companion space.
+ */
+export default function WaitingShell({
+  elapsedMs,
+  onStop,
+  isWaiting = false,
+}: WaitingShellProps) {
+  return (
+    <div className="w-full transition-all">
+      <div className="grid gap-lg lg:grid-cols-[1fr_360px] lg:items-start w-full">
+        <div className="flex flex-col min-w-0">
+          <WaitingTimer elapsedMs={elapsedMs} onStop={onStop} />
+        </div>
+        {isWaiting ? <WaitingLounge /> : null}
       </div>
     </div>
   );

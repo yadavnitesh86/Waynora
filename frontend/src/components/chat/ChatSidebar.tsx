@@ -36,16 +36,13 @@ function isDesktopViewport(): boolean {
 }
 
 /**
- * The chat history sidebar (PERSIST-06, QUAL-04).
+ * The luxury chat history dossier sidebar (PERSIST-06, QUAL-04).
  *
  * Responsive behaviour in one component: below `md` it is a drawer that
  * slides over the thread (scrim, Escape to close, focus moved inside on
  * open) and closes itself after any navigation; at `md` and above it is a
  * persistent panel with a collapse toggle. Both modes share the same
  * `isOpen` state and the same controls.
- *
- * Rename and delete-confirm state live here, not in each item, so
- * switching selection cancels a stranded edit.
  */
 export default function ChatSidebar({
   conversations,
@@ -90,8 +87,6 @@ export default function ChatSidebar({
     setEditingId(null);
     setConfirmDeleteId(null);
     onSelectConversation(id);
-    // On mobile the drawer covers the thread; navigating closes it. On
-    // desktop the persistent panel stays put.
     if (!isDesktopViewport()) {
       onClose();
     }
@@ -118,8 +113,7 @@ export default function ChatSidebar({
 
   return (
     <>
-      {/* Scrim: mobile only, decorative — the drawer itself carries the
-          controls and the Escape handler. */}
+      {/* Scrim: mobile only */}
       {isOpen ? (
         <div
           aria-hidden="true"
@@ -132,21 +126,21 @@ export default function ChatSidebar({
         tabIndex={-1}
         aria-label="Chat history"
         className={[
-          "fixed inset-y-0 left-0 z-30 flex w-72 flex-col border-r border-line bg-surface",
-          // QUAL-04: the drawer slide is transform-only at the locked 200ms
-          // ease-out; motion-reduce plus the global override in globals.css
-          // collapse it to an instant state change.
+          "fixed inset-y-0 left-0 z-30 flex w-80 flex-col border-r border-line/80 bg-surface/95 backdrop-blur-md shadow-luxury",
           "transition-transform duration-200 ease-out motion-reduce:transition-none",
-          "md:static md:z-auto md:shrink-0",
+          "md:static md:z-auto md:shrink-0 md:rounded-2xl md:border md:my-0 md:min-h-[calc(100vh-140px)]",
           isOpen
             ? "visible translate-x-0"
             : "invisible -translate-x-full md:hidden",
         ].join(" ")}
       >
-        <div className="flex items-center justify-between gap-sm border-b border-line px-md py-sm">
-          <p className="text-overline font-semibold uppercase tracking-[0.14em] text-accent">
-            Your chats
-          </p>
+        <div className="flex items-center justify-between gap-sm border-b border-line/70 px-md py-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-gold text-[10px]">✦</span>
+            <p className="text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-accent">
+              Your chats
+            </p>
+          </div>
           <div className="flex items-center gap-2xs">
             <Button
               variant="ghost"
@@ -204,37 +198,27 @@ export default function ChatSidebar({
           </div>
         </div>
 
-        <div className="px-md py-sm">
+        <div className="px-md py-md border-b border-line/40">
           <Button
             variant="primary"
             size="md"
-            className="w-full"
+            aria-label="New chat"
+            className="w-full rounded-full border border-gold/40 shadow-sm hover:shadow-luxury hover:-translate-y-0.5 transition-all group"
             onClick={handleCreate}
           >
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
-              fill="none"
-              aria-hidden="true"
-            >
-              <path
-                d="M8 3v10M3 8h10"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
-            New chat
+            <span aria-hidden="true" className="flex h-5 w-5 items-center justify-center rounded-full bg-accent-ink/20 text-[11px] transition-transform duration-200 group-hover:scale-110">
+              +
+            </span>
+            <span>New chat</span>
           </Button>
         </div>
 
         {conversations.length === 0 ? (
-          <div className="flex flex-col items-center justify-center px-md py-xl text-center">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-soft text-accent mb-sm">
+          <div className="flex flex-col items-center justify-center px-lg py-2xl text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-gold/30 bg-accent-soft text-accent mb-md shadow-2xs">
               <svg
-                width="20"
-                height="20"
+                width="24"
+                height="24"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -247,15 +231,15 @@ export default function ChatSidebar({
                 <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
               </svg>
             </div>
-            <p className="text-small font-semibold text-ink">No chats yet</p>
-            <p className="mt-xs text-caption leading-[1.5] text-ink-muted">
+            <p className="font-display text-small font-semibold text-ink">No chats yet</p>
+            <p className="mt-xs text-caption leading-relaxed text-ink-muted">
               Start a new chat and your trip conversations will appear here.
             </p>
           </div>
         ) : (
           <ul
             aria-label="Saved chats"
-            className="flex-1 overflow-y-auto pb-lg"
+            className="flex-1 overflow-y-auto p-xs pb-lg space-y-1"
           >
             {conversations.map((conversation) => (
               <ConversationItem

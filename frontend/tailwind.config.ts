@@ -21,6 +21,11 @@ export default {
         "surface-dark-raised": "var(--color-surface-dark-raised)",
         "ink-inverse": "var(--color-ink-inverse)",
         "ink-inverse-muted": "var(--color-ink-inverse-muted)",
+        gold: "var(--color-gold)",
+        "gold-light": "var(--color-gold-light)",
+        "gold-muted": "var(--color-gold-muted)",
+        "gold-soft": "var(--color-gold-soft)",
+        "emerald-deep": "var(--color-emerald-deep)",
       },
       fontFamily: {
         display: "var(--font-display)",
@@ -63,6 +68,8 @@ export default {
         sm: "var(--shadow-sm)",
         md: "var(--shadow-md)",
         lg: "var(--shadow-lg)",
+        luxury: "var(--shadow-luxury)",
+        "luxury-hover": "var(--shadow-luxury-hover)",
       },
       // 2048 tile pop — opacity/transform only, 200ms ease-out (locked motion
       // contract, D-14). The global prefers-reduced-motion override in

@@ -252,7 +252,7 @@ describe("Chat waiting lounge responsiveness (QUAL-04, GAME-01)", () => {
     const grid = lounge.closest("div")?.parentElement;
     expect(grid?.className).toContain("grid");
     expect(grid?.className).toContain("gap-lg");
-    expect(grid?.className).toContain("lg:grid-cols-2");
+    expect(grid?.className).toContain("lg:grid-cols-[1fr_360px]");
     expect(grid?.className).toContain("lg:items-start");
 
     // The board itself is fluid: it fills its column on small viewports and

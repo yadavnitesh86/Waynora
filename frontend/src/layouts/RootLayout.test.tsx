@@ -8,6 +8,7 @@ vi.mock("../auth/useCurrentUser", () => ({
     isAuthenticated: false,
     isLoading: false,
   })),
+  useCurrentUser: vi.fn(() => null),
 }));
 
 vi.mock("@convex-dev/auth/react", () => ({

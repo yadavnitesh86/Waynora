@@ -7,6 +7,8 @@ export interface TextAreaProps
   label: string;
   hint?: ReactNode;
   error?: string;
+  compact?: boolean;
+  labelClassName?: string;
 }
 
 const TEXTAREA_BASE = [
@@ -17,6 +19,14 @@ const TEXTAREA_BASE = [
   "focus:border-ink focus:outline-none focus:ring-1 focus:ring-ink",
 ].join(" ");
 
+const TEXTAREA_COMPACT = [
+  "w-full min-h-[48px] max-h-[140px] px-3 py-2 text-ink text-body",
+  "rounded-xl border bg-surface-raised transition-all duration-150 ease-out",
+  "placeholder:text-ink-muted/50",
+  "resize-none overflow-y-auto",
+  "focus:border-gold/60 focus:outline-none focus:ring-1 focus:ring-gold/40",
+].join(" ");
+
 /**
  * Labelled multi-line input mirroring TextField's a11y wiring exactly:
  *
@@ -25,11 +35,21 @@ const TEXTAREA_BASE = [
  * - `aria-describedby` listing the hint id and the error id
  * - 44px+ touch target (height + padding)
  *
- * Auto-grows from min 88px to max 192px (D-34); beyond 192px it scrolls
+ * Auto-grows from min 88px (or 48px if compact) to max 192px (or 140px); beyond it scrolls
  * internally so the composer never swallows the viewport.
  */
 const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function TextArea(
-  { label, hint, error, className, id, "aria-describedby": ariaDescribedBy, ...rest },
+  {
+    label,
+    hint,
+    error,
+    compact = false,
+    labelClassName,
+    className,
+    id,
+    "aria-describedby": ariaDescribedBy,
+    ...rest
+  },
   ref,
 ) {
   const generatedId = useId();
@@ -50,20 +70,27 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function TextAre
     const el = nativeRef.current;
     if (!el) return;
     el.style.height = "auto";
-    el.style.height = `${el.scrollHeight}px`;
-    if (el.scrollHeight > 192) {
-      el.style.height = "192px";
+    const minHeight = compact ? 48 : 88;
+    const maxHeight = compact ? 140 : 192;
+    const nextHeight = Math.max(minHeight, el.scrollHeight);
+    el.style.height = `${nextHeight}px`;
+    if (el.scrollHeight > maxHeight) {
+      el.style.height = `${maxHeight}px`;
       el.style.overflowY = "scroll";
     } else {
       el.style.overflowY = "hidden";
     }
-  }, [rest.value, rest.defaultValue]);
+  }, [rest.value, rest.defaultValue, compact]);
+
+  const defaultLabelClass = compact
+    ? "sr-only"
+    : "mb-2xs block text-small font-medium text-ink";
 
   return (
     <div>
       <label
         htmlFor={textareaId}
-        className="mb-2xs block text-small font-medium text-ink"
+        className={labelClassName ?? defaultLabelClass}
       >
         {label}
       </label>
@@ -79,7 +106,7 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function TextAre
         aria-invalid={error === undefined ? undefined : true}
         aria-describedby={describedBy}
         className={[
-          TEXTAREA_BASE,
+          compact ? TEXTAREA_COMPACT : TEXTAREA_BASE,
           error === undefined ? "border-line" : "border-danger",
           className,
         ]

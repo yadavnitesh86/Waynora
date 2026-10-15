@@ -189,25 +189,25 @@ export default function ConversationItem({
   }
 
   return (
-    <li className="px-2xs py-3xs">
+    <li className="px-1 py-0.5">
       <div
         className={[
-          "flex items-center gap-2xs rounded-md border px-2xs",
+          "flex items-center gap-1 rounded-xl border px-1.5 transition-all duration-150",
           isActive
-            ? "border-accent bg-accent-soft"
-            : "border-transparent hover:bg-surface-raised",
+            ? "border-gold/60 bg-accent-soft shadow-2xs"
+            : "border-transparent hover:border-line/70 hover:bg-surface-raised",
         ].join(" ")}
       >
         <button
           type="button"
           onClick={() => onSelect(conversation.id)}
           aria-current={isActive ? "true" : undefined}
-          className="min-w-0 flex-1 rounded-sm px-sm py-sm text-left"
+          className="min-w-0 flex-1 rounded-lg px-sm py-2 text-left"
         >
-          <span className="block truncate text-small font-medium text-ink">
+          <span className="block truncate text-small font-semibold text-ink">
             {conversation.title}
           </span>
-          <span className="mt-3xs block text-caption text-ink-muted">
+          <span className="mt-0.5 block text-[11px] font-mono text-ink-muted">
             {formatTimestamp(conversation.updatedAt)}
           </span>
         </button>
