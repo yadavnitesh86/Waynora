@@ -10,7 +10,7 @@ Waynora will be built as a five-phase vertical MVP: establish the React/Convex/A
 - [ ] **Phase 2: Cookie Persistence and Chat Domain** - Build bounded, validated conversation storage and pure chat management primitives.
 - [x] **Phase 3: Real Chat and Long-Request Lifecycle** - Deliver the core authenticated chat slice against the actual FastAPI `/ask` endpoint with honest waiting and recovery. (completed 2026-10-13)
 - [x] **Phase 4: Chat Management, 2048, and Responsive Experience** - Add sidebar management, the isolated waiting game, and cross-device interaction quality. (completed 2026-10-14)
-- [ ] **Phase 5: Editorial Landing, Hardening, and Verification** - Ship the premium public experience and validate security, deployment, accessibility, and all v1 workflows.
+- [x] **Phase 5: Editorial Landing, Hardening, and Verification** - Ship the premium public experience and validate security, deployment, accessibility, and all v1 workflows. (completed 2026-10-15)
 
 ## Phase Details
 
@@ -134,9 +134,9 @@ Plans:
 
 Plans:
 
-- [ ] 05-01: Apply `design-taste-frontend` and `high-end-visual-design` to build the editorial landing page, imagery, typography, CTAs, attribution, and metadata.
-- [ ] 05-02: Harden CORS/auth/env/security behavior and add adversarial Markdown, cookie, API, long-request, and error-path verification.
-- [ ] 05-03: Run full responsive/accessibility/release verification, fix introduced issues, and document deployment limitations and verified workflows.
+- [x] 05-01: Apply `design-taste-frontend` and `high-end-visual-design` to build the editorial landing page, imagery, typography, CTAs, attribution, and metadata.
+- [x] 05-02: Harden CORS/auth/env/security behavior and add adversarial Markdown, cookie, API, long-request, and error-path verification.
+- [x] 05-03: Run full responsive/accessibility/release verification, fix introduced issues, and document deployment limitations and verified workflows.
 
 ## Progress
 
@@ -146,7 +146,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation, Contracts, and Auth | 3/3 | Complete   | 2026-10-10 |
-| 2. Cookie Persistence and Chat Domain | 2/2 | In Progress|  |
+| 2. Cookie Persistence and Chat Domain | 2/2 | Complete   | 2026-10-11 |
 | 3. Real Chat and Long-Request Lifecycle | 3/3 | Complete   | 2026-10-13 |
 | 4. Chat Management, 2048, and Responsive Experience | 3/3 | Complete   | 2026-10-14 |
-| 5. Editorial Landing, Hardening, and Verification | 0/3 | Not started | - |
+| 5. Editorial Landing, Hardening, and Verification | 3/3 | Complete   | 2026-10-15 |

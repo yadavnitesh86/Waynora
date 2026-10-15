@@ -263,6 +263,16 @@ describe("keyboard traversal", () => {
     expect(positive).toHaveLength(0);
     unmount();
   });
+
+  it("renders the verified GitHub attribution link with external security attributes (LAND-05)", () => {
+    const { unmount } = renderRoute("/");
+    const link = screen.getByRole("link", { name: "YADAV NITESH's GitHub profile" });
+    expect(link).toHaveAttribute("href", "https://github.com/yadavnitesh86");
+    expect(link).toHaveAttribute("target", "_blank");
+    expect(link).toHaveAttribute("rel", "noopener noreferrer");
+    expect(link).toHaveTextContent("YADAV NITESH");
+    unmount();
+  });
 });
 
 describe("document metadata", () => {

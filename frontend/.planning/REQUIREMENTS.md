@@ -12,7 +12,7 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 - [x] **FOUND-01**: The application runs as a typed React/Vite SPA using the selected project stack and existing Convex dependency.
 - [x] **FOUND-02**: The application exposes a configurable public backend base URL and does not hardcode production endpoints or secrets.
 - [x] **FOUND-03**: The application has shared responsive design tokens and reusable layout primitives for landing, auth, chat, and waiting surfaces.
-- [ ] **FOUND-04**: The UI applies the installed frontend design skills, especially `design-taste-frontend` and `high-end-visual-design`, and avoids generic SaaS visual patterns.
+- [x] **FOUND-04**: The UI applies the installed frontend design skills, especially `design-taste-frontend` and `high-end-visual-design`, and avoids generic SaaS visual patterns.
 - [x] **FOUND-05**: The application provides accessible route structure, document metadata, page titles, focus states, and keyboard navigation foundations.
 
 ### Authentication
@@ -26,22 +26,22 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 
 ### Landing Experience
 
-- [ ] **LAND-01**: The landing page clearly communicates Waynora's AI-powered travel-planning value and includes a primary “Plan my trip” CTA.
-- [ ] **LAND-02**: The landing page includes a secondary CTA explaining how Waynora works and a clear 5–15 minute generation expectation.
-- [ ] **LAND-03**: The landing page accurately describes Destination Planner, Transport Agent, and AccommodationWeather Agent as specialists coordinated by the main travel agent.
-- [ ] **LAND-04**: The landing page explains what users receive in a generated plan, the planning process, and why generation can take time.
-- [ ] **LAND-05**: Waynora branding includes clickable “Made by YADAV NITESH” attribution linking to `https://github.com/yadavnitesh86` in a new tab with appropriate security attributes.
-- [ ] **LAND-06**: The landing page has an editorial travel-inspired visual identity with meaningful imagery or composition, purposeful motion, responsive layouts, and no fabricated testimonials, users, partners, booking, or live-pricing claims.
+- [x] **LAND-01**: The landing page clearly communicates Waynora's AI-powered travel-planning value and includes a primary “Plan my trip” CTA.
+- [x] **LAND-02**: The landing page includes a secondary CTA explaining how Waynora works and a clear 5–15 minute generation expectation.
+- [x] **LAND-03**: The landing page accurately describes Destination Planner, Transport Agent, and AccommodationWeather Agent as specialists coordinated by the main travel agent.
+- [x] **LAND-04**: The landing page explains what users receive in a generated plan, the planning process, and why generation can take time.
+- [x] **LAND-05**: Waynora branding includes clickable “Made by YADAV NITESH” attribution linking to `https://github.com/yadavnitesh86` in a new tab with appropriate security attributes.
+- [x] **LAND-06**: The landing page has an editorial travel-inspired visual identity with meaningful imagery or composition, purposeful motion, responsive layouts, and no fabricated testimonials, users, partners, booking, or live-pricing claims.
 
 ### Chat and Backend Integration
 
-- [ ] **CHAT-01**: An authenticated user can create a new chat and see a clear empty state before sending a message.
-- [ ] **CHAT-02**: The chat composer accepts multi-line trip requests and Enter/Shift+Enter behavior is predictable and documented in the UI.
-- [ ] **CHAT-03**: Submitting a valid request immediately displays the user's message before waiting for the backend.
+- [x] **CHAT-01**: An authenticated user can create a new chat and see a clear empty state before sending a message.
+- [x] **CHAT-02**: The chat composer accepts multi-line trip requests and Enter/Shift+Enter behavior is predictable and documented in the UI.
+- [x] **CHAT-03**: Submitting a valid request immediately displays the user's message before waiting for the backend.
 - [x] **CHAT-04**: The client sends the exact backend contract `POST /ask` with `{ question, thread_id? }` and validates `{ answer, thread_id }` before displaying a response.
-- [ ] **CHAT-05**: A returned `thread_id` is retained for supported follow-up messages in the same conversation.
-- [ ] **CHAT-06**: Assistant responses render readable Markdown including lists and tables through a safe renderer with raw HTML disabled and safe link handling.
-- [ ] **CHAT-07**: User and assistant messages are visually distinct, readable at long response lengths, and accessible to screen readers.
+- [x] **CHAT-05**: A returned `thread_id` is retained for supported follow-up messages in the same conversation.
+- [x] **CHAT-06**: Assistant responses render readable Markdown including lists and tables through a safe renderer with raw HTML disabled and safe link handling.
+- [x] **CHAT-07**: User and assistant messages are visually distinct, readable at long response lengths, and accessible to screen readers.
 - [x] **CHAT-08**: The UI prevents duplicate submissions while one request is active without discarding additional text the user is composing.
 - [x] **CHAT-09**: The client never fabricates a travel plan, agent result, progress event, or successful response when the backend fails.
 
@@ -49,9 +49,9 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 
 - [x] **WAIT-01**: The request lifecycle distinguishes idle, submitting, actively waiting, succeeded, network failure, timeout, HTTP failure, malformed response, and unexpected application failure states.
 - [x] **WAIT-02**: An active request remains supported for approximately 15 minutes, uses cleanup-safe timeout and abort handling, and does not use a normal short timeout that interrupts legitimate work.
-- [ ] **WAIT-03**: The waiting UI shows an active indicator, honest elapsed time, the 5–15 minute expectation, and copy based on elapsed time rather than render count.
-- [ ] **WAIT-04**: Waiting messages rotate through multiple non-repeating variants across time bands, especially after five minutes, without claiming specialist completion or fake percentage progress.
-- [ ] **WAIT-05**: Timeout and interruption messaging explains that server-side execution may continue, preserves the submitted request, and requires deliberate user action before retrying.
+- [x] **WAIT-03**: The waiting UI shows an active indicator, honest elapsed time, the 5–15 minute expectation, and copy based on elapsed time rather than render count.
+- [x] **WAIT-04**: Waiting messages rotate through multiple non-repeating variants across time bands, especially after five minutes, without claiming specialist completion or fake percentage progress.
+- [x] **WAIT-05**: Timeout and interruption messaging explains that server-side execution may continue, preserves the submitted request, and requires deliberate user action before retrying.
 - [x] **WAIT-06**: The request controller ignores stale results after chat changes or unmount and cleans up timers, listeners, and abort resources.
 
 ### Chat Persistence and Management
@@ -79,13 +79,13 @@ Requirements for the initial release. Each maps to exactly one roadmap phase.
 
 ### Error Handling, Security, and Quality
 
-- [ ] **QUAL-01**: Customer-facing errors are concise and friendly; raw tracebacks, provider errors, infrastructure diagnostics, secrets, and API keys never appear in the UI.
-- [ ] **QUAL-02**: Network, timeout, HTTP, malformed-response, validation, and unexpected failures provide appropriate recovery guidance without automatic expensive retries.
-- [ ] **QUAL-03**: Cookie data, API responses, and user input are validated at boundaries, and hostile Markdown/URL fixtures cannot execute scripts or unsafe protocols.
-- [ ] **QUAL-04**: Landing, authentication, chat, waiting, history, and game surfaces work responsively on desktop, tablet, and mobile.
-- [ ] **QUAL-05**: Available linting, type-checking, unit tests, and integration checks run successfully, with pure cookie, chat-state, API-schema, and 2048 logic covered.
-- [ ] **QUAL-06**: The documented workflows are verified, including landing, attribution, auth transitions, real `/ask` response rendering, long waits, elapsed messages, game controls, cookie reloads, chat CRUD, overflow handling, error recovery, accessibility, and absence of leaked secrets/errors.
-- [ ] **QUAL-07**: The production-like request path is tested for CORS, authentication configuration, and timeout behavior; limitations of the hosting/proxy path are documented rather than hidden.
+- [x] **QUAL-01**: Customer-facing errors are concise and friendly; raw tracebacks, provider errors, infrastructure diagnostics, secrets, and API keys never appear in the UI.
+- [x] **QUAL-02**: Network, timeout, HTTP, malformed-response, validation, and unexpected failures provide appropriate recovery guidance without automatic expensive retries.
+- [x] **QUAL-03**: Cookie data, API responses, and user input are validated at boundaries, and hostile Markdown/URL fixtures cannot execute scripts or unsafe protocols.
+- [x] **QUAL-04**: Landing, authentication, chat, waiting, history, and game surfaces work responsively on desktop, tablet, and mobile.
+- [x] **QUAL-05**: Available linting, type-checking, unit tests, and integration checks run successfully, with pure cookie, chat-state, API-schema, and 2048 logic covered.
+- [x] **QUAL-06**: The documented workflows are verified, including landing, attribution, auth transitions, real `/ask` response rendering, long waits, elapsed messages, game controls, cookie reloads, chat CRUD, overflow handling, error recovery, accessibility, and absence of leaked secrets/errors.
+- [x] **QUAL-07**: The production-like request path is tested for CORS, authentication configuration, and timeout behavior; limitations of the hosting/proxy path are documented rather than hidden.
 
 ## v2 Requirements
 
