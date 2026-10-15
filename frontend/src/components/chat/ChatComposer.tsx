@@ -56,9 +56,32 @@ export default function ChatComposer({ onSubmit, busy }: ChatComposerProps) {
         onChange={(e) => setDraft(e.target.value)}
         onKeyDown={handleKeyDown}
       />
-      <button type="submit" disabled={!canSubmit} className="mt-sm">
-        Send request
-      </button>
+      <div className="mt-sm flex items-center justify-between">
+        <p className="text-caption text-ink-muted">
+          Press <kbd className="font-mono rounded bg-line/60 px-1 py-0.5 text-[0.75rem]">Enter</kbd> to send, <kbd className="font-mono rounded bg-line/60 px-1 py-0.5 text-[0.75rem]">Shift+Enter</kbd> for new line
+        </p>
+        <button
+          type="submit"
+          disabled={!canSubmit}
+          aria-label="Send request"
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-accent text-accent-ink shadow-xs transition-all duration-150 hover:shadow-sm hover:scale-105 active:scale-95 disabled:opacity-40 disabled:hover:scale-100 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-focus"
+        >
+          <span className="sr-only">Send request</span>
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
     </form>
   );
 }

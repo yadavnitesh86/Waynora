@@ -43,7 +43,7 @@ describe("main.tsx composition (regression: nested routers)", () => {
     // suites). 10s keeps the regression semantics and removes the flake.
     expect(
       await screen.findByText(
-        /Plan a trip worth the wait/i,
+        /Your trip, planned by a real agent|Plan a trip worth the wait/i,
         {},
         { timeout: 10_000 },
       ),

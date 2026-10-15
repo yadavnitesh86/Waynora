@@ -1,40 +1,36 @@
-import { Link } from "react-router-dom";
 import { useDocumentTitle } from "../lib/useDocumentTitle";
-import { Button, PageHeader, VisuallyHidden } from "../components/ui";
+import LandingHero from "../components/landing/LandingHero";
+import StatStrip from "../components/landing/StatStrip";
+import HowItWorks from "../components/landing/HowItWorks";
+import AgentCards from "../components/landing/AgentCards";
+import WhatYouGet from "../components/landing/WhatYouGet";
 
+/**
+ * Editorial Landing Page (FOUND-04, LAND-01..LAND-06).
+ *
+ * Replaces the initial placeholder with a cohesive, editorial travel experience:
+ * - Clear AI travel planning value with primary and secondary CTAs (LAND-01)
+ * - Honest 5–15 minute planning expectation and truthful metrics (LAND-02)
+ * - Accurate multi-agent specialist architecture (LAND-03)
+ * - Transparent explanation of deliverables with an explicit example structure (LAND-04)
+ * - Custom brand logo and display serif typography (LAND-06)
+ */
 export default function Landing() {
-  useDocumentTitle("Waynora", "AI trip planning — tell us where you want to go", {
-    skipTitleSuffix: true,
-  });
+  useDocumentTitle(
+    "Waynora",
+    "AI trip planning — tell us where you want to go",
+    {
+      skipTitleSuffix: true,
+    },
+  );
 
   return (
-    <div className="flex min-h-[80vh] items-center px-md py-3xl">
-      <div className="mx-auto w-full max-w-container-xl">
-        {/* Phase 5 replaces this with the editorial landing page (D-13) */}
-        <PageHeader
-          eyebrow="AI trip planning"
-          title="Plan a trip worth the wait."
-          lede="Tell us where you want to go. A real agent builds your itinerary — usually in 5 to 15 minutes."
-          actions={
-            <>
-              <Button asChild>
-                <Link to="/signup">Create your free account</Link>
-              </Button>
-              <Button asChild variant="secondary">
-                <Link to="/signin">Sign in</Link>
-              </Button>
-            </>
-          }
-        />
-        {/* Honest status for assistive-technology users: the product is in
-            early access, so nothing here should imply a finished experience. */}
-        <VisuallyHidden>
-          <p>
-            Waynora is in early access. Trip generation and saved itineraries
-            are not available yet.
-          </p>
-        </VisuallyHidden>
-      </div>
+    <div className="flex flex-col bg-canvas text-ink">
+      <LandingHero />
+      <StatStrip />
+      <HowItWorks />
+      <AgentCards />
+      <WhatYouGet />
     </div>
   );
 }

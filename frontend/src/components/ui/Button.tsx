@@ -42,20 +42,19 @@ export interface ButtonProps
 
 const BASE = [
   "inline-flex items-center justify-center gap-xs",
-  "rounded-md font-semibold",
-  // Motion: state transitions only, capped at 200ms per the reduced-motion
-  // contract. Colour, shadow and transform animate — never layout.
-  "transition-[background-color,box-shadow,transform,color] duration-150 ease-out",
-  // Tactile press feedback (transform only, never layout-triggering).
+  "rounded-md font-semibold select-none",
+  "transition-all duration-150 ease-out",
   "active:scale-[0.98]",
+  "focus-visible:outline-2 focus-visible:outline-focus focus-visible:outline-offset-2",
 ].join(" ");
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  // Primary is the ONLY accent-filled control (UI-SPEC accent reservations).
   primary:
-    "bg-accent text-accent-ink border border-transparent shadow-sm hover:shadow-md",
-  secondary: "bg-transparent text-ink border border-line hover:bg-surface",
-  ghost: "bg-transparent text-ink border border-transparent hover:bg-surface",
+    "bg-accent text-accent-ink border border-transparent shadow-xs hover:shadow-md hover:-translate-y-[1px] active:translate-y-0",
+  secondary:
+    "bg-transparent text-ink border border-line hover:border-ink-muted hover:bg-surface active:translate-y-[1px]",
+  ghost:
+    "bg-transparent text-ink border border-transparent hover:bg-ink/5 active:bg-ink/10",
 };
 
 // Every size keeps the 44px minimum touch target from the a11y contract.

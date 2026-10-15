@@ -245,8 +245,9 @@ describe("keyboard traversal", () => {
       "Waynora",
       "Sign in",
       "Create account",
-      "Create your free account",
-      "Sign in",
+      "Plan my trip →",
+      "How it works ↓",
+      "YADAV NITESH",
     ]);
     unmount();
   });

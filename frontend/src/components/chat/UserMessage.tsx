@@ -55,7 +55,7 @@ function UserMessage({ message, isActive, onRetry }: UserMessageProps) {
   return (
     <div>
       <p className="mb-2xs text-caption text-ink-muted">You</p>
-      <div className="max-w-[48ch] rounded-lg border border-line bg-surface-raised px-lg py-md shadow-sm">
+      <div className="max-w-[48ch] rounded-lg border border-line bg-surface-raised px-lg py-md shadow-xs">
         <p className="text-body leading-[1.65] text-ink">{message.content}</p>
         {showInFlightFooter ? (
           <div className="mt-sm flex items-center gap-2xs text-caption text-ink-muted">

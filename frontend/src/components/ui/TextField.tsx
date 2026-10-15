@@ -19,8 +19,10 @@ export interface TextFieldProps
 }
 
 const INPUT_BASE = [
-  "w-full min-h-[44px] px-md py-sm text-ink",
-  "rounded-md border bg-surface-raised",
+  "w-full min-h-[44px] px-md py-sm text-ink text-body",
+  "rounded-md border bg-surface-raised transition-all duration-150 ease-out",
+  "placeholder:text-ink-muted/60",
+  "focus:border-ink focus:outline-none focus:ring-1 focus:ring-ink",
 ].join(" ");
 
 /**

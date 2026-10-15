@@ -144,9 +144,9 @@ export default function ChatSidebar({
         ].join(" ")}
       >
         <div className="flex items-center justify-between gap-sm border-b border-line px-md py-sm">
-          {/* A caption-weight paragraph, not a heading: the route owns the
-              page outline, and StorageNotice sets the same precedent. */}
-          <p className="text-small font-semibold text-ink">Your chats</p>
+          <p className="text-overline font-semibold uppercase tracking-[0.14em] text-accent">
+            Your chats
+          </p>
           <div className="flex items-center gap-2xs">
             <Button
               variant="ghost"
@@ -230,10 +230,24 @@ export default function ChatSidebar({
         </div>
 
         {conversations.length === 0 ? (
-          // Paragraph-only empty state: an h3 here would sit before the
-          // route h1 in DOM order and trip heading-order.
-          <div className="px-md py-lg">
-            <p className="text-small font-medium text-ink">No chats yet</p>
+          <div className="flex flex-col items-center justify-center px-md py-xl text-center">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-soft text-accent mb-sm">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
+              </svg>
+            </div>
+            <p className="text-small font-semibold text-ink">No chats yet</p>
             <p className="mt-xs text-caption leading-[1.5] text-ink-muted">
               Start a new chat and your trip conversations will appear here.
             </p>

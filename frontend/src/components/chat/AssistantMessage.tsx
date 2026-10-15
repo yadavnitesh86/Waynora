@@ -18,7 +18,7 @@ export interface AssistantMessageProps {
 function AssistantMessage({ message }: AssistantMessageProps) {
   return (
     <div className="border-t border-line pt-md">
-      <p className="mb-2xs text-caption text-ink-muted">Waynora</p>
+      <p className="mb-2xs text-caption font-semibold tracking-wide text-accent">Waynora</p>
       <Markdown content={message.content} />
     </div>
   );

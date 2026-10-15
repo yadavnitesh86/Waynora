@@ -1,4 +1,4 @@
-﻿# Phase 5: Editorial Landing, Hardening, and Verification — Context
+# Phase 5: Editorial Landing, Hardening, and Verification — Context
 
 **Gathered:** 2026-10-14  
 **Status:** Ready for planning
@@ -21,7 +21,7 @@ The user SEES a new Waynora — every surface that was placeholder-quality gets 
 
 ## Requirements Covered
 
-- **FOUND-04**: UI applies `design-taste-frontend` and `high-end-visual-design` skills; avoids generic SaaS patterns.
+- **FOUND-04**: UI applies `redesign-existing-projects`, `design-taste-frontend`, and `high-end-visual-design` skills; avoids generic SaaS patterns.
 - **LAND-01**: Landing page — clear AI travel-planning value + "Plan my trip" CTA.
 - **LAND-02**: Secondary CTA — how Waynora works + explicit 5–15 minute expectation.
 - **LAND-03**: Accurate agent architecture — Destination Planner, Transport Agent, AccommodationWeather Agent described as specialists coordinated by the main agent.

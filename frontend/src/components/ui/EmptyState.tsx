@@ -30,7 +30,7 @@ const EmptyState = forwardRef<HTMLDivElement, EmptyStateProps>(function EmptySta
           : ["max-w-prose", className].filter(Boolean).join(" ")
       }
     >
-      <h3 className="font-sans text-h3 font-semibold text-ink text-balance">
+      <h3 className="font-display text-h3 font-semibold text-ink text-balance tracking-tight">
         {title}
       </h3>
       <p className="mt-sm text-lead leading-[1.55] text-ink-muted">{body}</p>

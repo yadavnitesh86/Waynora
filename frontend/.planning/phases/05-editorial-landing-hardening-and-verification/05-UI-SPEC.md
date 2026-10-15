@@ -17,7 +17,7 @@ redesign_scope: full-frontend
 
 > Full-frontend visual redesign + editorial landing page + security hardening + release verification.
 > Written against `05-CONTEXT.md` (decisions D-01…D-12) and ROADMAP.md Phase 5 goals.
-> **Mandatory skills:** `design-taste-frontend` and `high-end-visual-design` — every UI task must reference these explicitly.
+> **Mandatory skills:** `redesign-existing-projects`, `design-taste-frontend`, and `high-end-visual-design` (supported by `minimalist-ui` and `stitch-design-taste`) — every UI task must reference and execute these explicitly.
 > **Hard boundary:** No changes to business logic, API calls, state machines, auth flow, cookie behaviour, routes, or backend config.
 
 ---
@@ -185,7 +185,9 @@ ALL animations wrapped with `prefers-reduced-motion` media query (CSS) or `useRe
 |------|--------|
 | Header bg | `--color-surface`, subtle bottom divider |
 | Header height | `min-h-[56px]` |
+| Brand logo | `/logo.png`, `h-8 w-8 object-contain rounded-md` alongside wordmark |
 | Wordmark | `--font-display`, italic or small-caps, ~20px |
+| Favicon | `<link rel="icon" type="image/png" href="/logo.png">` |
 | Nav items | Text-only + hover underline animation (remove left-border-rule) |
 | Unauthenticated nav | "Sign in" (text link) + "Start planning" (small primary button) |
 | Authenticated nav | "Chat" link + sidebar toggle icon-button + "Sign out" ghost link |
@@ -621,7 +623,7 @@ No shadcn, Radix, or other UI library. Hand-built primitives only (D-02, locked)
 
 ## Implementation Notes for Executor
 
-1. **Use `design-taste-frontend` and `high-end-visual-design` skills** — every UI task in the plan must say this explicitly.
+1. **Use `redesign-existing-projects`, `design-taste-frontend`, and `high-end-visual-design` skills** — every UI task in the plan must execute these explicitly with an audit-first methodology to replace generic patterns with bespoke typography, surfaces, layouts, and states.
 2. **Pick the exact palette** — the spec gives direction and constraints; fill values that produce the most impressive result. Document the chosen palette in the plan's first task.
 3. **Pick the display font** — Fraunces is recommended; Playfair Display or DM Serif Display are acceptable.
 4. **Pick animation approach** — Framer Motion recommended; CSS-only acceptable if equally polished.

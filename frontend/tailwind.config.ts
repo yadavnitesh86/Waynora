@@ -17,6 +17,10 @@ export default {
         focus: "var(--color-focus)",
         danger: "var(--color-danger)",
         success: "var(--color-success)",
+        "surface-dark": "var(--color-surface-dark)",
+        "surface-dark-raised": "var(--color-surface-dark-raised)",
+        "ink-inverse": "var(--color-ink-inverse)",
+        "ink-inverse-muted": "var(--color-ink-inverse-muted)",
       },
       fontFamily: {
         display: "var(--font-display)",
@@ -73,10 +77,19 @@ export default {
           "50%": { transform: "scale(1.08)" },
           "100%": { transform: "scale(1)" },
         },
+        shimmer: {
+          "100%": { transform: "translateX(100%)" },
+        },
+        "pulse-subtle": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.35" },
+        },
       },
       animation: {
         "tile-in": "tile-in 200ms ease-out",
         "tile-merge": "tile-merge 200ms ease-out",
+        shimmer: "shimmer 1.8s infinite",
+        "pulse-subtle": "pulse-subtle 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
       maxWidth: {
         prose: "var(--measure-prose)",

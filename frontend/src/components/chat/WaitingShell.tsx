@@ -16,17 +16,11 @@ export interface WaitingShellProps {
 }
 
 /**
- * The composed waiting panel (WAIT-03, WAIT-04): heading, elapsed readout,
- * expectation line, live band copy, Stop waiting control, and — while the
- * request is actively waiting (GAME-01) — a "Waiting lounge" card holding
- * the 2048 board. A pure function of elapsed for copy selection — no
- * render-count path, no progress/meter element, no specialist-agent names.
+ * Atmospheric waiting shell (WAIT-03, WAIT-04, 05-UI-SPEC Surface 8).
  *
- * The game is decoration during a real wait: it receives no request state,
- * calls no chat callbacks, and the stop control wires straight to the
- * controller's abort (GAME-06 — playing never touches the in-flight
- * request). Side-by-side from `lg` up so the wide desktop layout keeps the
- * honest timing copy visible next to the board; stacked on smaller screens.
+ * Double-bezel card structure, pulsing dots indicator, prominent tabular
+ * mono elapsed clock, blockquote band copy with display serif styling,
+ * and an isolated 2048 waiting lounge.
  */
 export default function WaitingShell({
   elapsedMs,
@@ -39,63 +33,70 @@ export default function WaitingShell({
   const readout = formatElapsed(elapsedMs);
 
   return (
-    <div className="w-full max-w-container-md rounded-lg border border-line bg-surface p-lg shadow-sm">
-      <div className="grid gap-lg lg:grid-cols-2 lg:items-start">
-        <div>
-          {/* Spinner + heading row */}
-          <div className="flex items-center gap-xs">
-            <Spinner size="md" />
-            <h3 className="font-sans text-h3 font-semibold text-ink">
-              Waynora is planning your trip
-            </h3>
+    <div className="w-full max-w-container-md rounded-[1.25rem] border border-line bg-surface p-1.5 shadow-sm">
+      <div className="rounded-xl border border-line/70 bg-surface-raised/60 p-md sm:p-lg">
+        <div className="grid gap-lg lg:grid-cols-2 lg:items-start">
+          <div className="flex flex-col">
+            {/* Active status row with Spinner + 3 pulsing dots */}
+            <div className="flex items-center gap-sm">
+              <Spinner size="md" />
+              <div className="flex items-center gap-1.5" aria-hidden="true">
+                <span className="h-2 w-2 rounded-full bg-accent animate-pulse-subtle" />
+                <span className="h-2 w-2 rounded-full bg-accent animate-pulse-subtle [animation-delay:200ms]" />
+                <span className="h-2 w-2 rounded-full bg-accent animate-pulse-subtle [animation-delay:400ms]" />
+              </div>
+              <h3 className="font-display text-h3 font-semibold text-ink tracking-tight">
+                Waynora is planning your trip
+              </h3>
+            </div>
+
+            {/* Elapsed readout + honest expectation line */}
+            <div className="mt-md rounded-md bg-canvas/80 border border-line/60 px-md py-sm flex flex-wrap items-baseline gap-xs">
+              <span className="text-caption font-semibold uppercase tracking-wider text-ink-muted">Elapsed</span>
+              <span className="font-mono text-body font-semibold tabular-nums text-accent">
+                {readout}
+              </span>
+              <span className="text-caption text-ink-muted ml-auto">
+                Plans usually take 5 to 15 minutes.
+              </span>
+            </div>
+
+            {/* Live band copy pull-quote — the only live region in the shell */}
+            <div
+              aria-live="polite"
+              aria-atomic="true"
+              className="mt-md border-l-2 border-accent/60 pl-md py-1 font-display italic text-lead text-ink/90 leading-snug"
+            >
+              {copy}
+            </div>
+
+            {/* Stop waiting control */}
+            <div className="mt-lg">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={onStop}
+                className="hover:border-danger hover:text-danger transition-colors"
+              >
+                Stop waiting
+              </Button>
+            </div>
           </div>
 
-          {/* Elapsed readout + expectation line */}
-          <div className="mt-md flex items-baseline gap-xs">
-            <span className="text-small text-ink-muted">Elapsed</span>
-            <span className="font-mono text-small tabular-nums text-ink">
-              {readout}
-            </span>
-            <span className="text-small text-ink-muted">
-              Plans usually take 5 to 15 minutes.
-            </span>
-          </div>
-
-          {/* Band copy — the only live region in the shell */}
-          <div
-            aria-live="polite"
-            aria-atomic="true"
-            className="mt-sm text-body text-ink"
-          >
-            {copy}
-          </div>
-
-          {/* Stop waiting control */}
-          <Button
-            variant="secondary"
-            size="sm"
-            onClick={onStop}
-            className="mt-md"
-          >
-            Stop waiting
-          </Button>
+          {/* Waiting lounge — 2048 game during active wait */}
+          {isWaiting ? (
+            <div className="rounded-lg border border-line bg-canvas p-xs sm:p-sm">
+              <h4 className="font-display text-small font-semibold text-ink">
+                Waiting lounge
+              </h4>
+              <p className="mt-2xs text-caption text-ink-muted">
+                A game of 2048 to pass the time. Playing never affects your
+                request.
+              </p>
+              <Game2048 />
+            </div>
+          ) : null}
         </div>
-
-        {/* Waiting lounge — the 2048 board, only while actively waiting
-            (GAME-01). Honest decoration: no progress implication, no link
-            to the request beyond sharing the waiting phase. */}
-        {isWaiting ? (
-          <div className="rounded-md border border-line bg-canvas p-xs sm:p-sm">
-            <h4 className="font-sans text-small font-semibold text-ink">
-              Waiting lounge
-            </h4>
-            <p className="mt-2xs text-caption text-ink-muted">
-              A game of 2048 to pass the time. Playing never affects your
-              request.
-            </p>
-            <Game2048 />
-          </div>
-        ) : null}
       </div>
     </div>
   );

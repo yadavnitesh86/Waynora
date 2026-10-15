@@ -55,7 +55,15 @@ export default function Chat() {
   /** The message owned by the live request; null whenever idle. */
   const [activeMessageId, setActiveMessageId] = useState<string | null>(null);
   /** Mobile drawer / desktop collapse state for the history sidebar. */
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    if (
+      typeof window !== "undefined" &&
+      typeof window.matchMedia === "function"
+    ) {
+      return window.matchMedia("(min-width: 768px)").matches;
+    }
+    return false;
+  });
 
   // `stop` MUST be destructured from the hook: a bare `stop` identifier
   // resolves to the DOM global `window.stop()`, which aborts nothing
@@ -353,6 +361,38 @@ export default function Chat() {
                 />
               </svg>
             </Button>
+            {!sidebarOpen && (
+              <Button
+                variant="ghost"
+                size="sm"
+                aria-label="Show chat history"
+                onClick={() => setSidebarOpen(true)}
+                className="hidden md:inline-flex"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  aria-hidden="true"
+                >
+                  <rect
+                    x="2.25"
+                    y="2.25"
+                    width="11.5"
+                    height="11.5"
+                    rx="1.75"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                  <path
+                    d="M6.75 2.25v11.5"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                  />
+                </svg>
+              </Button>
+            )}
             {/* C-03: the route h1 is the active conversation title — "New
                 chat" until the first user message derives one from it. */}
             <PageHeader

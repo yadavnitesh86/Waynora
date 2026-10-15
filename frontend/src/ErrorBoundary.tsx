@@ -30,7 +30,7 @@ export default class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo): void {
-    // Console only - never rendered into a product surface.
+    // Console only - never rendered into a product surface in production.
     console.error("[Waynora] render failure", error, info.componentStack);
   }
 
@@ -40,29 +40,47 @@ export default class ErrorBoundary extends Component<Props, State> {
       return this.props.children;
     }
 
-    // D-37: in production, render the customer-safe panel. Raw tracebacks
-    // never reach the UI (QUAL-01).
+    // D-37 / QUAL-01: in production, render the customer-safe panel.
+    // Raw tracebacks and internal stack dumps never reach the UI.
     if (!isDev) {
       return (
         <div
           role="alert"
-          className="flex min-h-screen flex-col items-center justify-center gap-md bg-canvas px-md font-sans"
+          className="flex min-h-screen flex-col items-center justify-center bg-canvas px-md py-3xl text-ink"
         >
-          <div className="w-full max-w-container-lg border border-line bg-surface p-lg">
-            <h1 className="text-h2 font-semibold text-ink">
+          <div className="w-full max-w-[32rem] rounded-[1.5rem] border border-line bg-surface p-xl sm:p-2xl text-center shadow-md">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-danger/10 text-danger mb-md">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <line x1="12" y1="8" x2="12" y2="12" />
+                <line x1="12" y1="16" x2="12.01" y2="16" />
+              </svg>
+            </div>
+            <h1 className="font-display text-h2 font-semibold text-ink">
               Something unexpected happened.
             </h1>
-            <p className="mt-md text-body text-ink-muted">
+            <p className="mt-sm text-body text-ink-muted leading-relaxed">
               Something went wrong on our side. Reload the page to try again.
             </p>
-            <Button
-              variant="secondary"
-              size="md"
-              onClick={() => window.location.reload()}
-              className="mt-lg"
-            >
-              Reload the page
-            </Button>
+            <div className="mt-xl flex justify-center">
+              <Button
+                variant="primary"
+                size="md"
+                onClick={() => window.location.reload()}
+              >
+                Reload the page
+              </Button>
+            </div>
           </div>
         </div>
       );
@@ -71,23 +89,31 @@ export default class ErrorBoundary extends Component<Props, State> {
     return (
       <div
         role="alert"
-        className="flex min-h-screen flex-col items-center justify-center gap-md bg-canvas px-md font-sans"
+        className="flex min-h-screen flex-col items-center justify-center bg-canvas px-md py-2xl font-sans"
       >
-        <div className="w-full max-w-container-lg border border-line bg-surface p-lg">
-          <p className="text-small font-medium text-ink-muted">
-            Waynora failed to start
+        <div className="w-full max-w-container-lg rounded-xl border border-line bg-surface p-lg shadow-sm">
+          <p className="text-overline font-semibold uppercase tracking-[0.14em] text-danger">
+            Development Error Surface
           </p>
           <h1 className="mt-xs text-h2 font-semibold text-ink">
             Something in the app threw during render
           </h1>
-          <p className="mt-md text-body text-ink-muted">
-            This is a development error surface. The message below is the real
-            cause - report it or paste it back into the session.
+          <p className="mt-sm text-body text-ink-muted">
+            This is a development diagnostic view (suppressed in production builds).
           </p>
-          <pre className="mt-md overflow-auto whitespace-pre-wrap border border-line bg-canvas p-md text-caption text-ink">
+          <pre className="mt-md overflow-auto whitespace-pre-wrap rounded-md border border-line bg-canvas p-md text-caption text-ink font-mono">
             {error.message}
             {error.stack ? `\n\n${error.stack}` : ""}
           </pre>
+          <div className="mt-lg">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => window.location.reload()}
+            >
+              Reload the page
+            </Button>
+          </div>
         </div>
       </div>
     );
