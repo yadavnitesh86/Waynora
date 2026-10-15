@@ -3,6 +3,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it, vi, afterEach } from "vitest";
 import { askBackend, askRequestSchema, askResponseSchema } from "./ask";
+import { CUSTOMER_MESSAGES } from "../errors";
 
 vi.mock("../env", () => ({
   env: {
@@ -28,10 +29,12 @@ const FORBIDDEN_SOURCE_MARKERS = [
 const HERE = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(HERE, "ask.ts"), "utf8");
 
-function stubFetch() {
+function stubFetch(response: Partial<Response> = {}) {
   const fetchMock = vi.fn().mockResolvedValue({
     ok: true,
+    status: 200,
     json: async () => ({ answer: "Here is your plan", thread_id: "t-1" }),
+    ...response,
   });
   vi.stubGlobal("fetch", fetchMock);
   return fetchMock;
@@ -55,15 +58,38 @@ describe("ask request schema (TM-04)", () => {
   });
 });
 
-describe("ask response schema (TM-04)", () => {
-  it("accepts answer + thread_id", () => {
+describe("ask response schema contract hardening (TM-04, QUAL-02, QUAL-03)", () => {
+  it("accepts valid answer + thread_id", () => {
     expect(
-      askResponseSchema.safeParse({ answer: "a", thread_id: "t" }).success,
+      askResponseSchema.safeParse({ answer: "Valid answer", thread_id: "t-1" }).success,
     ).toBe(true);
   });
 
-  it("rejects a response without thread_id", () => {
+  it("rejects a response missing thread_id", () => {
     expect(askResponseSchema.safeParse({ answer: "a" }).success).toBe(false);
+  });
+
+  it("rejects a response missing answer", () => {
+    expect(askResponseSchema.safeParse({ thread_id: "t-1" }).success).toBe(false);
+  });
+
+  it("rejects a response with non-string types", () => {
+    expect(askResponseSchema.safeParse({ answer: 12345, thread_id: "t-1" }).success).toBe(false);
+    expect(askResponseSchema.safeParse({ answer: "a", thread_id: null }).success).toBe(false);
+  });
+
+  it("rejects unexpected extra keys via strictObject (prevents schema pollution)", () => {
+    expect(
+      askResponseSchema.safeParse({
+        answer: "a",
+        thread_id: "t-1",
+        unexpected_extra_field: "injected",
+      }).success,
+    ).toBe(false);
+  });
+
+  it("rejects an empty object", () => {
+    expect(askResponseSchema.safeParse({}).success).toBe(false);
   });
 });
 
@@ -106,5 +132,102 @@ describe("ask wire format", () => {
     expect(Object.keys(JSON.parse(String(init.body)) as Record<string, unknown>)).toEqual([
       "question",
     ]);
+  });
+});
+
+describe("askBackend HTTP error and payload failure mapping (QUAL-02, QUAL-03)", () => {
+  const HTTP_ERROR_STATUSES = [
+    { status: 400, name: "Bad Request" },
+    { status: 401, name: "Unauthorized" },
+    { status: 429, name: "Rate Limit" },
+    { status: 500, name: "Internal Error" },
+    { status: 504, name: "Gateway Timeout" },
+  ];
+
+  for (const { status, name } of HTTP_ERROR_STATUSES) {
+    it(`maps HTTP ${status} (${name}) cleanly to { ok: false, kind: "http" } and never fabricates output`, async () => {
+      stubFetch({
+        ok: false,
+        status,
+        statusText: name,
+      });
+
+      const result = await askBackend({ question: "Where to go?" });
+
+      expect(result.ok).toBe(false);
+      if (!result.ok) {
+        expect(result.kind).toBe("http");
+        expect(result.message).toBe(CUSTOMER_MESSAGES.http);
+      }
+      expect((result as Record<string, unknown>).answer).toBeUndefined();
+    });
+  }
+
+  it("maps JSON parse error on 200 response cleanly to { ok: false, kind: 'malformed' }", async () => {
+    stubFetch({
+      ok: true,
+      status: 200,
+      json: async () => {
+        throw new Error("SyntaxError: Unexpected token < in JSON at position 0");
+      },
+    });
+
+    const result = await askBackend({ question: "Where to go?" });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.kind).toBe("malformed");
+      expect(result.message).toBe(CUSTOMER_MESSAGES.malformed);
+    }
+  });
+
+  it("maps schema validation mismatch on 200 response cleanly to { ok: false, kind: 'malformed' }", async () => {
+    stubFetch({
+      ok: true,
+      status: 200,
+      json: async () => ({ unexpected_schema: true }),
+    });
+
+    const result = await askBackend({ question: "Where to go?" });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.kind).toBe("malformed");
+      expect(result.message).toBe(CUSTOMER_MESSAGES.malformed);
+    }
+  });
+
+  it("maps network fetch failure cleanly to { ok: false, kind: 'network' }", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockRejectedValue(new TypeError("Failed to fetch")),
+    );
+
+    const result = await askBackend({ question: "Where to go?" });
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.kind).toBe("network");
+      expect(result.message).toBe(CUSTOMER_MESSAGES.network);
+    }
+  });
+
+  it("maps abort signal cleanly to { ok: false, kind: 'abort' }", async () => {
+    const abortError = new DOMException("The user aborted a request.", "AbortError");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockRejectedValue(abortError),
+    );
+
+    const controller = new AbortController();
+    controller.abort();
+
+    const result = await askBackend({ question: "Where to go?" }, controller.signal);
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.kind).toBe("abort");
+      expect(result.message).toBe(CUSTOMER_MESSAGES.abort);
+    }
   });
 });

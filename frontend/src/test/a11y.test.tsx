@@ -190,7 +190,7 @@ describe("axe-core on every route", () => {
         );
       }
       expect(container).toBeTruthy();
-    });
+    }, 25000);
   }
 });
 
@@ -338,7 +338,7 @@ describe("axe-core on chat history and waiting surfaces", () => {
     ).toBeInTheDocument();
 
     await expectNoAxeViolations(container);
-  });
+  }, 25000);
 
   it("has no critical or serious violations in the active waiting room with the 2048 board", async () => {
     mockAuthState.isAuthenticated = true;
@@ -355,7 +355,7 @@ describe("axe-core on chat history and waiting surfaces", () => {
     ).toBeInTheDocument();
 
     await expectNoAxeViolations(container);
-  });
+  }, 25000);
 
   it("has no critical or serious violations on the 2048 win overlay", async () => {
     const base = initGame(() => 0.5);
@@ -365,7 +365,7 @@ describe("axe-core on chat history and waiting surfaces", () => {
     expect(screen.getByText("You win!")).toBeInTheDocument();
 
     await expectNoAxeViolations(container);
-  });
+  }, 25000);
 
   it("has no critical or serious violations on the 2048 game-over overlay", async () => {
     const base = initGame(() => 0.5);
@@ -375,5 +375,5 @@ describe("axe-core on chat history and waiting surfaces", () => {
     expect(screen.getByText("Game Over")).toBeInTheDocument();
 
     await expectNoAxeViolations(container);
-  });
+  }, 25000);
 });

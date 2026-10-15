@@ -62,6 +62,9 @@ describe("ErrorBoundary", () => {
         "Something went wrong on our side. Reload the page to try again.",
       ),
     ).toBeInTheDocument();
+    expect(container.textContent).not.toContain("componentStack");
+    expect(container.textContent).not.toContain("Thrower");
+    expect(container.textContent).not.toContain("Boom! render crash");
   });
 
   it("with isDev=false, the Reload the page button calls window.location.reload", () => {
