@@ -26,9 +26,9 @@ export interface ChatTopBarProps {
  * still owns the route `<h1>` (C-03), but at a workspace scale, with a quiet
  * meta line and the one control a chat page cannot do without: history access.
  *
- * Mobile keeps it as a plain flow row so it never eats viewport height; from
- * `md` it becomes a frosted glass pill that stays pinned under the app shell
- * header, so a long itinerary never costs you the title or the controls.
+ * The chat page is a fixed-height app shell whose only scrolling region is
+ * the message list, so this bar is a plain full-width header row — nothing
+ * here needs to stick, because nothing behind it scrolls.
  *
  * It deliberately carries no "New chat" button: the sidebar's primary action
  * is always reachable (a drawer on mobile, a persistent panel on desktop),
@@ -46,9 +46,7 @@ export default function ChatTopBar({
   return (
     <header
       className={[
-        "z-20 mb-md flex flex-wrap items-center gap-sm py-xs",
-        "md:sticky md:top-16 md:mb-lg md:rounded-2xl md:border md:border-line/60",
-        "md:bg-canvas/90 md:px-md md:py-xs md:backdrop-blur-md",
+        "flex flex-wrap items-center gap-sm border-b border-line/60 px-md py-sm",
       ].join(" ")}
     >
       {/* QUAL-04: the drawer trigger lives here on small screens only; the

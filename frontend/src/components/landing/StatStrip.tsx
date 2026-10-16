@@ -1,7 +1,7 @@
 export default function StatStrip() {
   const stats = [
     {
-      value: "5 – 15 min",
+      value: "15 – 20 min",
       label: "Average planning time",
       detail: "Deep multi-agent search and synthesis takes time.",
       tag: "SYNCHRONOUS RESEARCH",

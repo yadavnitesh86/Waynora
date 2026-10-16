@@ -8,6 +8,7 @@ dependencies = [
     "aiosqlite>=0.22.1",
     "ddgs>=9.16.0",
     "deepagents>=0.7.14",
+    "deepeval==4.3.0",
     "duckduckgo-search>=8.1.1",
     "flights[mcp]>=0.9.0",
     "langchain>=1.4.0",

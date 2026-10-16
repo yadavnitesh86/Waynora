@@ -45,7 +45,7 @@ describe("Landing Route (LAND-01..LAND-06)", () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByText("5 – 15 min")).toBeInTheDocument();
+    expect(screen.getByText("15 –    20 min")).toBeInTheDocument();
     expect(screen.getByText("Average planning time")).toBeInTheDocument();
     expect(
       screen.getByText("No fake progress or hallucinated plans"),

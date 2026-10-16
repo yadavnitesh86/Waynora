@@ -162,7 +162,7 @@ describe("Chat route (first submit slice)", () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Describe your trip in your own words. A real agent builds the plan, usually in 5 to 15 minutes. Your chat stays in this browser.",
+        "Describe your trip in your own words. A real agent builds the plan, usually in 15 to 20 minutes. Your chat stays in this browser.",
       ),
     ).toBeInTheDocument();
     // C-18: no second CTA. The composer below is the only action.
@@ -360,8 +360,11 @@ describe("Chat route (answers, failures, and retry)", () => {
         screen.queryByText("Something went wrong on our side."),
       ).not.toBeInTheDocument();
     });
-    // ...and the identical message shows the in-flight footer instead.
-    expect(inTranscript().getByText("Waiting for your plan")).toBeInTheDocument();
+    // ...and the identical message shows its waiting state — the elapsed
+    // timer and stop control that now live inside the request's own bubble.
+    expect(
+      inTranscript().getByText("Plans usually take 15 to 20 minutes."),
+    ).toBeInTheDocument();
     expect(inTranscript().getByText("A trip to Paris")).toBeInTheDocument();
   });
 

@@ -13,7 +13,7 @@ describe("WaitingShell", () => {
   it("renders the C-11 Elapsed label and C-13 expectation", () => {
     render(<WaitingShell elapsedMs={0} onStop={() => {}} />);
     expect(screen.getByText("Elapsed")).toBeInTheDocument();
-    expect(screen.getByText("Plans usually take 5 to 15 minutes.")).toBeInTheDocument();
+    expect(screen.getByText("Plans usually take 15 to 20 minutes.")).toBeInTheDocument();
   });
 
   it("renders the C-14 Stop waiting button", () => {
@@ -103,7 +103,7 @@ describe("WaitingShell x 2048 waiting lounge (GAME-01, GAME-06)", () => {
     ).toBeNull();
     // The timing copy stays put in both phases.
     expect(
-      screen.getByText("Plans usually take 5 to 15 minutes."),
+      screen.getByText("Plans usually take 15 to 20 minutes."),
     ).toBeInTheDocument();
   });
 

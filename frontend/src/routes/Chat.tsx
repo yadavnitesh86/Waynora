@@ -7,7 +7,7 @@ import ChatTopBar, {
   buildChatMeta,
 } from "../components/chat/ChatTopBar";
 import StorageNotice from "../components/chat/StorageNotice";
-import { WaitingTimer, WaitingLounge } from "../components/chat/WaitingShell";
+import { WaitingLounge } from "../components/chat/WaitingShell";
 import { useAskController } from "../hooks/useAskController";
 import { useConversations } from "../hooks/useConversations";
 import { useElapsedClock } from "../hooks/useElapsedClock";
@@ -352,98 +352,73 @@ export default function Chat() {
   }, [status, activeConversation, syncConversation]);
 
   return (
-    <div className="w-full px-sm sm:px-md md:px-lg py-sm md:py-md">
-      {/* One container, matched to the app shell's header and footer: the
-          transcript's left edge lines up with the wordmark above and the
-          footer below, instead of sitting a second padding-step inside. */}
-      <div className="mx-auto w-full max-w-container-xl md:grid md:grid-cols-[auto_1fr] md:items-start md:gap-xl">
-          {/* The main column comes first in DOM order so the route h1 leads
-              the heading outline; CSS order puts the sidebar on its left
-              from `md` up. */}
-          <div className="min-w-0 md:order-2 w-full">
-            <ChatTopBar
-              title={activeConversation?.title ?? "New chat"}
-              meta={buildChatMeta(
-                activeConversation?.messages.length ?? 0,
-                activeConversation?.updatedAt,
-              )}
-              sidebarOpen={sidebarOpen}
-              onOpenSidebar={() => setSidebarOpen(true)}
-              hamburgerRef={hamburgerRef}
-            />
+    // App shell: full width, fills the space below the header, and does not
+    // scroll — only the message list scrolls internally. No max-width, no
+    // centering, no side padding: the sidebar touches the left edge.
+    <div className="flex h-full min-h-0 w-full">
+      {/* Sidebar: far-left, full-height, fixed 260px. Collapsible — when hidden
+          it leaves the row and chat takes the full width. */}
+      <ChatSidebar
+        conversations={conversations}
+        activeId={activeId}
+        isOpen={sidebarOpen}
+        onClose={closeSidebar}
+        onCreateConversation={handleCreateConversation}
+        onSelectConversation={handleSelectConversation}
+        onRenameConversation={renameConversation}
+        onDeleteConversation={handleDeleteConversation}
+      />
 
-            {/* Main workspace: two columns while waiting (chat on the left,
-                the companion lounge on the right, split only from `xl`). */}
-            <div
-              className={
-                isWaiting
-                  ? "grid w-full gap-lg xl:grid-cols-[1fr_320px] xl:items-start"
-                  : "w-full max-w-3xl"
-              }
-            >
-              <div className="flex min-h-0 min-w-0 flex-col">
-                {hasMessages ? (
-                  <div className="flex-1 pb-lg">
-                    <ChatThread
-                      messages={activeConversation.messages}
-                      activeMessageId={activeMessageId}
-                      onRetry={handleRetry}
-                    />
-                  </div>
-                ) : (
-                  <div className="flex-1 pb-lg">
-                    <ChatEmptyState onPickPrompt={handlePickPrompt} />
-                  </div>
-                )}
+      {/* Waiting lounge: a narrow rail directly right of the sidebar, mounted
+          only while a request is actively waiting (GAME-01). Hidden below md. */}
+      {isWaiting ? (
+        <WaitingLounge className="hidden md:flex md:w-80 md:shrink-0" />
+      ) : null}
 
-                {showStorageNotice ? <StorageNotice /> : null}
+      {/* Chat area: all remaining width. Only the message column is centered
+          (max-w-760px); the shell itself is full-width so nothing floats. */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        <ChatTopBar
+          title={activeConversation?.title ?? "New chat"}
+          meta={buildChatMeta(
+            activeConversation?.messages.length ?? 0,
+            activeConversation?.updatedAt,
+          )}
+          sidebarOpen={sidebarOpen}
+          onOpenSidebar={() => setSidebarOpen(true)}
+          hamburgerRef={hamburgerRef}
+        />
 
-                {/* D-33: page-level scroll with a sticky compact interaction
-                    dock. The gradient scrim above it is what makes content
-                    pass under the dock gracefully instead of colliding with a
-                    hard edge; the bottom padding reserves the iOS home-indicator
-                    inset. */}
-                <div className="sticky bottom-0 z-20 border-t border-line/60 bg-canvas/95 pb-[calc(16px+env(safe-area-inset-bottom))] pt-sm backdrop-blur-md">
-                  <div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-x-0 -top-10 h-10 bg-gradient-to-b from-canvas/0 via-canvas/70 to-canvas/95"
-                  />
-                  <div className="relative">
-                    <ChatComposer
-                      onSubmit={handleSubmit}
-                      busy={busy}
-                      draft={draft}
-                      onDraftChange={setDraft}
-                      focusToken={focusToken}
-                    />
-                    {busy ? (
-                      <div className="mt-xs">
-                        <WaitingTimer elapsedMs={elapsed} onStop={stop} />
-                      </div>
-                    ) : null}
-                  </div>
-                </div>
-              </div>
-
-              {/* Right column: companion lounge in its own space, pinned from
-                  `xl` so it never scrolls away mid-wait. */}
-              {isWaiting ? (
-                <WaitingLounge className="self-start xl:sticky xl:top-[88px]" />
-              ) : null}
-            </div>
+        {/* The only scrolling region: the message list. */}
+        <div className="flex min-h-0 flex-1 justify-center overflow-y-auto">
+          <div className="w-full max-w-[760px] px-md sm:px-lg pb-lg">
+            {hasMessages ? (
+              <ChatThread
+                messages={activeConversation.messages}
+                activeMessageId={activeMessageId}
+                onRetry={handleRetry}
+                elapsedMs={elapsed}
+                onStop={stop}
+              />
+            ) : (
+              <ChatEmptyState onPickPrompt={handlePickPrompt} />
+            )}
           </div>
+        </div>
 
-          <ChatSidebar
-            conversations={conversations}
-            activeId={activeId}
-            isOpen={sidebarOpen}
-            onClose={closeSidebar}
-            onCreateConversation={handleCreateConversation}
-            onSelectConversation={handleSelectConversation}
-            onRenameConversation={renameConversation}
-            onDeleteConversation={handleDeleteConversation}
+        {/* Composer pinned to the bottom of the chat area, aligned with the
+            message column. Safe-area padding for iOS. */}
+        <div className="mx-auto w-full max-w-[760px] px-md sm:px-lg pb-[calc(16px+env(safe-area-inset-bottom))] pt-sm">
+          {showStorageNotice ? <StorageNotice /> : null}
+          <ChatComposer
+            onSubmit={handleSubmit}
+            busy={busy}
+            draft={draft}
+            onDraftChange={setDraft}
+            focusToken={focusToken}
           />
         </div>
+      </div>
     </div>
   );
 }

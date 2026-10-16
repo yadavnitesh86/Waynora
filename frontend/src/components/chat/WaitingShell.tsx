@@ -29,17 +29,24 @@ export interface WaitingShellProps {
 export function WaitingTimer({
   elapsedMs,
   onStop,
+  compact = false,
 }: {
   elapsedMs: number;
   onStop: () => void;
+  /**
+   * Compact renders the same content without its card chrome, for use
+   * inside the user message bubble where a bordered strip on top of an
+   * already-bordered bubble would read as a box inside a box.
+   */
+  compact?: boolean;
 }) {
   const band = selectBand(elapsedMs);
   const variant = selectVariant(elapsedMs);
   const copy = BAND_COPY[band][variant];
   const readout = formatElapsed(elapsedMs);
 
-  return (
-    <div className="rounded-xl border border-line bg-surface/95 px-md py-sm shadow-sm">
+  const content = (
+    <>
       <h3 className="sr-only">Waynora is planning your trip</h3>
 
       <div className="flex flex-col gap-xs sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-md">
@@ -62,7 +69,7 @@ export function WaitingTimer({
           />
 
           <span className="text-caption text-ink-muted">
-            Plans usually take 5 to 15 minutes.
+            Plans usually take 15 to 20 minutes.
           </span>
         </div>
 
@@ -86,6 +93,16 @@ export function WaitingTimer({
           </Button>
         </div>
       </div>
+    </>
+  );
+
+  if (compact) {
+    return <div className="w-full">{content}</div>;
+  }
+
+  return (
+    <div className="rounded-xl border border-line bg-surface/95 px-md py-sm shadow-sm">
+      {content}
     </div>
   );
 }
@@ -99,7 +116,7 @@ export function WaitingTimer({
 export function WaitingLounge({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`rounded-2xl border border-line bg-surface/95 p-md shadow-sm ${className}`}
+      className={`flex flex-col border-r border-line/70 bg-surface/50 p-md ${className}`}
     >
       <h4 className="font-display text-small font-semibold tracking-tight text-ink">
         Waiting lounge

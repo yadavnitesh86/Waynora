@@ -130,36 +130,61 @@ afterEach(() => {
 });
 
 describe("Chat responsive layout contracts (QUAL-04)", () => {
-  it("lays out a centered container that splits sidebar and chat from md up", async () => {
+  it("lays out a full-width, no-scroll shell with a centered message column", async () => {
     const { container } = render(<Chat />);
     await screen.findByText("Japan itinerary please");
 
-    // Centered page container at every width.
-    expect(container.querySelector('[class*="max-w-container-xl"]')).toBeTruthy();
+    // No centered container anywhere: the shell is full width, so nothing
+    // floats away from the screen edges.
+    expect(
+      container.querySelector('[class*="max-w-container-xl"]'),
+    ).toBeNull();
 
-    // The md+ split: [auto sidebar | 1fr chat], main column ordered second
-    // in DOM so the route h1 leads the heading outline.
-    const split = container.querySelector('[class*="md:grid-cols"]');
-    expect(split?.className).toContain("md:grid");
-    expect(split?.className).toContain("md:grid-cols-[auto_1fr]");
-    expect(split?.className).toContain("md:items-start");
-    expect(split?.className).toContain("md:gap-xl");
-    const mainColumn = container.querySelector('[class*="md:order-2"]');
-    expect(mainColumn).not.toBeNull();
+    // The shell is a full-width flex row that fills the available height.
+    const shell = container.firstElementChild as HTMLElement;
+    expect(shell.className).toContain("flex");
+    expect(shell.className).toContain("h-full");
+    expect(shell.className).toContain("w-full");
+
+    // The sidebar is the first column, fixed 260px, touching the far left.
+    const sidebar = within(container).getByRole("navigation", {
+      name: "Chat history",
+    });
+    expect(sidebar.className).toContain("md:w-[260px]");
+    expect(sidebar.className).toContain("md:shrink-0");
+
+    // The message column is centered inside the chat area — the only thing
+    // that is centered, never the whole app. Scoped to the element that is
+    // BOTH the scroll region and the centering flex, so it cannot match the
+    // sidebar's own scrollable list.
+    const scroll = container.querySelector(
+      '[class*="overflow-y-auto"][class*="justify-center"]',
+    );
+    expect(scroll?.className).toContain("flex-1");
+    expect(
+      scroll?.querySelector('[class*="max-w-[760px]"]'),
+    ).toBeTruthy();
   });
 
-  it("keeps the composer sticky to the bottom of the chat column", async () => {
+  it("pins the composer at the bottom of the chat area without a sticky dock", async () => {
     render(<Chat />);
     await screen.findByText("Japan itinerary please");
 
-    const sticky = document.querySelector(".sticky.bottom-0");
-    expect(sticky).not.toBeNull();
-    expect(sticky?.className).toContain("bottom-0");
-    // Opaque canvas background so thread content never shows through.
-    expect(sticky?.className).toContain("bg-canvas");
+    // The old sticky dock is gone; the composer is a plain flex child.
+    expect(document.querySelector(".sticky.bottom-0")).toBeNull();
+
+    // The message list is the only scrolling region. Scoped to the element
+    // that is both the scroll region and the chat-area centering flex, so it
+    // cannot match the sidebar's own scrollable list.
+    const scroll = document.querySelector(
+      '[class*="overflow-y-auto"][class*="justify-center"]',
+    );
+    expect(scroll?.className).toContain("flex-1");
+
+    // The composer sits outside the scroll region, pinned below it.
     expect(
-      sticky?.contains(screen.getByLabelText("Your trip request")),
-    ).toBe(true);
+      scroll?.contains(screen.getByLabelText("Your trip request")),
+    ).toBe(false);
   });
 
   it("shows the drawer trigger on mobile only and the collapse toggle on desktop only", async () => {
@@ -228,14 +253,14 @@ describe("Chat responsive layout contracts (QUAL-04)", () => {
     expect(
       await screen.findByText("Paris itinerary please"),
     ).toBeInTheDocument();
-    // The persistent md+ panel stays put, as a pinned (non-overlay) column.
+    // The persistent md+ panel stays put, as a stretched (non-overlay) column.
     expect(sidebarNav()).toHaveClass("visible", "translate-x-0");
-    expect(sidebarNav()).toHaveClass("md:sticky", "md:shrink-0");
+    expect(sidebarNav()).toHaveClass("md:static", "md:shrink-0");
   });
 });
 
 describe("Chat waiting lounge responsiveness (QUAL-04, GAME-01)", () => {
-  it("puts the game side-by-side from lg and stacked below it", async () => {
+  it("places the game in a left rail beside the chat, never in the chat column", async () => {
     const { container } = render(<Chat />);
     await screen.findByText("Japan itinerary please");
 
@@ -244,25 +269,28 @@ describe("Chat waiting lounge responsiveness (QUAL-04, GAME-01)", () => {
       name: "2048 game board",
     });
 
-    // The lounge card lives inside the shell's two-column grid.
+    // The lounge is a direct child of the full-width shell: a fixed-width
+    // rail between the sidebar and the chat, never a column stealing chat
+    // width from inside the chat area.
     const lounge = screen.getByRole("heading", {
       level: 4,
       name: "Waiting lounge",
     });
-    const grid = lounge.closest("div")?.parentElement;
-    expect(grid?.className).toContain("grid");
-    expect(grid?.className).toContain("gap-lg");
-    expect(grid?.className).toContain("xl:grid-cols-[1fr_320px]");
-    expect(grid?.className).toContain("xl:items-start");
+    const loungeCard = lounge.closest("div") as HTMLElement;
+    expect(loungeCard.className).toContain("md:w-80");
+    expect(loungeCard.className).toContain("md:shrink-0");
+    const shell = loungeCard.parentElement as HTMLElement;
+    expect(shell.className).toContain("flex");
+    expect(shell.className).toContain("w-full");
 
     // The board itself is fluid: it fills its column on small viewports and
     // caps at max-w-md on wide ones — no fixed pixel width anywhere.
     expect(board.className).not.toMatch(/w-\[\d/);
     expect(container.querySelector('[class*="max-w-md"]')).toBeTruthy();
 
-    // Timing copy and stop control remain visible next to the game.
+    // Waiting copy and stop control live in the request's own bubble.
     expect(
-      screen.getByText("Plans usually take 5 to 15 minutes."),
+      screen.getByText("Plans usually take 15 to 20 minutes."),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Stop waiting" }),

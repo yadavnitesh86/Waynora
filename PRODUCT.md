@@ -22,7 +22,7 @@ Deep-research travel intelligence with total transparency: real synchronous agen
 
 - Web application (React 18 + Vite SPA, TypeScript, TailwindCSS + CSS tokens, Convex authentication).
 - Backend: FastAPI application exposing synchronous `POST /ask` with checkpointer-backed `thread_id` conversation continuation.
-- Real execution times range from 5 to 15 minutes per generation flight.
+- Real execution times range from 15 to 20 minutes per generation flight.
 - Single-flight request lifecycle with elapsed-time-driven waiting copy and isolated 2048 game engagement.
 
 ## Capabilities and Constraints

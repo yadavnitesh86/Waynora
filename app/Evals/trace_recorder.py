@@ -19,11 +19,11 @@ async def record_agent_run(User_input:str ) -> dict:
    actual_output = ""
    for message in reversed(messages):
         if isinstance(message, AIMessage) and message.content:
-            actual_output = message.content
+            output = message.content
             break
    record = {
         "input": User_input,
-        "actual_output": actual_output,
+        "output": actual_output,
     }
    path = Path("data/waynora_traces.jsonl")
    path.parent.mkdir(parents=True, exist_ok=True)

@@ -65,7 +65,7 @@ export default function LandingHero() {
 
             <p className="mt-md max-w-prose text-lead leading-[1.65] text-ink-muted">
               Describe where you want to go. Waynora&apos;s specialist agents research and write
-              your complete itinerary — usually in 5 to 15 minutes. No fake progress, no instant hallucinations.
+              your complete itinerary — usually in 15 to 20 minutes. No fake progress, no instant hallucinations.
             </p>
 
             {/* CTAs with Button-in-Button architecture */}

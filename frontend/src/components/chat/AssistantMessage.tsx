@@ -34,7 +34,7 @@ function AssistantMessage({ message }: AssistantMessageProps) {
         </span>
       </div>
 
-      <div className="max-w-[72ch] text-ink">
+      <div className="max-w-[88ch] text-ink">
         <Markdown content={message.content} />
       </div>
     </article>

@@ -93,7 +93,7 @@ export default function ChatEmptyState({
         </h2>
         <p className="mt-sm max-w-prose text-lead leading-[1.6] text-ink-muted">
           Describe your trip in your own words. A real agent builds the plan,
-          usually in 5 to 15 minutes. Your chat stays in this browser.
+          usually in 15 to 20 minutes. Your chat stays in this browser.
         </p>
 
         <div className="mt-xl border-t border-line/60 pt-lg">

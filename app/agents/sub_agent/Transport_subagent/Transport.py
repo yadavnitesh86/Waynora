@@ -43,11 +43,17 @@ RULES
 * get_reference_data/search_calendar/discover_flights → use only when they add real value.
 * No tools outside domain. No itinerary-building or final decisions. Keep result concise.
 
-DATES
+CRITICAL: Transportation Date Formats
 
-* Flights: dd/mm/yyyy. Trains: YYYY-MM-DD. Prefer user dates, else current date.
-* Round trip: returnDate strictly after departureDate; omit for one-way unless required.
-* Validate before calling; fix and retry once, never repeat a failed call unchanged.
+Flights (Kiwi): Use dd/mm/yyyy (e.g., 16/10/2026). Never use YYYY-MM-DD for flight searches.
+
+Trains: Use YYYY-MM-DD, unless the tool specifies otherwise.
+
+Before calling a tool, validate that dates are valid and formatted correctly for that specific tool. Never pass unconverted user dates.
+
+For round trips, returnDate must be strictly later than departureDate. For one-way trips, omit returnDate unless required by the tool.
+
+If a date-format error occurs, correct the arguments and retry once. Never repeat the same failed call unchanged. If it fails again, stop and report the error.
 
 """
 

@@ -128,7 +128,7 @@ describe("Chat lifecycle — LONG-REQUEST", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Elapsed")).toBeInTheDocument();
     expect(
-      screen.getByText("Plans usually take 5 to 15 minutes."),
+      screen.getByText("Plans usually take 15 to 20 minutes."),
     ).toBeInTheDocument();
 
     // Elapsed starts at 0:00

@@ -19,7 +19,7 @@ const FAQS: FaqItem[] = [
   {
     id: "timing",
     category: "HONEST SYNTHESIS",
-    question: "Why does planning take 5 to 15 minutes?",
+    question: "Why does planning take 15 to 20 minutes?",
     answer:
       "Deep autonomous research requires real computation. Our agents calculate multi-city transit legs, verify neighborhood walkability, and consider microclimates across your travel window. We do not display fake loading progress or spit out pre-cached tourist lists.",
   },

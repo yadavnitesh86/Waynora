@@ -41,9 +41,9 @@ function isDesktopViewport(): boolean {
  * Responsive behaviour in one component: below `md` it is a drawer that
  * slides over the thread (scrim, Escape to close, focus moved inside on
  * open) and closes itself after any navigation; at `md` and above it is a
- * persistent panel that pins itself under the app-shell header and scrolls
- * its own list, so history survives an itinerary of any length. Both modes
- * share the same `isOpen` state and the same controls.
+ * persistent panel that stretches from under the app-shell header to the
+ * footer and scrolls its own list, so history survives an itinerary of any
+ * length. Both modes share the same `isOpen` state and the same controls.
  */
 export default function ChatSidebar({
   conversations,
@@ -129,11 +129,12 @@ export default function ChatSidebar({
         className={[
           "fixed inset-y-0 left-0 z-30 flex w-[min(20rem,85vw)] flex-col border-r border-line/80 bg-surface shadow-luxury",
           "transition-transform duration-200 ease-out motion-reduce:transition-none",
-          "md:static md:z-auto md:w-80 md:shrink-0 md:rounded-2xl md:border md:border-line/70 md:my-0",
-          // Literal arbitrary values (Tailwind cannot extract interpolated
-          // ones): 64px shell header + 24px clearance above, minus the same
-          // clearance below, so the panel never outlives the viewport.
-          "md:sticky md:top-[88px] md:h-[calc(100dvh-112px)]",
+          // Full-height panel: a flex item that stretches from under the app
+          // header to the footer, divided from the chat by a hairline. No
+          // rounding, no drop shadow — a sidebar should read as architecture,
+          // not as a card somebody dropped on the page. Fixed 260px; DOM order
+          // (not CSS order) is what places it at the far left.
+          "md:static md:z-auto md:w-[260px] md:shrink-0 md:shadow-none",
           isOpen ? "visible translate-x-0" : "invisible -translate-x-full md:hidden",
         ].join(" ")}
       >

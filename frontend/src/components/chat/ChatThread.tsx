@@ -8,6 +8,10 @@ export interface ChatThreadProps {
   /** The message owned by the active request, or null when idle. */
   activeMessageId: string | null;
   onRetry: (message: Message) => void;
+  /** Elapsed time for the active request; drives the in-bubble waiting UI. */
+  elapsedMs?: number;
+  /** Stop handler for the active request. */
+  onStop?: () => void;
 }
 
 /**
@@ -29,25 +33,34 @@ function ChatThread({
   messages,
   activeMessageId,
   onRetry,
+  elapsedMs,
+  onStop,
 }: ChatThreadProps) {
   return (
     <ol
       aria-label="Conversation"
       className="flex flex-col gap-lg sm:gap-xl"
     >
-      {messages.map((message) => (
-        <li key={message.id} className="min-w-0">
-          {message.role === "user" ? (
-            <UserMessage
-              message={message}
-              isActive={message.id === activeMessageId}
-              onRetry={onRetry}
-            />
-          ) : (
-            <AssistantMessage message={message} />
-          )}
-        </li>
-      ))}
+      {messages.map((message) => {
+        const isActive = message.id === activeMessageId;
+        return (
+          <li key={message.id} className="min-w-0">
+            {message.role === "user" ? (
+              <UserMessage
+                message={message}
+                isActive={isActive}
+                onRetry={onRetry}
+                // The waiting state belongs to the live request's own bubble;
+                // every other turn renders bare.
+                elapsedMs={isActive ? elapsedMs : undefined}
+                onStop={isActive ? onStop : undefined}
+              />
+            ) : (
+              <AssistantMessage message={message} />
+            )}
+          </li>
+        );
+      })}
     </ol>
   );
 }
