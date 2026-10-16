@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button, EmptyState, PageHeader } from "../components/ui";
 import ChatComposer from "../components/chat/ChatComposer";
+import ChatEmptyState from "../components/chat/ChatEmptyState";
 import ChatSidebar from "../components/chat/ChatSidebar";
 import ChatThread from "../components/chat/ChatThread";
+import ChatTopBar, {
+  buildChatMeta,
+} from "../components/chat/ChatTopBar";
 import StorageNotice from "../components/chat/StorageNotice";
 import { WaitingTimer, WaitingLounge } from "../components/chat/WaitingShell";
 import { useAskController } from "../hooks/useAskController";
@@ -64,6 +67,13 @@ export default function Chat() {
     }
     return false;
   });
+  /**
+   * The composer draft lives here so the empty state's starter prompts can
+   * prefill it. `ChatComposer` stays uncontrolled for every other caller.
+   */
+  const [draft, setDraft] = useState("");
+  /** Bumped to pull focus into the composer after a prefill. */
+  const [focusToken, setFocusToken] = useState(0);
 
   // `stop` MUST be destructured from the hook: a bare `stop` identifier
   // resolves to the DOM global `window.stop()`, which aborts nothing
@@ -101,6 +111,10 @@ export default function Chat() {
   }, [activeMessageId]);
 
   const busy = status.kind === "submitting" || status.kind === "waiting";
+  // GAME-01: the companion board exists only while a request is ACTIVELY
+  // waiting — the brief submitting phase shows no lounge, and the terminal
+  // phases unmount it with the shell.
+  const isWaiting = status.kind === "waiting";
   const hasMessages =
     activeConversation !== null && activeConversation.messages.length > 0;
   // The clock is request-scoped (code review CR-02): it runs only while a
@@ -229,6 +243,16 @@ export default function Chat() {
     setActiveMessageId(null);
   }, [createConversation]);
 
+  /**
+   * A starter prompt from the empty state fills the composer and focuses it.
+   * It never submits on the user's behalf: the brief stays editable, so the
+   * words that eventually reach the backend are the ones the user chose.
+   */
+  const handlePickPrompt = useCallback((text: string) => {
+    setDraft(text);
+    setFocusToken((token) => token + 1);
+  }, []);
+
   const handleSelectConversation = useCallback(
     (id: string) => {
       selectConversation(id);
@@ -328,135 +352,98 @@ export default function Chat() {
   }, [status, activeConversation, syncConversation]);
 
   return (
-    <div className="w-full px-sm sm:px-md md:px-lg py-md md:py-xl min-h-[calc(100vh-70px)]">
-      <div className="md:grid md:grid-cols-[auto_1fr] md:items-start md:gap-xl w-full">
-        {/* The main column comes first in DOM order so the route h1 leads
-            the heading outline; CSS order puts the sidebar on its left
-            from `md` up. */}
-        <div className="min-w-0 md:order-2 w-full max-w-container-xl mx-auto px-xs sm:px-sm md:px-md">
-          <div className="flex items-center gap-sm">
-            {/* QUAL-04: the drawer trigger lives in the header on small
-                screens only; the desktop panel has its own collapse toggle. */}
-            <Button
-              ref={hamburgerRef}
-              variant="ghost"
-              size="sm"
-              aria-label="Open chat history"
-              aria-expanded={sidebarOpen}
-              onClick={() => setSidebarOpen(true)}
-              className="md:hidden"
-            >
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 16 16"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M2.75 4h10.5M2.75 8h10.5M2.75 12h10.5"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </Button>
-            {!sidebarOpen && (
-              <Button
-                variant="ghost"
-                size="sm"
-                aria-label="Show chat history"
-                onClick={() => setSidebarOpen(true)}
-                className="hidden md:inline-flex"
-              >
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                  aria-hidden="true"
-                >
-                  <rect
-                    x="2.25"
-                    y="2.25"
-                    width="11.5"
-                    height="11.5"
-                    rx="1.75"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                  <path
-                    d="M6.75 2.25v11.5"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                  />
-                </svg>
-              </Button>
-            )}
-            {/* C-03: the route h1 is the active conversation title — "New
-                chat" until the first user message derives one from it. */}
-            <PageHeader
+    <div className="w-full px-sm sm:px-md md:px-lg py-sm md:py-md">
+      {/* One container, matched to the app shell's header and footer: the
+          transcript's left edge lines up with the wordmark above and the
+          footer below, instead of sitting a second padding-step inside. */}
+      <div className="mx-auto w-full max-w-container-xl md:grid md:grid-cols-[auto_1fr] md:items-start md:gap-xl">
+          {/* The main column comes first in DOM order so the route h1 leads
+              the heading outline; CSS order puts the sidebar on its left
+              from `md` up. */}
+          <div className="min-w-0 md:order-2 w-full">
+            <ChatTopBar
               title={activeConversation?.title ?? "New chat"}
-              className="min-w-0"
-            />
-          </div>
-
-          {/* Main workspace: 2 columns when waiting (Chat on left, stationary Game Lounge on right) */}
-          <div
-            className={
-              busy && status.kind === "waiting"
-                ? "grid gap-lg lg:grid-cols-[1fr_360px] lg:items-start w-full"
-                : "w-full max-w-4xl"
-            }
-          >
-            {/* Left Column: Full Chat Area */}
-            <div className="min-w-0 flex flex-col min-h-[calc(100vh-220px)]">
-              {hasMessages ? (
-                <div className="flex-1 pb-10">
-                  <ChatThread
-                    messages={activeConversation.messages}
-                    activeMessageId={activeMessageId}
-                    onRetry={handleRetry}
-                  />
-                </div>
-              ) : (
-                <div className="mb-lg flex-1">
-                  <EmptyState
-                    title="Where do you want to go?"
-                    body="Describe your trip in your own words. A real agent builds the plan, usually in 5 to 15 minutes. Your chat stays in this browser."
-                  />
-                </div>
+              meta={buildChatMeta(
+                activeConversation?.messages.length ?? 0,
+                activeConversation?.updatedAt,
               )}
+              sidebarOpen={sidebarOpen}
+              onOpenSidebar={() => setSidebarOpen(true)}
+              hamburgerRef={hamburgerRef}
+            />
 
-              {showStorageNotice ? <StorageNotice /> : null}
+            {/* Main workspace: two columns while waiting (chat on the left,
+                the companion lounge on the right, split only from `xl`). */}
+            <div
+              className={
+                isWaiting
+                  ? "grid w-full gap-lg xl:grid-cols-[1fr_320px] xl:items-start"
+                  : "w-full max-w-3xl"
+              }
+            >
+              <div className="flex min-h-0 min-w-0 flex-col">
+                {hasMessages ? (
+                  <div className="flex-1 pb-lg">
+                    <ChatThread
+                      messages={activeConversation.messages}
+                      activeMessageId={activeMessageId}
+                      onRetry={handleRetry}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex-1 pb-lg">
+                    <ChatEmptyState onPickPrompt={handlePickPrompt} />
+                  </div>
+                )}
 
-              {/* D-33: page-level scroll with a sticky compact interaction dock */}
-              <div className="sticky bottom-0 border-t border-line/50 bg-canvas/95 backdrop-blur-md pb-md pt-sm z-20">
-                <ChatComposer onSubmit={handleSubmit} busy={busy} />
-                {busy ? (
-                  <WaitingTimer elapsedMs={elapsed} onStop={stop} />
-                ) : null}
+                {showStorageNotice ? <StorageNotice /> : null}
+
+                {/* D-33: page-level scroll with a sticky compact interaction
+                    dock. The gradient scrim above it is what makes content
+                    pass under the dock gracefully instead of colliding with a
+                    hard edge; the bottom padding reserves the iOS home-indicator
+                    inset. */}
+                <div className="sticky bottom-0 z-20 border-t border-line/60 bg-canvas/95 pb-[calc(16px+env(safe-area-inset-bottom))] pt-sm backdrop-blur-md">
+                  <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-x-0 -top-10 h-10 bg-gradient-to-b from-canvas/0 via-canvas/70 to-canvas/95"
+                  />
+                  <div className="relative">
+                    <ChatComposer
+                      onSubmit={handleSubmit}
+                      busy={busy}
+                      draft={draft}
+                      onDraftChange={setDraft}
+                      focusToken={focusToken}
+                    />
+                    {busy ? (
+                      <div className="mt-xs">
+                        <WaitingTimer elapsedMs={elapsed} onStop={stop} />
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
               </div>
+
+              {/* Right column: companion lounge in its own space, pinned from
+                  `xl` so it never scrolls away mid-wait. */}
+              {isWaiting ? (
+                <WaitingLounge className="self-start xl:sticky xl:top-[88px]" />
+              ) : null}
             </div>
-
-            {/* Right Column: Stationary Game Lounge in dedicated space (does not move with scroll) */}
-            {busy && status.kind === "waiting" ? (
-              <WaitingLounge className="sticky top-6 self-start" />
-            ) : null}
           </div>
-        </div>
 
-        <ChatSidebar
-          conversations={conversations}
-          activeId={activeId}
-          isOpen={sidebarOpen}
-          onClose={closeSidebar}
-          onCreateConversation={handleCreateConversation}
-          onSelectConversation={handleSelectConversation}
-          onRenameConversation={renameConversation}
-          onDeleteConversation={handleDeleteConversation}
-        />
-      </div>
+          <ChatSidebar
+            conversations={conversations}
+            activeId={activeId}
+            isOpen={sidebarOpen}
+            onClose={closeSidebar}
+            onCreateConversation={handleCreateConversation}
+            onSelectConversation={handleSelectConversation}
+            onRenameConversation={renameConversation}
+            onDeleteConversation={handleDeleteConversation}
+          />
+        </div>
     </div>
   );
 }

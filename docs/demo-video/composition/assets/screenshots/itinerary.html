@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1920, height=1080">
+<title>Waynora — Itinerary</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #f5f0e8;
+    color: #1a1512;
+    font-family: 'Inter', system-ui, sans-serif;
+    width: 1920px;
+    height: 1080px;
+    overflow: hidden;
+  }
+
+  .app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 32px;
+    border-bottom: 1px solid #e8e0d0;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .brand-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #2a2520 0%, #1a1512 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .brand-icon svg {
+    width: 16px;
+    height: 16px;
+    color: #f5f0e8;
+  }
+
+  .brand-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1512;
+  }
+
+  .brand-badge {
+    font-size: 10px;
+    font-weight: 500;
+    color: #c9a84c;
+    background: #fdf8e8;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .header-tagline {
+    font-size: 11px;
+    font-weight: 500;
+    color: #a89f8d;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .header-tagline .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #c9a84c;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .header-chat {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1a1512;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .header-chat .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #c9a84c;
+  }
+
+  .header-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #1a1512;
+  }
+
+  .header-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #2a2520 0%, #1a1512 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #f5f0e8;
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  .header-signout {
+    font-size: 13px;
+    color: #a89f8d;
+    cursor: pointer;
+  }
+
+  .app-body {
+    display: flex;
+    height: calc(100vh - 64px);
+  }
+
+  .sidebar {
+    width: 280px;
+    border-right: 1px solid #e8e0d0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .sidebar-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #a89f8d;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .btn-new-chat {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #2a2520 0%, #1a1512 100%);
+    border: none;
+    border-radius: 8px;
+    color: #f5f0e8;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .chat-item {
+    padding: 12px;
+    border-radius: 8px;
+    background: #fdf8e8;
+    border: 1px solid #e8e0d0;
+  }
+
+  .chat-item-title {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1a1512;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .chat-item-time {
+    font-size: 11px;
+    color: #a89f8d;
+  }
+
+  .main-content {
+    flex: 1;
+    padding: 24px;
+    overflow-y: auto;
+    max-width: 720px;
+  }
+
+  .conversation-header {
+    margin-bottom: 24px;
+  }
+
+  .conversation-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: #1a1512;
+    margin-bottom: 4px;
+  }
+
+  .conversation-meta {
+    font-size: 12px;
+    color: #a89f8d;
+  }
+
+  .message-group {
+    margin-bottom: 24px;
+  }
+
+  .message-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #a89f8d;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+
+  .message-bubble {
+    padding: 16px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: #1a1512;
+  }
+
+  .message-user {
+    background: #fdf8e8;
+    border: 1px solid #e8e0d0;
+  }
+
+  .message-assistant {
+    background: #f5f0e8;
+    border: 1px solid #e8e0d0;
+  }
+
+  .itinerary-content {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #1a1512;
+  }
+
+  .itinerary-content h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1512;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+
+  .itinerary-content h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #c9a84c;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 16px;
+    margin-bottom: 8px;
+  }
+
+  .itinerary-content p {
+    margin-bottom: 8px;
+    color: #4a4035;
+  }
+
+  .itinerary-content ul {
+    margin-left: 20px;
+    margin-bottom: 12px;
+  }
+
+  .itinerary-content li {
+    margin-bottom: 4px;
+    color: #4a4035;
+  }
+
+  .itinerary-content .day-header {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1512;
+    margin-top: 16px;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e8e0d0;
+  }
+
+  .itinerary-content .time-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #c9a84c;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 8px;
+    margin-bottom: 4px;
+  }
+
+  .itinerary-content .cost {
+    font-weight: 500;
+    color: #1a1512;
+  }
+
+  .itinerary-content .note {
+    font-size: 13px;
+    color: #a89f8d;
+    font-style: italic;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #e8e0d0;
+  }
+
+  .waiting-lounge {
+    width: 320px;
+    border-left: 1px solid #e8e0d0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .lounge-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1512;
+  }
+
+  .lounge-subtitle {
+    font-size: 12px;
+    color: #a89f8d;
+    margin-top: 4px;
+  }
+
+  .game-board {
+    display: grid;
+    grid-template-columns: repeat(4, 60px);
+    grid-template-rows: repeat(4, 60px);
+    gap: 4px;
+    padding: 8px;
+    background: #fdf8e8;
+    border: 1px solid #e8e0d0;
+    border-radius: 12px;
+  }
+
+  .game-tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    font-size: 20px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .tile-2 { background: #f5f0e8; color: #1a1512; }
+  .tile-4 { background: #fdf8e8; color: #1a1512; }
+  .tile-8 { background: #c9a84c; color: #f5f0e8; }
+  .tile-16 { background: #a68a3a; color: #f5f0e8; }
+  .tile-empty { background: #f5f0e8; }
+
+  .game-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #a89f8d;
+  }
+
+  .game-score {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: #1a1512;
+    text-align: center;
+  }
+
+  .game-tip {
+    font-size: 11px;
+    color: #a89f8d;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+  <div class="app-header">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <span class="brand-name">Waynora</span>
+      <span class="brand-badge">Atelier</span>
+    </div>
+    <div class="header-tagline">
+      <span class="dot"></span>
+      Autonomous Travel Intelligence · Bespoke Atelier
+    </div>
+    <div class="header-actions">
+      <div class="header-chat"><span class="dot"></span> Chat</div>
+      <div class="header-user">
+        <div class="header-avatar">W</div>
+        Explorer
+      </div>
+      <div class="header-signout">Sign out</div>
+    </div>
+  </div>
+  <div class="app-body">
+    <div class="sidebar">
+      <div class="sidebar-label">Your Chats</div>
+      <button class="btn-new-chat">+ New chat</button>
+      <div class="chat-item">
+        <div class="chat-item-title">5-day Jaipur, Rajasthan trip</div>
+        <div class="chat-item-time">1:55 PM</div>
+      </div>
+    </div>
+    <div class="main-content">
+      <div class="conversation-header">
+        <div class="conversation-title">5-day Jaipur, Rajasthan trip</div>
+        <div class="conversation-meta">1 message · updated 1:55 PM</div>
+      </div>
+      <div class="message-group">
+        <div class="message-label">You</div>
+        <div class="message-bubble message-user">Plan a 5-day trip to Jaipur, Rajasthan in December</div>
+      </div>
+      <div class="message-group">
+        <div class="message-label">Waynora</div>
+        <div class="message-bubble message-assistant">
+          <div class="itinerary-content">
+            <h3>5-Day Jaipur Itinerary</h3>
+            <p><strong>December 15–19, 2026 · 2 travelers · Budget: ₹45,000</strong></p>
+
+            <div class="day-header">Day 1 — Arrival & Old City</div>
+            <div class="time-label">Morning</div>
+            <p>Arrive at Jaipur Airport (JAI). Pre-paid taxi to Samode Haveli (30 min, ₹450). Check in and freshen up.</p>
+            <div class="time-label">Afternoon</div>
+            <p>Explore the Pink City on foot: Hawa Mahal, City Palace, Jantar Mantar. Lunch at Lassiwala (₹300/person).</p>
+            <div class="time-label">Evening</div>
+            <p>Sunset at Nahargarh Fort (entry ₹200). Dinner at 1135 AD (₹1,200/person) — reserve ahead.</p>
+
+            <div class="day-header">Day 2 — Amber Fort & Culture</div>
+            <div class="time-label">Morning</div>
+            <p>Amber Fort (entry ₹500/person). Arrive by 8 AM to avoid crowds. Explore Sheesh Mahal and Ganesh Pol.</p>
+            <div class="time-label">Afternoon</div>
+            <p>Jaigarh Fort (entry ₹300). Lunch at The Rajput Room (₹800/person).</p>
+            <div class="time-label">Evening</div>
+            <p>Albert Hall Museum (entry ₹400). Evening bazaar: Johari Bazaar for jewelry and textiles.</p>
+
+            <div class="day-header">Day 3 — Pushkar Day Trip</div>
+            <div class="time-label">Full Day</div>
+            <p>Day trip to Pushkar (11 km, 45 min by taxi). Visit Brahma Temple, Pushkar Lake. Lunch at Sunset Café (₹400/person). Return by 6 PM.</p>
+
+            <div class="day-header">Day 4 — Crafts & Relaxation</div>
+            <div class="time-label">Morning</div>
+            <p>Sanganer block-printing workshop (₹1,500/person, 2 hrs). Visit Anokhi Museum.</p>
+            <div class="time-label">Afternoon</div>
+            <p>Spa afternoon at Samode Haveli (₹2,500/person). Pack for departure.</p>
+
+            <div class="day-header">Day 5 — Departure</div>
+            <div class="time-label">Morning</div>
+            <p>Breakfast at hotel. Last-minute shopping at Bapu Bazaar. Airport transfer by 11 AM.</p>
+
+            <h4>Accommodation</h4>
+            <p><strong>Samode Haveli</strong> — ₹4,500/night · 4.5/5 · Heritage property in Old City · 5 nights total: ₹22,500</p>
+
+            <h4>Transport Summary</h4>
+            <ul>
+              <li>Flights: Delhi → Jaipur round trip: ₹6,400/person (₹12,800 total)</li>
+              <li>Airport transfers: ₹900</li>
+              <li>Pushkar day trip taxi: ₹2,000</li>
+              <li>Local transport: ₹3,000</li>
+            </ul>
+
+            <p class="cost"><strong>Total estimated cost: ₹41,200</strong> (within ₹45,000 budget)</p>
+
+            <p class="note">All prices are estimates based on current research. Please verify before booking. Weather in December: 10–22°C, pleasant.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="waiting-lounge">
+      <div>
+        <div class="lounge-title">Waiting lounge</div>
+        <div class="lounge-subtitle">A game of 2048 to pass the time. Playing never affects your request.</div>
+      </div>
+      <div class="game-board">
+        <div class="game-tile tile-empty"></div>
+        <div class="game-tile tile-2"></div>
+        <div class="game-tile tile-empty"></div>
+        <div class="game-tile tile-empty"></div>
+        <div class="game-tile tile-empty"></div>
+        <div class="game-tile tile-4"></div>
+        <div class="game-tile tile-empty"></div>
+        <div class="game-tile tile-2"></div>
+        <div class="game-tile tile-empty"></div>
+        <div class="game-tile tile-empty"></div>
+        <div class="game-tile tile-8"></div>
+        <div class="game-tile tile-empty"></div>
+        <div class="game-tile tile-empty"></div>
+        <div class="game-tile tile-empty"></div>
+        <div class="game-tile tile-4"></div>
+        <div class="game-tile tile-empty"></div>
+      </div>
+      <div class="game-info">
+        <span>Current score: 16</span>
+        <span>Best: 24</span>
+      </div>
+      <div class="game-tip">Use arrow keys or WASD to move tiles</div>
+    </div>
+  </div>
+</body>
+</html>

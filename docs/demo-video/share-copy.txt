@@ -1,0 +1,1 @@
+Waynora: AI trip planning that actually researches. Three specialist agents, one orchestrator, zero fake progress — just deep multi-agent research and an honest 5–15 minute wait with 2048 to keep you company.

@@ -50,12 +50,16 @@ function WarningGlyph() {
  * displayed string and the persisted data-layer source stay identical. The
  * action is always deliberate: a visible, labelled secondary button; there is
  * no timer, no focus trigger, and no reload hook (QUAL-02, D-27).
+ *
+ * The block is set apart from the prompt it sits inside by a hairline, not by
+ * another filled card — a failure inside a raised bubble should not look like
+ * a separate piece of UI fighting the message for attention.
  */
 export default function RecoveryBlock({ kind, onRetry }: RecoveryBlockProps) {
   const copy = RECOVERY_COPY[kind];
 
   return (
-    <div className="mt-md">
+    <div className="mt-md border-t border-line/60 pt-md">
       <div className="flex items-start gap-2xs">
         <WarningGlyph />
         <ErrorText>{copy.headline}</ErrorText>

@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "historyId": "efb1313c-8a3a-4ab8-b5e6-d29d86282e21",
+  "currentRevision": null,
+  "pendingChanges": false,
+  "files": {
+    "assets/screenshots/game-played.png": {
+      "hash": "765136a3491330cad7df9705fbe682d36236371c310657b2bd088891ef12e36f",
+      "content": "C:\\Users\\yadav_alldafn\\.cache\\hyperframes\\history\\efb1313c-8a3a-4ab8-b5e6-d29d86282e21\\blobs\\76\\765136a3491330cad7df9705fbe682d36236371c310657b2bd088891ef12e36f"
+    },
+    "assets/screenshots/itinerary.html": {
+      "hash": "df14fb2169312b3c7e7aa24481512d04d0985e41f5b58fa0059e0e310b49849a",
+      "content": "C:\\Users\\yadav_alldafn\\.cache\\hyperframes\\history\\efb1313c-8a3a-4ab8-b5e6-d29d86282e21\\blobs\\df\\df14fb2169312b3c7e7aa24481512d04d0985e41f5b58fa0059e0e310b49849a"
+    },
+    "assets/screenshots/itinerary.png": {
+      "hash": "6f1f47167e31080e957f92c55a69fa1507d5b91e912c9bb47db0d3b2ec3718b8",
+      "content": "C:\\Users\\yadav_alldafn\\.cache\\hyperframes\\history\\efb1313c-8a3a-4ab8-b5e6-d29d86282e21\\blobs\\6f\\6f1f47167e31080e957f92c55a69fa1507d5b91e912c9bb47db0d3b2ec3718b8"
+    },
+    "assets/screenshots/signin.png": {
+      "hash": "2c0a31eae508f5c25e42f672119fd95e5b5153438abc547f9f31d92c3dbacf12",
+      "content": "C:\\Users\\yadav_alldafn\\.cache\\hyperframes\\history\\efb1313c-8a3a-4ab8-b5e6-d29d86282e21\\blobs\\2c\\2c0a31eae508f5c25e42f672119fd95e5b5153438abc547f9f31d92c3dbacf12"
+    },
+    "assets/screenshots/waiting.png": {
+      "hash": "ee610992570ea6930c39db6a3c8edcf14e5954f2b6067196ba3d1845f14d244f",
+      "content": "C:\\Users\\yadav_alldafn\\.cache\\hyperframes\\history\\efb1313c-8a3a-4ab8-b5e6-d29d86282e21\\blobs\\ee\\ee610992570ea6930c39db6a3c8edcf14e5954f2b6067196ba3d1845f14d244f"
+    },
+    "assets/sfx/interface/bong_001.ogg": {
+      "hash": "d21d0f0b782445db579d11e2506b24cd1ac9d664ee33aeaf807761aa7b6fd710",
+      "content": "C:\\Users\\yadav_alldafn\\.cache\\hyperframes\\history\\efb1313c-8a3a-4ab8-b5e6-d29d86282e21\\blobs\\d2\\d21d0f0b782445db579d11e2506b24cd1ac9d664ee33aeaf807761aa7b6fd710"
+    },
+    "assets/sfx/interface/click_001.ogg": {
+      "hash": "ccfb7fa0cccdd9faec0eb16033c732b1e308d139d80f799161495d58f7adcdb9",
+      "content": "C:\\Users\\yadav_alldafn\\.cache\\hyperframes\\history\\efb1313c-8a3a-4ab8-b5e6-d29d86282e21\\blobs\\cc\\ccfb7fa0cccdd9faec0eb16033c732b1e308d139d80f799161495d58f7adcdb9"
+    },
+    "assets/sfx/interface/drop_001.ogg": {
+      "hash": "692ee3a6f1821402ca649ff735bee9591dc4846c8098fc7d6a90fd15fa57c1af",
+      "content": "C:\\Users\\yadav_alldafn\\.cache\\hyperframes\\history\\efb1313c-8a3a-4ab8-b5e6-d29d86282e21\\blobs\\69\\692ee3a6f1821402ca649ff735bee9591dc4846c8098fc7d6a90fd15fa57c1af"
+    },
+    "index.html": {
+      "hash": "8d2119f93c49b0a58b44dcc6607530c89bfd11ab69a63722917154463df3f84d",
+      "content": "C:\\Users\\yadav_alldafn\\.cache\\hyperframes\\history\\efb1313c-8a3a-4ab8-b5e6-d29d86282e21\\blobs\\8d\\8d2119f93c49b0a58b44dcc6607530c89bfd11ab69a63722917154463df3f84d"
+    },
+    "assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3": {
+      "hash": "5888d4bd2ba0119b87a94e502ae2cc401c08192945cc5e5c2f8e8a33aa47a0a1",
+      "content": "C:\\Users\\yadav_alldafn\\.cache\\hyperframes\\history\\efb1313c-8a3a-4ab8-b5e6-d29d86282e21\\blobs\\58\\5888d4bd2ba0119b87a94e502ae2cc401c08192945cc5e5c2f8e8a33aa47a0a1"
+    },
+    "assets/screenshots/landing.png": {
+      "hash": "d84eb3d7b5450f8e5dbfae6375080f8f967a9b2b50f6ca622087a84b7075482d",
+      "content": "C:\\Users\\yadav_alldafn\\.cache\\hyperframes\\history\\efb1313c-8a3a-4ab8-b5e6-d29d86282e21\\blobs\\d8\\d84eb3d7b5450f8e5dbfae6375080f8f967a9b2b50f6ca622087a84b7075482d"
+    }
+  },
+  "revisions": {},
+  "checks": {
+    "latest": null,
+    "revisions": {},
+    "unversioned": []
+  },
+  "snapshots": {
+    "latest": null,
+    "revisions": {},
+    "unversioned": []
+  },
+  "renders": {
+    "latest": {
+      "id": "967963aa-dea1-42e2-9579-53515fbc3feb",
+      "completedAt": 1792073297905,
+      "output": "C:\\Users\\yadav_alldafn\\OneDrive\\New folder\\Documents\\01_projects\\Gen ai project\\Working\\Waynora\\docs\\demo-video\\brag.mp4",
+      "status": "completed",
+      "revision": null
+    },
+    "retainedRevisions": []
+  },
+  "pendingArtifactCleanup": []
+}

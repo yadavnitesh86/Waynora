@@ -41,8 +41,9 @@ function isDesktopViewport(): boolean {
  * Responsive behaviour in one component: below `md` it is a drawer that
  * slides over the thread (scrim, Escape to close, focus moved inside on
  * open) and closes itself after any navigation; at `md` and above it is a
- * persistent panel with a collapse toggle. Both modes share the same
- * `isOpen` state and the same controls.
+ * persistent panel that pins itself under the app-shell header and scrolls
+ * its own list, so history survives an itinerary of any length. Both modes
+ * share the same `isOpen` state and the same controls.
  */
 export default function ChatSidebar({
   conversations,
@@ -126,18 +127,22 @@ export default function ChatSidebar({
         tabIndex={-1}
         aria-label="Chat history"
         className={[
-          "fixed inset-y-0 left-0 z-30 flex w-80 flex-col border-r border-line/80 bg-surface/95 backdrop-blur-md shadow-luxury",
+          "fixed inset-y-0 left-0 z-30 flex w-[min(20rem,85vw)] flex-col border-r border-line/80 bg-surface shadow-luxury",
           "transition-transform duration-200 ease-out motion-reduce:transition-none",
-          "md:static md:z-auto md:shrink-0 md:rounded-2xl md:border md:my-0 md:min-h-[calc(100vh-140px)]",
-          isOpen
-            ? "visible translate-x-0"
-            : "invisible -translate-x-full md:hidden",
+          "md:static md:z-auto md:w-80 md:shrink-0 md:rounded-2xl md:border md:border-line/70 md:my-0",
+          // Literal arbitrary values (Tailwind cannot extract interpolated
+          // ones): 64px shell header + 24px clearance above, minus the same
+          // clearance below, so the panel never outlives the viewport.
+          "md:sticky md:top-[88px] md:h-[calc(100dvh-112px)]",
+          isOpen ? "visible translate-x-0" : "invisible -translate-x-full md:hidden",
         ].join(" ")}
       >
         <div className="flex items-center justify-between gap-sm border-b border-line/70 px-md py-sm">
-          <div className="flex items-center gap-2">
-            <span className="text-gold text-[10px]">✦</span>
-            <p className="text-[11px] font-mono font-bold uppercase tracking-[0.16em] text-accent">
+          <div className="flex items-center gap-xs">
+            <span className="text-gold" aria-hidden="true">
+              ✦
+            </span>
+            <p className="font-mono text-overline font-semibold uppercase tracking-[0.14em] text-ink-muted">
               Your chats
             </p>
           </div>
@@ -198,15 +203,18 @@ export default function ChatSidebar({
           </div>
         </div>
 
-        <div className="px-md py-md border-b border-line/40">
+        <div className="border-b border-line/50 px-md py-md">
           <Button
             variant="primary"
             size="md"
             aria-label="New chat"
-            className="w-full rounded-full border border-gold/40 shadow-sm hover:shadow-luxury hover:-translate-y-0.5 transition-all group"
+            className="group w-full rounded-full border border-gold/40 shadow-sm transition-all duration-200 ease-out hover:-translate-y-px hover:shadow-md"
             onClick={handleCreate}
           >
-            <span aria-hidden="true" className="flex h-5 w-5 items-center justify-center rounded-full bg-accent-ink/20 text-[11px] transition-transform duration-200 group-hover:scale-110">
+            <span
+              aria-hidden="true"
+              className="flex h-5 w-5 items-center justify-center rounded-full bg-accent-ink/15 text-caption font-bold transition-transform duration-200 ease-out group-hover:rotate-90"
+            >
               +
             </span>
             <span>New chat</span>
@@ -214,8 +222,11 @@ export default function ChatSidebar({
         </div>
 
         {conversations.length === 0 ? (
-          <div className="flex flex-col items-center justify-center px-lg py-2xl text-center">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-gold/30 bg-accent-soft text-accent mb-md shadow-2xs">
+          <div className="flex flex-1 flex-col items-center justify-center px-lg py-2xl text-center">
+            <div
+              aria-hidden="true"
+              className="mb-md flex h-14 w-14 items-center justify-center rounded-2xl border border-line bg-surface-raised text-accent shadow-sm"
+            >
               <svg
                 width="24"
                 height="24"
@@ -225,21 +236,22 @@ export default function ChatSidebar({
                 strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                aria-hidden="true"
               >
                 <circle cx="12" cy="12" r="10" />
                 <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" />
               </svg>
             </div>
-            <p className="font-display text-small font-semibold text-ink">No chats yet</p>
-            <p className="mt-xs text-caption leading-relaxed text-ink-muted">
+            <p className="font-display text-small font-semibold text-ink">
+              No chats yet
+            </p>
+            <p className="mt-xs max-w-[28ch] text-caption leading-relaxed text-ink-muted">
               Start a new chat and your trip conversations will appear here.
             </p>
           </div>
         ) : (
           <ul
             aria-label="Saved chats"
-            className="flex-1 overflow-y-auto p-xs pb-lg space-y-1"
+            className="flex-1 space-y-3xs overflow-y-auto p-xs pb-lg"
           >
             {conversations.map((conversation) => (
               <ConversationItem

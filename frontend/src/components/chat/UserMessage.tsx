@@ -31,8 +31,12 @@ function resolveRecoveryKind(error: string | undefined): RecoveryKind {
 }
 
 /**
- * User turn (CHAT-07, D-30): a real `You` caption plus a double-bezel letterpress card.
+ * User turn (CHAT-07, D-30): a real `You` caption plus a single raised card.
+ *
  * Elevation marks whose words these are, and the assistant turn stays flat.
+ * The card is capped at a readable measure and squinted toward its caption,
+ * so the turn reads as one authored block rather than a boxed form field.
+ *
  * Three states on the same card:
  *
  * - default: the prompt alone
@@ -50,25 +54,34 @@ function UserMessage({ message, isActive, onRetry }: UserMessageProps) {
     !showRecovery && !showReloadRecovery && inFlight;
 
   return (
-    <div className="my-sm">
-      <div className="mb-1.5 flex items-center gap-1.5 text-caption font-mono text-ink-muted font-semibold tracking-wider">
-        <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+    <article className="flex flex-col items-start">
+      <div className="mb-xs flex items-center gap-2xs font-mono text-overline font-semibold uppercase tracking-[0.14em] text-ink-muted">
+        <span
+          aria-hidden="true"
+          className="h-1.5 w-1.5 rounded-full bg-accent"
+        />
         <span>You</span>
       </div>
-      <div className="max-w-[56ch] rounded-2xl rounded-tl-xs border border-line/80 bg-surface-raised px-lg py-md sm:px-xl sm:py-lg shadow-sm transition-all">
-        <p className="text-body leading-[1.68] text-ink font-normal">{message.content}</p>
+
+      <div className="max-w-[58ch] rounded-2xl rounded-tl-md border border-line/80 bg-surface-raised px-lg py-md shadow-sm transition-colors sm:px-xl sm:py-lg">
+        <p className="whitespace-pre-wrap text-body leading-[1.68] text-ink">
+          {message.content}
+        </p>
+
         {showInFlightFooter ? (
-          <div className="mt-md flex items-center gap-2 rounded-lg bg-accent-soft/70 px-sm py-1.5 text-caption text-accent font-medium border border-accent/20">
+          <div className="mt-md flex items-center gap-xs rounded-lg border border-accent/20 bg-accent-soft/70 px-sm py-xs text-caption font-medium text-accent">
             <Spinner size="sm" />
             <span>{IN_FLIGHT_CAPTION}</span>
           </div>
         ) : null}
+
         {showRecovery ? (
           <RecoveryBlock
             kind={resolveRecoveryKind(error)}
             onRetry={() => onRetry(message)}
           />
         ) : null}
+
         {showReloadRecovery ? (
           <RecoveryBlock
             kind="reload-recovery"
@@ -76,7 +89,7 @@ function UserMessage({ message, isActive, onRetry }: UserMessageProps) {
           />
         ) : null}
       </div>
-    </div>
+    </article>
   );
 }
 

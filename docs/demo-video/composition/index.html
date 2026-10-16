@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Waynora — Launch Video</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      body {
+        background: #0f0d0b;
+        overflow: hidden;
+      }
+
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      .clip {
+        position: absolute;
+        inset: 0;
+        overflow: hidden;
+      }
+
+      .screenshot-bg {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+      }
+
+      /* Scene 1: Landing (0-4s) */
+      #scene-landing .screenshot-bg {
+        background-image: url('assets/screenshots/landing.png');
+      }
+
+      /* Scene 2: Sign In (4-7s) */
+      #scene-signin .screenshot-bg {
+        background-image: url('assets/screenshots/signin.png');
+      }
+
+      /* Scene 3: Chat + Waiting (7-13s) */
+      #scene-chat .screenshot-bg {
+        background-image: url('assets/screenshots/waiting.png');
+      }
+
+      /* Scene 4: Itinerary (13-18s) */
+      #scene-itinerary .screenshot-bg {
+        background-image: url('assets/screenshots/itinerary.png');
+      }
+
+      /* Scene 5: Logo Outro (18-20s) */
+      #scene-outro .screenshot-bg {
+        background-image: url('assets/screenshots/landing.png');
+        filter: brightness(0.3) blur(8px);
+      }
+
+      .outro-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+      }
+
+      .outro-logo {
+        font-family: 'Playfair Display', 'Georgia', serif;
+        font-size: 96px;
+        font-weight: 600;
+        color: #f5f0e8;
+        letter-spacing: -0.02em;
+        text-shadow: 0 4px 40px rgba(0, 0, 0, 0.5);
+      }
+
+      .outro-divider {
+        width: 80px;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, #c9a84c, transparent);
+      }
+
+      .outro-tagline {
+        font-family: 'Inter', system-ui, sans-serif;
+        font-size: 16px;
+        font-weight: 300;
+        color: #f5f0e8;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-width="1920"
+      data-height="1080"
+      data-duration="20"
+    >
+      <!-- Scene 1: Landing Page (0-4s) -->
+      <section id="scene-landing" class="clip" data-start="0" data-duration="4">
+        <div class="screenshot-bg" id="landing-bg"></div>
+      </section>
+
+      <!-- Scene 2: Sign In (4-7s) -->
+      <section id="scene-signin" class="clip" data-start="4" data-duration="3">
+        <div class="screenshot-bg" id="signin-bg"></div>
+      </section>
+
+      <!-- Scene 3: Chat + Waiting (7-13s) -->
+      <section id="scene-chat" class="clip" data-start="7" data-duration="6">
+        <div class="screenshot-bg" id="chat-bg"></div>
+      </section>
+
+      <!-- Scene 4: Itinerary Result (13-18s) -->
+      <section id="scene-itinerary" class="clip" data-start="13" data-duration="5">
+        <div class="screenshot-bg" id="itinerary-bg"></div>
+      </section>
+
+      <!-- Scene 5: Logo Outro (18-20s) -->
+      <section id="scene-outro" class="clip" data-start="18" data-duration="2">
+        <div class="screenshot-bg" id="outro-bg"></div>
+        <div class="outro-overlay">
+          <div class="outro-logo" id="outro-logo">Waynora</div>
+          <div class="outro-divider"></div>
+          <div class="outro-tagline" id="outro-tagline">Deep-research travel intelligence with total transparency</div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Audio -->
+    <audio id="bg-music" data-start="0" data-duration="20" data-track-index="10" data-volume="0.35" src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3"></audio>
+    <audio id="sfx-transition1" data-start="4" data-duration="0.3" data-track-index="11" data-volume="0.4" src="assets/sfx/interface/drop_001.ogg"></audio>
+    <audio id="sfx-transition2" data-start="7" data-duration="0.3" data-track-index="12" data-volume="0.4" src="assets/sfx/interface/drop_001.ogg"></audio>
+    <audio id="sfx-reveal" data-start="13" data-duration="0.12" data-track-index="13" data-volume="0.5" src="assets/sfx/interface/bong_001.ogg"></audio>
+    <audio id="sfx-logo" data-start="18" data-duration="0.11" data-track-index="14" data-volume="0.4" src="assets/sfx/interface/drop_001.ogg"></audio>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      // Scene 1: Landing (0-4s) — slow zoom in
+      tl.fromTo('#landing-bg', { scale: 1.05 }, { scale: 1.12, duration: 4, ease: 'none' }, 0);
+
+      // Scene 2: Sign In (4-7s) — crossfade handled by clip timing, subtle zoom
+      tl.fromTo('#signin-bg', { scale: 1.08 }, { scale: 1.03, duration: 3, ease: 'none' }, 4);
+
+      // Scene 3: Chat + Waiting (7-13s) — slow pan
+      tl.fromTo('#chat-bg', { scale: 1.12, x: -20 }, { scale: 1.08, x: 0, duration: 6, ease: 'none' }, 7);
+
+      // Scene 4: Itinerary (13-18s) — reveal zoom
+      tl.fromTo('#itinerary-bg', { scale: 1.15 }, { scale: 1.0, duration: 5, ease: 'power2.out' }, 13);
+
+      // Scene 5: Logo Outro (18-20s) — logo fade in
+      tl.fromTo('#outro-logo', { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: 'power3.out' }, 18.2);
+      tl.fromTo('#outro-tagline', { y: 15, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'power2.out' }, 18.7);
+
+      window.__timelines['main'] = tl;
+    </script>
+  </body>
+</html>

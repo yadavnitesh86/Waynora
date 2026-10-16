@@ -20,6 +20,11 @@ export interface WaitingShellProps {
  *
  * Shows running elapsed time and honest timing expectation, with stop button.
  * Unnecessary information (specialists, bulky quotes) removed.
+ *
+ * Everything here sits on the app's type scale: the strip is small, but not
+ * by inventing 9px/11px sizes that fall off the scale and under AA contrast.
+ * The live band copy is allowed to wrap — a sentence cut mid-word by
+ * `truncate` is worse than a second line.
  */
 export function WaitingTimer({
   elapsedMs,
@@ -34,38 +39,39 @@ export function WaitingTimer({
   const readout = formatElapsed(elapsedMs);
 
   return (
-    <div className="mt-2 rounded-xl border border-gold/30 bg-surface/95 px-3 py-2 shadow-xs backdrop-blur-md">
+    <div className="rounded-xl border border-line bg-surface/95 px-md py-sm shadow-sm">
       <h3 className="sr-only">Waynora is planning your trip</h3>
 
-      <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="flex flex-col gap-xs sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-md">
         {/* Running time & expectation */}
-        <div className="flex items-center gap-2">
-          <div className="relative flex h-5 w-5 shrink-0 items-center justify-center text-accent">
-            <Spinner size="sm" />
-          </div>
+        <div className="flex flex-wrap items-center gap-sm">
+          <Spinner size="sm" />
 
-          <div className="flex items-baseline gap-1.5 font-mono text-[13px]">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-gold-muted">
+          <div className="flex items-baseline gap-2xs">
+            <span className="font-mono text-overline font-bold uppercase tracking-[0.14em] text-ink-muted">
               Elapsed
             </span>
-            <span className="font-mono text-body font-bold tabular-nums text-accent px-1.5 py-0.5 rounded bg-accent-soft/70">
+            <span className="font-mono text-small font-bold tabular-nums text-accent">
               {readout}
             </span>
           </div>
 
-          <span className="text-line/80">•</span>
+          <span
+            aria-hidden="true"
+            className="hidden h-1 w-1 rounded-full bg-line sm:block"
+          />
 
-          <span className="text-caption text-ink-muted font-medium">
+          <span className="text-caption text-ink-muted">
             Plans usually take 5 to 15 minutes.
           </span>
         </div>
 
-        {/* Stop control & live copy */}
-        <div className="flex items-center gap-2">
+        {/* Live copy & stop control */}
+        <div className="flex flex-wrap items-center gap-sm sm:justify-end">
           <div
             aria-live="polite"
             aria-atomic="true"
-            className="text-caption text-ink-muted/80 italic max-w-[180px] truncate"
+            className="max-w-[30ch] text-caption leading-snug text-ink-muted"
           >
             {copy}
           </div>
@@ -74,7 +80,7 @@ export function WaitingTimer({
             variant="secondary"
             size="sm"
             onClick={onStop}
-            className="h-7 rounded-full px-2.5 text-[11px] text-ink-muted hover:border-danger hover:text-danger hover:bg-danger/5 transition-all"
+            className="rounded-full px-sm transition-colors hover:border-danger hover:bg-danger/5 hover:text-danger"
           >
             Stop waiting
           </Button>
@@ -86,16 +92,19 @@ export function WaitingTimer({
 
 /**
  * 2048 game lounge component in the right-side companion slot (Points 2 & 3).
+ *
+ * Quiet frame, no gold: while a plan is being built, the lounge should read
+ * as a calm holding pattern, not as a third competing accent object.
  */
 export function WaitingLounge({ className = "" }: { className?: string }) {
   return (
     <div
-      className={`rounded-2xl border border-line/80 bg-surface/95 p-sm sm:p-md shadow-card backdrop-blur-md ${className}`}
+      className={`rounded-2xl border border-line bg-surface/95 p-md shadow-sm ${className}`}
     >
-      <h4 className="font-display text-small font-semibold text-ink tracking-tight">
+      <h4 className="font-display text-small font-semibold tracking-tight text-ink">
         Waiting lounge
       </h4>
-      <p className="mt-2xs text-caption text-ink-muted leading-relaxed mb-sm">
+      <p className="mt-2xs mb-sm text-caption leading-relaxed text-ink-muted">
         A game of 2048 to pass the time. Playing never affects your request.
       </p>
       <Game2048 />
@@ -108,6 +117,10 @@ export function WaitingLounge({ className = "" }: { className?: string }) {
  *
  * Left column: Streamlined waiting status & running chronograph.
  * Right column: 2048 expedition lounge in the dedicated companion space.
+ *
+ * The companion grid only splits from `xl`: below that the board would take
+ * a fixed 360px out of a chat column that is already narrowed by the history
+ * panel, leaving the itinerary no room to be read.
  */
 export default function WaitingShell({
   elapsedMs,
@@ -116,8 +129,8 @@ export default function WaitingShell({
 }: WaitingShellProps) {
   return (
     <div className="w-full transition-all">
-      <div className="grid gap-lg lg:grid-cols-[1fr_360px] lg:items-start w-full">
-        <div className="flex flex-col min-w-0">
+      <div className="grid w-full gap-lg xl:grid-cols-[1fr_320px] xl:items-start">
+        <div className="flex min-w-0 flex-col">
           <WaitingTimer elapsedMs={elapsedMs} onStop={onStop} />
         </div>
         {isWaiting ? <WaitingLounge /> : null}

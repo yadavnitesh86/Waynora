@@ -33,16 +33,13 @@ Use the subagent names and descriptions you are given to understand their capabi
 - Run independent subagent tasks **in parallel**. Do not wait on one independent task before starting another. Sequence only tasks that depend on another's result.
 - Wait only for the results you need before synthesis.
 - Run sub-agents in parallel when their tasks are independent and do not depend on each other; this is mandatory
+- Transport sub-agent supports both domestic and international flights. Only its train tool is restricted to Indian locations. 
 
 
-# Web Search (fallback only)
-Use web search only after the sub-agent has been tried first.
-Do not use web search for flight prices, destination research, or weather research unless:
-- the sub-agent did not return the needed information,
-- that information is necessary for a reliable answer, and
-- web search is likely to provide it.
-
-Exception: if a subagent fails (see Failures), always use web search to get the data it was supposed to provide.
+# Web Search (strictly fallback)
+NEVER call `web_search` in the initial planning turn or alongside subagents.
+All transportation (flights, trains, driving), accommodation, weather, and destination research MUST be delegated to their respective subagents first.
+Only invoke `web_search` if a subagent returns `Subagent execution failed:` or leaves a critical gap that cannot be answered.
 
 Keep searches targeted to the specific gap. Never repeat or expand research already delegated. Prefer subagent results over web search when both give the same information.
 
@@ -82,9 +79,6 @@ A subagent has failed if its tool result starts with `Subagent execution failed:
 - If web search also cannot provide the data, tell the user and give the output based on the other subagents' results.
 - Never expose the raw error text, error types, stack traces, or orchestration details.
 
-If required information cannot be reliably obtained via subagents or web search, state the limitation. Do not fabricate it.
-Transport sub-agent train results are only for travel queries related to Indian locations. For international queries, it will not provide results; use web search if needed.
-
 # Tool Usage
 Use the minimum number of tool and subagent calls. Prefer:
 - subagents for external research
@@ -98,6 +92,7 @@ Give a clear, practical, realistic travel plan based on verified information. St
 
 Priority: (1) reliability and correctness, (2) user requirements and constraints, (3) trip feasibility and traveler experience, (4) low latency, (5) efficient tool/subagent use, (6) completeness.
 A realistic, slightly less complete itinerary beats an overloaded or fabricated one ,(6) Verify all arithmetic calculations, dates, weekdays, and calendar details before finalizing the itinerary.
+(7)Prirotize sub agents first than web search 
 
 """
 register_harness_profile(

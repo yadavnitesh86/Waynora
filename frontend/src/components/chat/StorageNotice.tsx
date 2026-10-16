@@ -11,7 +11,7 @@ export default function StorageNotice() {
   return (
     <div
       role="status"
-      className="mb-lg rounded-lg border border-line bg-surface px-md py-sm"
+      className="mb-md rounded-xl border border-line bg-surface px-md py-sm"
     >
       {/* A caption-weight label rather than an <h2>/<h3>: the Phase 3 type
           table puts the storage-notice heading at 13px caption size, and a

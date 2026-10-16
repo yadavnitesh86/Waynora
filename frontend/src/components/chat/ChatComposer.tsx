@@ -1,23 +1,87 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import TextArea from "../ui/TextArea";
+import Button from "../ui/Button";
+
+/** Static id for the composer hint, wired to the textarea via aria-describedby. */
+const HINT_ID = "chat-composer-hint";
 
 export interface ChatComposerProps {
   onSubmit: (text: string) => void;
   busy?: boolean;
+  /**
+   * Controlled draft. Pass both `draft` and `onDraftChange` to let a parent
+   * prefill the composer (the empty state's starter prompts do exactly that);
+   * omit both and the composer keeps its own local draft as before.
+   */
+  draft?: string;
+  onDraftChange?: (value: string) => void;
+  /** Increment to move focus into the textarea (used after a prefill). */
+  focusToken?: number;
 }
 
-export default function ChatComposer({ onSubmit, busy }: ChatComposerProps) {
-  const [draft, setDraft] = useState("");
+/** Arrow glyph for the send control. */
+function SendGlyph() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="transition-transform duration-200 ease-out group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+    >
+      <path d="M5 12h14M12 5l7 7-7 7" />
+    </svg>
+  );
+}
+
+export default function ChatComposer({
+  onSubmit,
+  busy,
+  draft,
+  onDraftChange,
+  focusToken,
+}: ChatComposerProps) {
+  // Uncontrolled by default: every existing caller keeps working untouched.
+  const [localDraft, setLocalDraft] = useState("");
+  const isControlled = draft !== undefined && onDraftChange !== undefined;
+  const value = isControlled ? draft : localDraft;
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const lastFocusTokenRef = useRef(focusToken ?? 0);
+
+  const setValue = useCallback(
+    (next: string) => {
+      if (onDraftChange !== undefined) {
+        onDraftChange(next);
+      } else {
+        setLocalDraft(next);
+      }
+    },
+    [onDraftChange],
+  );
+
+  // A prefill from the empty state should land the caret in the field, not
+  // just fill an invisible box.
+  useEffect(() => {
+    if (focusToken === undefined || focusToken === lastFocusTokenRef.current) {
+      return;
+    }
+    lastFocusTokenRef.current = focusToken;
+    textareaRef.current?.focus();
+  }, [focusToken]);
 
   const handleSubmit = useCallback(() => {
-    const trimmed = draft.trim();
+    const trimmed = value.trim();
     if (trimmed.length > 0 && !busy) {
       onSubmit(trimmed);
-      setDraft("");
+      setValue("");
       textareaRef.current?.focus();
     }
-  }, [draft, busy, onSubmit]);
+  }, [value, busy, onSubmit, setValue]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -29,10 +93,10 @@ export default function ChatComposer({ onSubmit, busy }: ChatComposerProps) {
     [handleSubmit],
   );
 
-  const canSubmit = !busy && draft.trim().length > 0;
+  const canSubmit = !busy && value.trim().length > 0;
 
   return (
-    <div className="w-full rounded-2xl border border-gold/30 bg-surface/95 p-2 sm:p-2.5 shadow-card backdrop-blur-md transition-all focus-within:border-gold/60 focus-within:shadow-luxury">
+    <div className="w-full rounded-2xl border border-line bg-surface-raised/95 p-sm shadow-sm transition-colors duration-200 focus-within:border-gold/60">
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -41,57 +105,47 @@ export default function ChatComposer({ onSubmit, busy }: ChatComposerProps) {
         aria-busy={busy || undefined}
         className="flex flex-col"
       >
-        {busy && (
+        {busy ? (
           <div
             role="status"
-            className="mb-1.5 flex items-center gap-2 rounded-lg border border-accent/25 bg-accent-soft/80 px-2.5 py-1 text-caption text-accent"
+            className="mb-xs flex items-center gap-xs rounded-lg border border-accent/25 bg-accent-soft/80 px-sm py-xs text-caption text-accent"
           >
             <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-accent" />
             </span>
-            A request is already running. Your text stays here until it finishes.
+            A request is already running. Your text stays here until it
+            finishes.
           </div>
-        )}
+        ) : null}
 
         <TextArea
           ref={textareaRef}
           compact
           label="Your trip request"
           placeholder="Example: 10 days in Japan in April, two people, mid-range budget."
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          className="text-body transition-all"
+          aria-describedby={HINT_ID}
+          className="text-body"
         />
 
-        <div className="mt-1 flex items-center justify-between gap-2 pt-1 border-t border-line/30">
-          <p className="text-[11px] text-ink-muted/80 truncate">
+        <div className="mt-xs flex items-center justify-between gap-sm border-t border-line/60 pt-xs">
+          <p id={HINT_ID} className="text-caption text-ink-muted">
             Press Enter to send. Shift+Enter starts a new line.
           </p>
 
-          <button
+          <Button
             type="submit"
+            variant="primary"
+            size="sm"
             disabled={!canSubmit}
             aria-label="Send request"
-            className="group inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-gold/40 bg-accent text-accent-ink shadow-2xs transition-all duration-200 hover:scale-105 hover:shadow-luxury active:scale-95 disabled:opacity-35 disabled:hover:scale-100 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-focus"
+            className="group w-11 shrink-0 rounded-full p-0"
           >
-            <span className="sr-only">Send request</span>
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-              className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-            >
-              <path d="M5 12h14M12 5l7 7-7 7" />
-            </svg>
-          </button>
+            <SendGlyph />
+          </Button>
         </div>
       </form>
     </div>

@@ -228,9 +228,9 @@ describe("Chat responsive layout contracts (QUAL-04)", () => {
     expect(
       await screen.findByText("Paris itinerary please"),
     ).toBeInTheDocument();
-    // The persistent md+ panel stays put, as a static (non-overlay) column.
+    // The persistent md+ panel stays put, as a pinned (non-overlay) column.
     expect(sidebarNav()).toHaveClass("visible", "translate-x-0");
-    expect(sidebarNav()).toHaveClass("md:static", "md:shrink-0");
+    expect(sidebarNav()).toHaveClass("md:sticky", "md:shrink-0");
   });
 });
 
@@ -244,7 +244,7 @@ describe("Chat waiting lounge responsiveness (QUAL-04, GAME-01)", () => {
       name: "2048 game board",
     });
 
-    // The lounge card lives inside the shell's lg two-column grid.
+    // The lounge card lives inside the shell's two-column grid.
     const lounge = screen.getByRole("heading", {
       level: 4,
       name: "Waiting lounge",
@@ -252,8 +252,8 @@ describe("Chat waiting lounge responsiveness (QUAL-04, GAME-01)", () => {
     const grid = lounge.closest("div")?.parentElement;
     expect(grid?.className).toContain("grid");
     expect(grid?.className).toContain("gap-lg");
-    expect(grid?.className).toContain("lg:grid-cols-[1fr_360px]");
-    expect(grid?.className).toContain("lg:items-start");
+    expect(grid?.className).toContain("xl:grid-cols-[1fr_320px]");
+    expect(grid?.className).toContain("xl:items-start");
 
     // The board itself is fluid: it fills its column on small viewports and
     // caps at max-w-md on wide ones — no fixed pixel width anywhere.

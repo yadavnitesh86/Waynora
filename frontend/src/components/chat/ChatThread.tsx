@@ -19,6 +19,9 @@ export interface ChatThreadProps {
  * the assistant `Markdown` wrapper already owns its own `aria-live="polite"`.
  * That is the double-announcement rule, and it is binding.
  *
+ * Turn spacing belongs to the list, not to the turns: one gap token means a
+ * conversation of thirty turns breathes exactly as evenly as one of three.
+ *
  * Memoized so the per-second elapsed tick (03-03) re-renders only the waiting
  * shell and the in-flight footer, never the transcript or `Markdown`.
  */
@@ -28,22 +31,23 @@ function ChatThread({
   onRetry,
 }: ChatThreadProps) {
   return (
-    <ol aria-label="Conversation" className="mb-lg">
-      {messages.map((message) =>
-        message.role === "user" ? (
-          <li key={message.id} className="mb-lg">
+    <ol
+      aria-label="Conversation"
+      className="flex flex-col gap-lg sm:gap-xl"
+    >
+      {messages.map((message) => (
+        <li key={message.id} className="min-w-0">
+          {message.role === "user" ? (
             <UserMessage
               message={message}
               isActive={message.id === activeMessageId}
               onRetry={onRetry}
             />
-          </li>
-        ) : (
-          <li key={message.id} className="mb-lg">
+          ) : (
             <AssistantMessage message={message} />
-          </li>
-        ),
-      )}
+          )}
+        </li>
+      ))}
     </ol>
   );
 }

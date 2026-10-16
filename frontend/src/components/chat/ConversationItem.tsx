@@ -56,6 +56,76 @@ export interface ConversationItemProps {
   onCancelDelete: () => void;
 }
 
+/** Rename glyph — 16px, currentColor, 1.5 stroke, per the icon contract. */
+function RenameGlyph() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M10.8 2.7l2.5 2.5-7.3 7.3-3.3.8.8-3.3 7.3-7.3z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/** Delete glyph — same contract. */
+function TrashGlyph() {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 16 16"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M2.75 4.25h10.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+      <path
+        d="M11.5 4.25V2.75a1 1 0 0 0-1-1h-3.5a1 1 0 0 0-1 1v1.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M4.25 4.25l.5 9h6.5l.5-9"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M6.75 6.75v4.5M9.25 6.75v4.5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+/**
+ * Row action styling. The controls stay in the accessibility tree at every
+ * width — they are revealed with opacity, never `display: none` — and
+ * `focus-within` means a keyboard user Tab-ing into the row sees them
+ * appear rather than losing them off-screen. Touch widths never hide them,
+ * because there is no hover to reveal them with.
+ */
+const ROW_ACTION = [
+  "shrink-0 text-ink-muted opacity-100 transition-opacity duration-150",
+  "md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100",
+].join(" ");
+
 /**
  * One conversation in the history sidebar (PERSIST-06).
  *
@@ -65,6 +135,10 @@ export interface ConversationItemProps {
  * the destructive action so a keyboard user never loses their place).
  * Rename and confirm state live in `ChatSidebar` so selecting another
  * conversation cancels an edit instead of leaving it stranded.
+ *
+ * The active row is marked by tint plus a gold hairline — the accent is
+ * spent on state, not on decoration, so thirty conversations in the list do
+ * not all read as gold objects competing with each other.
  */
 export default function ConversationItem({
   conversation,
@@ -164,12 +238,12 @@ export default function ConversationItem({
           role="group"
           aria-label={`Delete ${conversation.title}`}
           onKeyDown={handleConfirmKeyDown}
-          className="rounded-md border border-line bg-surface-raised px-sm py-sm"
+          className="rounded-xl border border-line bg-surface-raised px-md py-sm shadow-sm"
         >
           <p className="text-small font-medium text-ink">
             Delete this chat? This can&apos;t be undone.
           </p>
-          <div className="mt-sm flex items-center gap-sm">
+          <div className="mt-sm flex items-center gap-xs">
             <Button
               ref={confirmRef}
               variant="secondary"
@@ -189,12 +263,12 @@ export default function ConversationItem({
   }
 
   return (
-    <li className="px-1 py-0.5">
+    <li className="px-2xs py-3xs">
       <div
         className={[
-          "flex items-center gap-1 rounded-xl border px-1.5 transition-all duration-150",
+          "group flex items-center gap-3xs rounded-xl border px-xs transition-colors duration-150",
           isActive
-            ? "border-gold/60 bg-accent-soft shadow-2xs"
+            ? "border-gold/40 bg-accent-soft/60"
             : "border-transparent hover:border-line/70 hover:bg-surface-raised",
         ].join(" ")}
       >
@@ -202,12 +276,12 @@ export default function ConversationItem({
           type="button"
           onClick={() => onSelect(conversation.id)}
           aria-current={isActive ? "true" : undefined}
-          className="min-w-0 flex-1 rounded-lg px-sm py-2 text-left"
+          className="min-w-0 flex-1 rounded-lg px-sm py-xs text-left"
         >
           <span className="block truncate text-small font-semibold text-ink">
             {conversation.title}
           </span>
-          <span className="mt-0.5 block text-[11px] font-mono text-ink-muted">
+          <span className="mt-3xs block font-mono text-overline text-ink-muted">
             {formatTimestamp(conversation.updatedAt)}
           </span>
         </button>
@@ -216,60 +290,18 @@ export default function ConversationItem({
           size="sm"
           aria-label={`Rename ${conversation.title}`}
           onClick={() => onStartRename(conversation.id)}
+          className={ROW_ACTION}
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M10.8 2.7l2.5 2.5-7.3 7.3-3.3.8.8-3.3 7.3-7.3z"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <RenameGlyph />
         </Button>
         <Button
           variant="ghost"
           size="sm"
           aria-label={`Delete ${conversation.title}`}
           onClick={() => onStartDelete(conversation.id)}
+          className={ROW_ACTION}
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 16 16"
-            fill="none"
-            aria-hidden="true"
-          >
-            <path
-              d="M2.75 4.25h10.5"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-            <path
-              d="M11.5 4.25V2.75a1 1 0 0 0-1-1h-3.5a1 1 0 0 0-1 1v1.5"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M4.25 4.25l.5 9h6.5l.5-9"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinejoin="round"
-            />
-            <path
-              d="M6.75 6.75v4.5M9.25 6.75v4.5"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-            />
-          </svg>
+          <TrashGlyph />
         </Button>
       </div>
     </li>

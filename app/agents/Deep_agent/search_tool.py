@@ -11,8 +11,12 @@ client = Parallel(api_key=os.getenv("PARALLEL_API_KEY"))
 @tool
 async def web_search(objective: str, search_queries: list[str]) -> str:
     """
-    Search the live web for current events, prices, and recent facts.
-
+     FALLBACK ONLY. Search the live web ONLY when a subagent has explicitly failed or did not return required data.
+    STRICT RULES:
+    - NEVER call this tool on the first turn or in parallel with subagents.
+    - NEVER use this tool for flight search, hotel booking, weather, or attraction research as a primary choice.
+    - Specialized subagents (transport_research, etc.) MUST always be called first.
+    - Use this tool ONLY if a subagent returns an error/failure or cannot provide essential information.
     objective: one concise, self-contained sentence describing what you want to find.
     search_queries: 3 diverse keyword queries (3-6 words each). No sentences, no site: operators.
     """
