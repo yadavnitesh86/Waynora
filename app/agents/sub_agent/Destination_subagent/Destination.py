@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain.agents.middleware import ToolCallLimitMiddleware
 from langchain_mcp_adapters.client import MultiServerMCPClient
+from app.portkey.wrap_error import wrap_error
 
 from app.portkey.llm import get_llm
 
@@ -110,6 +111,7 @@ async def destination_initiation():
         system_prompt=SYSTEM_PROMPT,
         response_format=DestinationResearchResult,
         middleware=[
+            wrap_error,
             ToolCallLimitMiddleware(
                 tool_name="tavily_search", run_limit=4, exit_behavior="continue"
             ),

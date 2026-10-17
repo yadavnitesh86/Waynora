@@ -32,6 +32,7 @@ async def get_llm(model_type: str) -> ChatOpenAI:
         raise ValueError(f"Portkey config for '{model_type}' is not configured.")
     if model_type == "heavy":
         streamingH = True
+        
     else:
         streamingH = False
 
@@ -51,7 +52,7 @@ async def get_llm(model_type: str) -> ChatOpenAI:
 
 def get_llm_for_summarization():
     return ChatOpenAI(
-        model_name="sensenova-6.8-flash-lite",
+        model_name=os.getenv("model_name_s"),
         api_key=os.getenv("OPENAI_API_KEY1"),
-        base_url="https://api.hcnsec.cn/v1",
+        base_url=os.getenv("base_url_s"),
     )

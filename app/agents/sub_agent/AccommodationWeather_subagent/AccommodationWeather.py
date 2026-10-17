@@ -5,6 +5,7 @@ from deepagents import CompiledSubAgent
 from dotenv import load_dotenv
 from langchain.agents import create_agent
 from langchain_mcp_adapters.client import MultiServerMCPClient
+from app.portkey.wrap_error import wrap_error
 
 from app.agents.sub_agent.AccommodationWeather_subagent.schema import (
     AccommodationWeatherResult,
@@ -121,6 +122,7 @@ async def create_AW_agent():
         tools=mcp_tools,
         system_prompt=SYSTEM_PROMPT,
         response_format=AccommodationWeatherResult,
+        middleware=[wrap_error]
     )
 
 

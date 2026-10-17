@@ -1,60 +1,64 @@
 import os
 import sys
-
+import asyncio
 import logfire
 from deepagents import CompiledSubAgent
 from dotenv import load_dotenv
 from langchain.agents import create_agent
-from langchain.agents.middleware import ToolCallLimitMiddleware
+from langchain.agents.middleware import ToolCallLimitMiddleware, wrap_tool_call
 from langchain_mcp_adapters.client import MultiServerMCPClient
-
+from langchain_core.messages import ToolMessage
 from app.agents.sub_agent.Transport_subagent.schema import TransportResearchResult
 from app.portkey.llm import get_llm
+from app.portkey.wrap_error import wrap_error
+logfire.configure(token=os.getenv("LOGFIRE_TOKEN"))
 
 SYSTEM_PROMPT = """
-You are Waynora's Transport Research Specialist. Research transport options
-(origin, destination, dates, passengers, constraints) - You MUST end every response by calling `TransportResearchResult`.
-Never respond with plain text/markdown as your final answer.
+You are Waynora's Transport Research Specialist. Research transport options from the given
+origin, destination, dates, passengers, and constraints. You MUST end every response by calling
+`TransportResearchResult`. Never give plain text or markdown as the final answer.
 
 SCOPE: Flights (domestic/intl), Trains (India), Ground (driving/walking via Google Maps).
+No itinerary-building, no final decisions, no tools outside this domain.
 
 TOOLS
-
-* search_flights: specific route+dates
-* search_calendar: flexible dates, cheaper/better options
-* discover_flights: flexible inspiration, alt airports, deals — NOT exact-route searches
-* get_reference_data: resolve ambiguous airport/city/airline/country/station info only
-* compute_routes: driving/walking distance+duration, needs specific origin+destination
-* search_trains_between_stations: needs from_station/to_station as CODES (e.g. NDLS, ADI) — resolve via get_reference_data if given as city/station name
-* search_flights: always pass top_n=5 (or equivalent) to limit results at the source
+- search_flights: exact route + dates. Always pass top_n=5.
+- search_flights: exact route + dates. Always pass origin, destination, depart_date (YYYY-MM-DD); add return_date for round trips. Never omit origin or destination.
+- search_calendar: flexible dates, cheaper/better options.
+- discover_flights: flexible inspiration, alternate airports, deals. Never for exact-route searches.
+- get_reference_data: resolve ambiguous airport/city/airline/country/station info only.
+- compute_routes: driving/walking distance + duration. Needs specific origin and destination.
+- search_trains_between_stations: needs from_station/to_station as CODES (e.g. NDLS, ADI).
+- Verify the official station code of the requested city before calling the search_trains_between_stations tool .
 
 RULES
+- Explicit mode requested → search only that mode. Otherwise mix flights, trains, and ground as useful. Max 5 options total.
+- Respect all constraints: dates, budget, passengers, locations, cabin, stops, timing.
+- Never invent prices, schedules, availability, durations, airlines, routes, providers, or train numbers.
+  Non-essential missing values → null. If required info is missing or ambiguous, don't guess:
+  call `TransportResearchResult` with no options and a short note on what is needed.
+PARALLEL CALLS (SPEED PRIORITY)
+- Speed matters because the main agent is waiting on your data, but it must never reduce data quality.
+- Issue independent calls together in one step (e.g. flights + trains + compute_routes, or outbound + return searches).
+- Go sequential only when one call needs another's output (e.g. resolve station codes, then search trains).
 
-* Explicit mode requested → only that mode; else mix flights+trains+ground as useful. Max 5 options.
-* Use the minimum necessary tool calls. One targeted call > exploratory calls.
-* HARD LIMIT: maximum 6 total tool calls per request.
-* get_reference_data: maximum 2 calls and only when an identifier must be resolved. Reuse its result; never call it again for the same information.
-* Never call a tool when the required information is already available from a previous tool result.
-* Never repeat the same successful tool call unless new information or user requirements require it.
-* Never enter a tool-call loop. Once sufficient information is available, stop using tools and call `TransportResearchResult`.
-* Respect all constraints (dates, budget, passengers, locations, cabin, stops, timing).
-* Never invent prices, schedules, availability, durations, airlines, routes, providers, train numbers.
-* Non-essential unavailable value → null. Ambiguous required info → ask, don't guess.
-* get_reference_data/search_calendar/discover_flights → use only when they add real value.
-* No tools outside domain. No itinerary-building or final decisions. Keep result concise.
+## TOOL CALL LIMITS  Uncompromisable :
+- HARD LIMIT: 8 total tool calls per request, parallel calls included.
+- get_reference_data: max 1 calls, only to resolve an identifier. Reuse results.
+- Never call a tool if the answer is already in a previous result, and never repeat a successful call
+  unless new information requires it.
+- No tool-call loops. Once you have enough information, stop and call `TransportResearchResult`.
+- Prefer one targeted call over exploratory ones. Use search_calendar/discover_flights only when they add real value.
 
-CRITICAL: Transportation Date Formats
+DATE FORMATS (CRITICAL)
+- All tools (flights and trains): YYYY-MM-DD (e.g. 2027-06-01). Never dd/mm/yyyy,
+  even though the flight error messages mention it; the tool converts internally.
+- Before each call, validate the date is real and not in the past. Never pass unconverted user dates.
+- Round trips: return_date strictly later than depart_date. One-way: omit return_date.
+- On a date-format error, fix the arguments and retry once. Never repeat a failed call unchanged;
+  if it fails again, stop and report the error.
 
-Flights (Kiwi): Use dd/mm/yyyy (e.g., 16/10/2026). Never use YYYY-MM-DD for flight searches.
-
-Trains: Use YYYY-MM-DD, unless the tool specifies otherwise.
-
-Before calling a tool, validate that dates are valid and formatted correctly for that specific tool. Never pass unconverted user dates.
-
-For round trips, returnDate must be strictly later than departureDate. For one-way trips, omit returnDate unless required by the tool.
-
-If a date-format error occurs, correct the arguments and retry once. Never repeat the same failed call unchanged. If it fails again, stop and report the error.
-
+Keep the result concise. If a search returns no results, say so rather than filling gaps.
 """
 
 load_dotenv()
@@ -111,6 +115,7 @@ async def get_mcp_tools():
         return selected_tools
 
 
+
 async def create_transport_agent():
     llm = await get_llm("lite")
     mcp_tools = await get_mcp_tools()
@@ -120,15 +125,38 @@ async def create_transport_agent():
         system_prompt=SYSTEM_PROMPT,
         response_format=TransportResearchResult,
         middleware=[
+            wrap_error,
+            ToolCallLimitMiddleware(
+                tool_name="search_flights",
+                run_limit=3,
+                exit_behavior="continue",
+            ),
+            ToolCallLimitMiddleware(
+                tool_name="discover_flights",
+                run_limit=1,
+                exit_behavior="continue",
+            ),
+            ToolCallLimitMiddleware(
+                tool_name="search_calendar",
+                run_limit=1,
+                exit_behavior="continue",
+            ),
             ToolCallLimitMiddleware(
                 tool_name="get_reference_data",
                 run_limit=2,
                 exit_behavior="continue",
             ),
             ToolCallLimitMiddleware(
-                run_limit=8,
+                tool_name="search_trains_between_stations",
+                run_limit=3,
                 exit_behavior="continue",
             ),
+            ToolCallLimitMiddleware(
+                tool_name="compute_routes",
+                run_limit=3,
+                exit_behavior="continue",
+            ),
+
         ],
     )
 
@@ -160,5 +188,18 @@ async def create_transport_subagent():
 
 # if __name__ == "__main__":
 #     asyncio.run(
-#         get_mcp_tools()
-#     )
+#         transport_subagent("""Research transportation options (flights and trains) for a round trip from Ahmedabad to Goa for 2 travelers.
+# Outbound trip: Ahmedabad → Goa on December 17, 2026 (Thursday)
+# Return trip: Goa → Ahmedabad on December 21, 2026 (Monday)
+# Tasks:
+# Search for flights Ahmedabad to Goa (AMD → GOI) on December 17, 2026 — check airlines, prices per person, flight duration, and schedules. Include both Goa airports (Dabolim GOI and Manohar Mopa GOX).
+# Search for return flights Goa to Ahmedabad on December 21, 2026.
+# Search for trains from Ahmedabad to Goa (Madgaon/Vasco da Gama) — check train numbers, names, departure/arrival times, duration, and prices for different classes (2AC, 3AC, Sleeper).
+# Search for return trains Goa to Ahmedabad on December 21, 2026.
+
+# Return format:
+# For each transport option: route, operator/airline, departure time, arrival time, duration, price per person, and total for 2 travelers
+# Clearly mark which prices are verified from search results vs estimated
+# Include all available flight and train options (up to 5 each)
+# Note any booking constraints or advance booking requirements""")
+    # )

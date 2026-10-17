@@ -12,6 +12,7 @@ from app.agents.sub_agent.Destination_subagent.Destination import (
 )
 from app.agents.sub_agent.Transport_subagent.Transport import create_transport_subagent
 from app.portkey.llm import get_llm
+from datetime import date
 
 load_dotenv()
 
@@ -29,6 +30,7 @@ Use supplied subagent descriptions to select the minimum necessary specialists. 
 - Wait only for results needed to produce a reliable answer.
 - The Transport subagent handles domestic and international flights. Its train tool is restricted to Indian locations.
 - Prioritize subagents over web_search.
+-Today’s date is provided by default in every question. Use it to resolve missing or relative dates, include resolved dates in subagent prompts, and verify them before replying.
 
 # Web Search (Fallback Only)
 Never call web_search during initial planning or alongside subagents.
@@ -125,9 +127,11 @@ REFUSAL = "Sorry, I can't help with that request. I'm happy to help with travel-
 
 async def ask(agent, question: str, thread_id: str) -> str:
     config = {"configurable": {"thread_id": thread_id}}
+    today = date.today().strftime("%Y-%m-%d, %A")
+    content = f"[Today's date: {today}]\n\n{question}"
     try:
         result = await agent.ainvoke(
-            {"messages": [{"role": "user", "content": question}]},
+            {"messages": [{"role": "user", "content": content}]},
             config=config,
         )
         return result["messages"][-1].content
