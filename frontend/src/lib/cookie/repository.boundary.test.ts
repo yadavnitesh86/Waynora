@@ -6,6 +6,7 @@ import {
   dataCookieName,
 } from "./codec";
 import {
+  STORAGE_KEY,
   readConversations,
   writeConversations,
 } from "./repository";
@@ -79,11 +80,12 @@ function makeSampleConversation(id: string, overrides: Partial<Conversation> = {
   };
 }
 
-describe("Cookie Repository & Codec Boundary Hardening (QUAL-03)", () => {
+describe("Repository & Codec Boundary Hardening (QUAL-03)", () => {
   let cookieJar: ReturnType<typeof createCookieJar>;
   let originalDocumentCookie: PropertyDescriptor | undefined;
 
   beforeEach(() => {
+    window.localStorage.clear();
     cookieJar = createCookieJar();
     originalDocumentCookie = Object.getOwnPropertyDescriptor(
       document,
@@ -99,6 +101,7 @@ describe("Cookie Repository & Codec Boundary Hardening (QUAL-03)", () => {
   });
 
   afterEach(() => {
+    window.localStorage.clear();
     if (originalDocumentCookie) {
       Object.defineProperty(document, "cookie", originalDocumentCookie);
     }
@@ -159,7 +162,21 @@ describe("Cookie Repository & Codec Boundary Hardening (QUAL-03)", () => {
   });
 
   describe("Schema tampering and version boundary resilience", () => {
-    it("safely falls back to empty state on future or unknown schema versions", () => {
+    it("safely falls back to empty state on future or unknown schema versions in localStorage", () => {
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          version: 2,
+          conversations: [makeSampleConversation("convo-1")],
+        }),
+      );
+
+      const readBack = readConversations();
+      expect(readBack.conversations).toEqual([]);
+      expect(readBack.recovered).toBe(false);
+    });
+
+    it("safely falls back to empty state on future or unknown schema versions in legacy cookies", () => {
       const valid = makeSampleConversation("convo-1");
       const { index, chunks } = encodeEnvelope({
         version: 1,
@@ -248,21 +265,22 @@ describe("Cookie Repository & Codec Boundary Hardening (QUAL-03)", () => {
       expect(result.recovered).toBe(false);
     });
 
-    it("salvages intact conversations when one shard is lost or deleted (partial shard drop)", () => {
+    it("salvages intact conversations when migrating a legacy cookie with a lost shard", () => {
       const c1 = makeSampleConversation("survivor-1");
       const c2 = makeSampleConversation("lost-2");
 
-      writeConversations([c1, c2]);
+      const { index, chunks } = encodeEnvelope({
+        version: 1,
+        conversations: [c1, c2],
+      });
 
-      // Intentionally delete or corrupt data cookie shard for c2
-      // In repository.ts, chunks are written sequentially
-      // Let's find and delete the last shard
-      const names = Array.from(cookieJar.rawMap.keys());
-      const dataCookies = names.filter((n) => n.startsWith("waynora_chat_") && n !== INDEX_COOKIE);
-      expect(dataCookies.length).toBeGreaterThanOrEqual(2);
+      document.cookie = `${INDEX_COOKIE}=${encodeURIComponent(index)}`;
+      chunks.forEach((chunk, i) => {
+        document.cookie = `${dataCookieName(i)}=${encodeURIComponent(chunk)}`;
+      });
 
-      // Delete the second data cookie
-      cookieJar.rawMap.delete(dataCookies[1]!);
+      // Delete the second data cookie shard
+      cookieJar.rawMap.delete(dataCookieName(1));
 
       const result = readConversations();
       expect(result.recovered).toBe(true);
@@ -270,12 +288,8 @@ describe("Cookie Repository & Codec Boundary Hardening (QUAL-03)", () => {
       expect(result.conversations[0]?.id).toBe("survivor-1");
     });
 
-    it("handles corrupted base64 or garbage data inside a shard without throwing", () => {
-      const c1 = makeSampleConversation("valid-1");
-      writeConversations([c1]);
-
-      // Corrupt data cookie 0 with unparseable garbage
-      cookieJar.rawMap.set(dataCookieName(0), encodeURIComponent("GARBAGE_PAYLOAD_%$#@!*&"));
+    it("handles corrupted base64 or garbage data in localStorage without throwing", () => {
+      window.localStorage.setItem(STORAGE_KEY, "GARBAGE_PAYLOAD_%$#@!*&");
 
       expect(() => {
         const result = readConversations();
