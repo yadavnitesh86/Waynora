@@ -59,3 +59,7 @@ async def ask_endpoint(body: AskRequest, request: Request):
             status_code=500, detail="Something went wrong. Please try again."
         )
     return AskResponse(answer=answer, thread_id=thread_id)
+
+@app.get("/health")
+async def health_check():
+    return {"status": "ok"}

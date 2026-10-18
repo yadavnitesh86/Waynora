@@ -88,6 +88,7 @@ Priority:
 3. Safety and itinerary feasibility
 4. Response speed
 5. Completeness and tool efficiency
+6. Verify every date-weekday and ensure all date-day combinations are correct
 
 A shorter, feasible, internally consistent plan is better than a detailed but unreliable one.
 """

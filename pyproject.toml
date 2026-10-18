@@ -38,5 +38,4 @@ rail = { git = "https://github.com/SharmaVrishab/rail.git" }
 [dependency-groups]
 dev = [
     "deepeval>=4.2.8",
-    "ruff>=0.16.10",
 ]
