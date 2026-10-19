@@ -22,12 +22,12 @@ SCOPE: Flights (domestic/intl), Trains (India), Ground (driving/walking via Goog
 No itinerary-building, no final decisions, no tools outside this domain.
 
 ## TOOLS and crictal rules
+- If a tool returns  “Tool call limit reached,” or “exceeded limit,” stop immediately and do not retry or use other tools to bypass it.
 - search_flights: exact route + dates. Always pass top_n=5.
 - search_flights: exact route + dates. Always pass origin, destination, depart_date (YYYY-MM-DD); add return_date for round trips. Never omit origin or destination.
 - search_calendar: flexible dates, cheaper/better options.
 - discover_flights: flexible inspiration, alternate airports, deals. Never for exact-route searches.
-- get_reference_data: resolve ambiguous airport/city/airline/country/station info only.
-- compute_routes: driving/walking distance + duration. Needs specific origin and destination.
+- get_reference_data: Use only for flight-related code lookups to resolve ambiguous airport, city, airline, or country info. It does not provide train station codes, so verify Indian train station codes separately.- compute_routes: driving/walking distance + duration. Needs specific origin and destination.
 - search_trains_between_stations: needs from_station/to_station as CODES (e.g. NDLS, ADI).
 - Verify the official station code of the requested city before calling the search_trains_between_stations tool .
 
@@ -90,6 +90,9 @@ async def get_mcp_tools():
                         "-m",
                         "app.agents.sub_agent.Transport_subagent.server",
                     ],
+                    "env": {
+                        "RAILRADAR_API_KEY": os.environ["RAILRADAR_API_KEY"],
+                    },
                 },
                 "google_maps": {
                     "transport": "streamable_http",
@@ -179,28 +182,15 @@ async def create_transport_subagent():
 
 # Bellow code is for Testing while developing the sub agent
 
-# async def transport_subagent(Instruction: str):
-#     agent = await create_transport_agent()
-#     result = await agent.ainvoke(
-#         {"messages": [{"role": "user", "content": Instruction}]}
-#     )
-#     print(result["messages"][-1].content)
+async def transport_subagent(Instruction: str):
+    agent = await create_transport_agent()
+    result = await agent.ainvoke(
+        {"messages": [{"role": "user", "content": Instruction}]}
+    )
+    print(result["messages"][-1].content)
 
 
-# if __name__ == "__main__":
-#     asyncio.run(
-#         transport_subagent("""Research transportation options (flights and trains) for a round trip from Ahmedabad to Goa for 2 travelers.
-# Outbound trip: Ahmedabad → Goa on December 17, 2026 (Thursday)
-# Return trip: Goa → Ahmedabad on December 21, 2026 (Monday)
-# Tasks:
-# Search for flights Ahmedabad to Goa (AMD → GOI) on December 17, 2026 — check airlines, prices per person, flight duration, and schedules. Include both Goa airports (Dabolim GOI and Manohar Mopa GOX).
-# Search for return flights Goa to Ahmedabad on December 21, 2026.
-# Search for trains from Ahmedabad to Goa (Madgaon/Vasco da Gama) — check train numbers, names, departure/arrival times, duration, and prices for different classes (2AC, 3AC, Sleeper).
-# Search for return trains Goa to Ahmedabad on December 21, 2026.
-
-# Return format:
-# For each transport option: route, operator/airline, departure time, arrival time, duration, price per person, and total for 2 travelers
-# Clearly mark which prices are verified from search results vs estimated
-# Include all available flight and train options (up to 5 each)
-# Note any booking constraints or advance booking requirements""")
-    # )
+if __name__ == "__main__":
+    asyncio.run(
+        transport_subagent("""give me train option between ahmedabad to jaipur using search_trains_between_stations tool date 20-10-2026""")
+    )

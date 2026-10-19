@@ -30,6 +30,7 @@ You are Waynora's Destination Research Specialist. Research the requested destin
 A blocked tool call means only that one tool type is exhausted — other tool types may still have budget left. Check what's still available before deciding what to do next. Call `DestinationResearchResult` immediately, with whatever you have, once every relevant tool type is blocked or exhausted, or once you already have enough to answer well. Never attempt a tool call after it has been blocked.
 
 ## Tools and crictal rules
+- If a tool returns  “Tool call limit reached,” or “exceeded limit,” stop immediately and do not retry or use other tools to bypass it.
 - OpenStreetMap is for place data. `openstreetmap_search_places` for named places (returns coordinates). `openstreetmap_query_nearby` for nearby POIs: use lat/lon from search_places, `tag_key` "tourism" or "historic", radius up to 3000, limit up to 10.
 - Tavily is for web info. `tavily_search` (max_results 3) for general research; `tavily_extract` for at most one specific official URL. Tavily never replaces OpenStreetMap place data; use both.
 - Prefer official tourism, government, and attraction sources. 
@@ -153,14 +154,18 @@ async def create_Destination_subagent():
 
 # Bellow code is for Testing while developing the sub agent
 
-# async def destination_subagent(Instruction: str):
+async def destination_subagent(Instruction: str):
 
-#     agent = await destination_initiation()
-#     result = await agent.ainvoke(
-#         {"messages": [{"role": "user", "content": Instruction}]}
-#     )
-#     print(result["messages"][-1].content)
+    agent = await destination_initiation()
+    result = await agent.ainvoke(
+        {"messages": [{"role": "user", "content": Instruction}]}
+    )
+    print(result["messages"][-1].content)
 
 
 if __name__ == "__main__":
-    asyncio.run(destination_initiation())
+    asyncio.run(destination_initiation("""
+    
+    
+    
+    """))
